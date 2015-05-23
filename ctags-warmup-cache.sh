@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-CTAGS_CONFIG='/home/nrocco/.dotfiles/ctags/ctags-php'
+CTAGS_CONFIG='/home/nrocco/ide/ctags-php'
 GIT_DIR=`git rev-parse --git-dir`
 
 if [[ '--vendors' == "$1" ]]
