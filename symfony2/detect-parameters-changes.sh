@@ -8,5 +8,5 @@ fi
 
 if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- app/config/parameters.yml.dist
 then
-    echo "==> changes in parameters.yml detected! you might want to check it out."
+    echo "[symfony2/detect-parameters-changes] Changes in parameters.yml detected! you might want to check it out."
 fi

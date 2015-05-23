@@ -8,5 +8,5 @@ fi
 
 if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- composer.json composer.lock
 then
-    echo "==> changes in composer detected! you might want to run composer install"
+    echo "[symfony2/detect-composer-changes] Changes in composer detected! you might want to run composer install"
 fi

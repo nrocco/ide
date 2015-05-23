@@ -8,5 +8,5 @@ fi
 
 if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- app/DoctrineMigrations
 then
-    echo "==> changes in migrations detected! you might want to run php app/console doctrine:migrations:migrate"
+    echo "[symfony2/detect-database-changes] Changes in migrations detected! you might want to run php app/console doctrine:migrations:migrate"
 fi
