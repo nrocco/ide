@@ -1,0 +1,4 @@
+#!/bin/sh
+export IGNORE_DIRS="app/cache app/logs"
+/home/nrocco/ide/ctags-warmup-cache.sh
+/home/nrocco/ide/ctrlp-warmup-cache.sh
