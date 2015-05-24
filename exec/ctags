@@ -1,12 +1,7 @@
 #!/bin/bash -e
 IDE_PREFIX="ide/ctags"
 
-if [ -z "$IDE_PATH" ]
-then
-    >&2 echo "This script cannot be directly invocated"
-    exit 1
-fi
-
+test -z "$IDE_PATH" && exit 1
 
 # Include common functions
 . "$IDE_PATH/lib/functions.sh"

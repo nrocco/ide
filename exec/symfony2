@@ -1,22 +1,13 @@
 #!/bin/bash -e
 IDE_PREFIX="ide/symfony2"
 
-if [ -z "$IDE_PATH" ]
-then
-    >&2 echo "This script cannot be directly invocated"
-    exit 1
-fi
+test -z "$IDE_PATH" && exit 1
 
+# Include common functions
 . "$IDE_PATH/lib/functions.sh"
 
 
 function __detect_composer_changes() {
-    if [[ -z $1 || -z $2 ]]
-    then
-        logerr "Usage: ide symfony2 $SUBCOMMAND from to"
-        exit 1
-    fi
-
     if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- composer.json composer.lock
     then
         logerr "changes in composer detected! you might want to run composer install"
@@ -25,12 +16,6 @@ function __detect_composer_changes() {
 
 
 function __detect_database_changes() {
-    if [[ -z $1 || -z $2 ]]
-    then
-        logerr "Usage: ide symfony2 $SUBCOMMAND from to"
-        exit 1
-    fi
-
     if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- app/DoctrineMigrations
     then
         log "changes in migrations detected! you might want to run php app/console doctrine:migrations:migrate"
@@ -39,28 +24,31 @@ function __detect_database_changes() {
 
 
 function __detect_parameters_changes() {
-    if [[ -z $1 || -z $2 ]]
-    then
-        logerr "Usage: ide symfony2 $SUBCOMMAND from to"
-        exit 1
-    fi
-
     if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- app/config/parameters.yml.dist
     then
         log "changes in parameters.yml detected! you might want to check it out."
     fi
 }
 
+
 if [ -z "$1" ]
 then
-    logerr "Usage: ide symfony2 [composer-changes|database-changes|parameters-changes|check_all] from to"
+    logerr "Usage: git ide symfony2 [composer-changes|database-changes|parameters-changes|check_all] from to"
     exit 1
 fi
 
+
 SUBCOMMAND="$1"
 shift
-
 log "subcommand $SUBCOMMAND"
+
+
+if [[ -z $1 || -z $2 ]]
+then
+    logerr "Usage: git ide symfony2 $SUBCOMMAND from to"
+    exit 1
+fi
+
 
 case "$SUBCOMMAND" in
     composer-changes)
