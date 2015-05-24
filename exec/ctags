@@ -14,14 +14,25 @@ log "Warming up the ctags cache..."
 log "Using ctags options file $CTAGS_CONFIG"
 
 
-# TODO this --vendors command should not be symfony2 specific!
 if [[ '--vendors' == "$1" ]]
 then
 
     log "Creating tags in ${GIT_DIR}/tags_vendors"
 
-    find vendor -type f -name '*.php' | \
-        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+    if [ -d vendor ]
+    then
+        log "Symfony2 style project detected"
+        find vendor -type f -name '*.php' | \
+            ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+    elif [ -d env ]
+    then
+        log "Python style project detected"
+        find env/lib/*/site-packages -type f -name '*.py' | \
+            ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+    else
+        logerr "Oops, don't know what kind of project this is..."
+        exit 1
+    fi
 
 else
 
