@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export IDE_PATH=$(dirname $(dirname "${BASH_SOURCE[0]}"))
+
+if [ -z "$1" ]
+then
+    >&2 echo "Usage: git ide [$(ls $IDE_PATH/exec*|xargs)]"
+    exit 1
+fi
+
+COMMAND=$1
+shift
+
+exec "$IDE_PATH/exec/$COMMAND" "$@"

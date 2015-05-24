@@ -1,0 +1,42 @@
+#!/bin/bash
+IDE_PREFIX="ide/ctrlp"
+
+if [ -z "$IDE_PATH" ]
+then
+    >&2 echo "This script cannot be directly invocated"
+    exit 1
+fi
+
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh"
+
+
+# Determine location of the cache file
+PROJECT="$(git rev-parse --show-toplevel)"
+CACHE_DIR="$HOME/.cache/ctrlp"
+CACHE_FILE="${CACHE_DIR}/${PROJECT//\//%}.txt"
+
+
+# Find out what needs to be ignored
+LOCAL_IGNORE=`git config --local --null ide.ctrlp.ignore`
+GLOBAL_IGNORE=`git config --global --null ide.ctrlp.ignore`
+PRUNE_DIRS=( ${GLOBAL_IGNORE[@]} ${LOCAL_IGNORE[@]} )
+
+
+# Show some helpful output
+log "Warming up the ctrlp cache..."
+log " - global: ide.ctrlp.ignore = ${GLOBAL_IGNORE[@]}"
+log " - local:  ide.ctrlp.ignore = ${LOCAL_IGNORE[@]}"
+log " - cache:  $CACHE_FILE"
+
+
+# Start caching all the things
+for dir in "${prune_dirs[@]}"
+do
+    prune="$prune -path $dir -prune -or"
+done
+/usr/bin/find * $prune \( -type f -and -print \) > "$CACHE_FILE"
+
+
+log "Done."

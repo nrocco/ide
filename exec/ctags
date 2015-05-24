@@ -1,0 +1,40 @@
+#!/bin/bash -e
+IDE_PREFIX="ide/ctags"
+
+if [ -z "$IDE_PATH" ]
+then
+    >&2 echo "This script cannot be directly invocated"
+    exit 1
+fi
+
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh"
+
+
+CTAGS_CONFIG=`git config --null ide.ctags.config`
+
+
+log "Warming up the ctags cache..."
+log "Using ctags options file $CTAGS_CONFIG"
+
+
+# TODO this --vendors command should not be symfony2 specific!
+if [[ '--vendors' == "$1" ]]
+then
+
+    log "Creating tags in ${GIT_DIR}/tags_vendors"
+
+    find vendor -type f -name '*.php' | \
+        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors
+
+else
+
+    log "Creating tags in ${GIT_DIR}/tags"
+
+    git ls-files | \
+        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags
+
+fi
+
+log "Done."
