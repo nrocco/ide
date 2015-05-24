@@ -14,8 +14,8 @@ CACHE_FILE="${CACHE_DIR}/${PROJECT//\//%}.txt"
 
 
 # Find out what needs to be ignored
-LOCAL_IGNORE=`git config --local --null ide.ctrlp.ignore`
-GLOBAL_IGNORE=`git config --global --null ide.ctrlp.ignore`
+LOCAL_IGNORE=`git config --local --null ide.ctrlp.ignore || true`
+GLOBAL_IGNORE=`git config --global --null ide.ctrlp.ignore || true`
 PRUNE_DIRS=( ${GLOBAL_IGNORE[@]} ${LOCAL_IGNORE[@]} )
 
 
@@ -27,11 +27,12 @@ log " - cache:  $CACHE_FILE"
 
 
 # Start caching all the things
-for dir in "${prune_dirs[@]}"
+for dir in "${PRUNE_DIRS[@]}"
 do
     prune="$prune -path $dir -prune -or"
 done
-/usr/bin/find * $prune \( -type f -and -print \) > "$CACHE_FILE"
+
+find * $prune \( -type f -and -print \) > "$CACHE_FILE"
 
 
 log "Done."

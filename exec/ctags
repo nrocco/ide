@@ -21,14 +21,14 @@ then
     log "Creating tags in ${GIT_DIR}/tags_vendors"
 
     find vendor -type f -name '*.php' | \
-        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors
+        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
 
 else
 
     log "Creating tags in ${GIT_DIR}/tags"
 
     git ls-files | \
-        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags
+        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags > /dev/null 2>&1
 
 fi
 
