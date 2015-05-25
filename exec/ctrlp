@@ -1,11 +1,7 @@
 #!/bin/bash -e
-IDE_PREFIX="ide/ctrlp"
-
-# This script should only be executed through bin/ide
-test -z "$IDE_PATH" && exit 1
 
 # Include common functions
-. "$IDE_PATH/lib/functions.sh"
+. "$IDE_PATH/lib/functions.sh" || exit 1
 
 
 #############################################################################

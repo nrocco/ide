@@ -1,5 +1,3 @@
-GIT_DIR=`git rev-parse --git-dir`
-
 function __ide_get_subcommands() {
     ls "$IDE_PATH/exec" | xargs
 }
@@ -40,3 +38,12 @@ function __ide_config_local() {
 function __ide_config_global() {
     __ide_config "$1" "$2" "--global"
 }
+
+# Make sure we are in a git repository
+if ! GIT_DIR=$(git rev-parse --git-dir 2> /dev/null)
+then
+    logerr "Not in a git repo!"
+    exit 1
+fi
+
+IDE_PREFIX=${IDE_PREFIX-ide/$(basename $0)}
