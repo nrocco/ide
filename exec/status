@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh" || exit 1
+
+
+#############################################################################
+#############################################################################
+
+
+function log_section() {
+    echo -e "\033[1;32m[$1]\033[0m"
+}
+
+log_section "local options"
+git config --local --get-regexp '^ide' | while read key value; do
+    echo "$key = $value"
+done
+
+echo
+
+log_section "global options"
+git config --global --get-regexp '^ide' | while read key value; do
+    echo "$key = $value"
+done
+
+echo
+
+log_section "enabled hooks"
+find .git/hooks -perm +0111 -a -not -type d -a -not -name '*.sample' -ls
