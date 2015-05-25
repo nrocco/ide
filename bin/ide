@@ -1,14 +1,11 @@
 #!/bin/bash
 
+# Calculate the directory where `ide` is located
 export IDE_PATH=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 
-if [ -z "$1" ]
-then
-    >&2 echo "Usage: git ide [$(ls $IDE_PATH/exec*|xargs)]"
-    exit 1
-fi
-
-COMMAND=$1
+# Get the subcommand, and default to `help` if none given
+COMMAND=${1-help}
 shift
 
+# Execute the subcommand
 exec "$IDE_PATH/exec/$COMMAND" "$@"

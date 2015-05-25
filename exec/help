@@ -1,0 +1,26 @@
+#!/bin/bash
+IDE_PREFIX="ide/help"
+
+# This script should only be executed through bin/ide
+test -z "$IDE_PATH" && exit 1
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh"
+
+
+#############################################################################
+#############################################################################
+
+
+cat << EOF 1>&2
+usage: git ide [$(__ide_get_subcommands)]
+
+ide provides a powerful ide that gets out of your way.
+
+available sub commands:
+
+    help            print this help and exit
+    ctags           (re)generates the tags file
+    ctrlp           (re)generates the ctrlp cache file
+    symfony         provides checks for symfony2 based projects
+EOF

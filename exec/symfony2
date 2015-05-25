@@ -1,10 +1,15 @@
 #!/bin/bash -e
 IDE_PREFIX="ide/symfony2"
 
+# This script should only be executed through bin/ide
 test -z "$IDE_PATH" && exit 1
 
 # Include common functions
 . "$IDE_PATH/lib/functions.sh"
+
+
+#############################################################################
+#############################################################################
 
 
 function __detect_composer_changes() {

@@ -1,13 +1,22 @@
 #!/bin/bash -e
 IDE_PREFIX="ide/ctags"
 
+# This script should only be executed through bin/ide
 test -z "$IDE_PATH" && exit 1
 
 # Include common functions
 . "$IDE_PATH/lib/functions.sh"
 
 
-CTAGS_CONFIG=`git config --null ide.ctags.config`
+#############################################################################
+#############################################################################
+
+
+if ! CTAGS_CONFIG=$(__ide_config ide.ctags.config)
+then
+    logerr "You must configure ide.ctags.config"
+    exit 1
+fi
 
 
 log "Warming up the ctags cache..."

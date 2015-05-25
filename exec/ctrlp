@@ -1,10 +1,15 @@
 #!/bin/bash -e
 IDE_PREFIX="ide/ctrlp"
 
+# This script should only be executed through bin/ide
 test -z "$IDE_PATH" && exit 1
 
 # Include common functions
 . "$IDE_PATH/lib/functions.sh"
+
+
+#############################################################################
+#############################################################################
 
 
 # Determine location of the cache file
@@ -13,9 +18,10 @@ CACHE_DIR="$HOME/.cache/ctrlp"
 CACHE_FILE="${CACHE_DIR}/${PROJECT//\//%}.txt"
 
 
+__ide_config_local ide.ctrlp.ignore ''
 # Find out what needs to be ignored
-LOCAL_IGNORE=`git config --local --null ide.ctrlp.ignore || true`
-GLOBAL_IGNORE=`git config --global --null ide.ctrlp.ignore || true`
+LOCAL_IGNORE=$(__ide_config_local ide.ctrlp.ignore '')
+GLOBAL_IGNORE=$(__ide_config_global ide.ctrlp.ignore '')
 PRUNE_DIRS=( ${GLOBAL_IGNORE[@]} ${LOCAL_IGNORE[@]} )
 
 
@@ -29,10 +35,10 @@ log " - cache:  $CACHE_FILE"
 # Start caching all the things
 for dir in "${PRUNE_DIRS[@]}"
 do
-    prune="$prune -path $dir -prune -or"
+    prune="$prune -path '*/$dir' -prune -or"
 done
 
-find * $prune \( -type f -and -print \) > "$CACHE_FILE"
+find * $prune \( -type f -print \) | \grep -v __pycache__ > "$CACHE_FILE"
 
 
 log "Done."

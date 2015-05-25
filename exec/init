@@ -1,0 +1,22 @@
+#!/bin/bash -e
+IDE_PREFIX="ide/init"
+
+# This script should only be executed through bin/ide
+test -z "$IDE_PATH" && exit 1
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh"
+
+
+#############################################################################
+#############################################################################
+
+
+if LANGUAGE=$(__ide_config ide.project.language)
+then
+    logerr "The repository is already setup as a $LANGUAGE project."
+    exit 1
+fi
+
+log "Setting up the repository as a ide project..."
+echo "TODO"
