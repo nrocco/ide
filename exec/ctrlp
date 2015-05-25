@@ -14,7 +14,6 @@ CACHE_DIR="$HOME/.cache/ctrlp"
 CACHE_FILE="${CACHE_DIR}/${PROJECT//\//%}.txt"
 
 
-__ide_config_local ide.ctrlp.ignore ''
 # Find out what needs to be ignored
 LOCAL_IGNORE=$(__ide_config_local ide.ctrlp.ignore '')
 GLOBAL_IGNORE=$(__ide_config_global ide.ctrlp.ignore '')
