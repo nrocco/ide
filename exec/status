@@ -12,6 +12,11 @@ function log_section() {
     echo -e "\033[1;32m[$1]\033[0m"
 }
 
+log_section "language"
+__ide_detect_project_language
+
+echo
+
 log_section "local options"
 git config --local --get-regexp '^ide' | while read key value; do
     echo "$key = $value"

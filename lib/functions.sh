@@ -2,6 +2,16 @@ function __ide_get_subcommands() {
     ls "$IDE_PATH/exec" | xargs
 }
 
+function __ide_detect_project_language() {
+    if   [ -f 'setup.py' ];          then echo 'python/package'
+    elif [ -f 'app/AppKernel.php' ]; then echo 'php/symfony2'
+    elif [ -f 'composer.json' ];     then echo 'php/package'
+    elif [ -f 'manage.py' ];         then echo 'python/django'
+    else
+        echo 'generic/plain'
+    fi
+}
+
 function logerr() {
     >&2 echo "$@"
 }
