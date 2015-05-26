@@ -15,8 +15,8 @@ CACHE_FILE="${CACHE_DIR}/${PROJECT//\//%}.txt"
 
 
 # Find out what needs to be ignored
-LOCAL_IGNORE=$(__ide_config_local ide.ctrlp.ignore '')
-GLOBAL_IGNORE=$(__ide_config_global ide.ctrlp.ignore '')
+LOCAL_IGNORE=$(__ide_config_local ide.ctrlp.ignore || true)
+GLOBAL_IGNORE=$(__ide_config_global ide.ctrlp.ignore || true)
 PRUNE_DIRS=( ${GLOBAL_IGNORE[@]} ${LOCAL_IGNORE[@]} )
 
 
