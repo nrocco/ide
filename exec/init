@@ -15,4 +15,20 @@ then
 fi
 
 log "Setting up the repository as a ide project..."
-echo "TODO"
+
+auto_lang=$(__ide_detect_project_language)
+
+log "What type of project are you running here?"
+echo -n "[$auto_lang] "
+
+read chosen_lang
+
+if [ -z "$chosen_lang" ]
+then
+    lang=$auto_lang
+else
+    lang=$chosen_lang
+fi
+
+log "Setting the project language to: $lang"
+git config --local ide.project.language "$lang"
