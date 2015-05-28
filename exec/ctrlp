@@ -30,10 +30,11 @@ log " - cache:  $CACHE_FILE"
 # Start caching all the things
 for dir in "${PRUNE_DIRS[@]}"
 do
-    prune="$prune -path '*/$dir' -prune -or"
+    prune="$prune -name $dir -o"
 done
 
-find * $prune \( -type f -print \) | \grep -v __pycache__ > "$CACHE_FILE"
+
+find * -type d '(' $(echo $prune | sed "s/...$//g") ')' -prune -o -type f > "$CACHE_FILE"
 
 
 log "Done."
