@@ -1,0 +1,45 @@
+#!/bin/bash -e
+
+# Include common functions
+. "$IDE_PATH/lib/functions.sh" || exit 1
+
+
+#############################################################################
+#############################################################################
+
+
+if [ -z "$1" ]
+then
+    echo "usage: git ide hooks [enable|disable] hook"
+    echo "       git ide hooks [hook]"
+    exit 1
+
+elif [[ "enable" == "$1" ]]
+then
+    echo -e "#!/usr/bin/env bash\ngit ide hooks" '"$(basename $0)" "$@"' > ".git/hooks/$2" && \
+    chmod +x ".git/hooks/$2"
+    log "Enabled git ide hook .git/hooks/$2"
+    exit
+
+elif [[ "disable" == "$1" ]]
+then
+
+    rm ".git/hooks/$2"
+    log "Disabled git ide hook .git/hooks/$2"
+    exit
+fi
+
+
+LANGUAGE="$(__ide_config_local ide.project.language)"
+HOOK="$1"
+shift
+
+
+case "$HOOK" in
+    post-checkout)
+        exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK"
+        ;;
+    *)
+        log "Unsupported hook: $HOOK"
+        ;;
+esac

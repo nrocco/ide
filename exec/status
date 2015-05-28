@@ -32,4 +32,4 @@ done
 echo
 
 log_section "enabled hooks"
-find .git/hooks -perm +0111 -a -not -type d -a -not -name '*.sample' -ls
+find .git/hooks -perm +0111 -a -not -type d -a -not -name '*.sample'
