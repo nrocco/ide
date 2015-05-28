@@ -20,7 +20,7 @@
 
 
 # Only continue if this is a branch checkout
-[ 0 -eq $3 ] && exit 0
+[[ 0 -eq $3 ]] && exit 0
 
 
 # Warm up the ctags cache

@@ -11,7 +11,7 @@
 function __detect_composer_changes() {
     if ! git --no-pager diff --exit-code --quiet --name-only $1 $2 -- composer.json composer.lock
     then
-        logerr "changes in composer detected! you might want to run composer install"
+        log "changes in composer detected! you might want to run composer install"
     fi
 }
 
