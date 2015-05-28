@@ -8,11 +8,8 @@
 #############################################################################
 
 
-if ! CTAGS_CONFIG=$(__ide_config ide.ctags.config)
-then
-    logerr "You must configure ide.ctags.config"
-    exit 1
-fi
+LANGUAGE=$(__ide_config ide.project.language)
+CTAGS_CONFIG="$IDE_PATH/configs/$LANGUAGE/ctags"
 
 
 log "Warming up the ctags cache..."
@@ -24,27 +21,29 @@ then
 
     log "Creating tags in ${GIT_DIR}/tags_vendors"
 
-    if [ -d vendor ]
-    then
-        log "Symfony2 style project detected"
-        find vendor -type f -name '*.php' | \
-            ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
-    elif [ -d env ]
-    then
-        log "Python style project detected"
-        find env/lib/*/site-packages -type f -name '*.py' | \
-            ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
-    else
-        logerr "Oops, don't know what kind of project this is..."
-        exit 1
-    fi
+    case "$LANGUAGE" in
+
+        php/symfony2)
+            log "Symfony2 style project detected"
+            find vendor -type f -name '*.php' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+            ;;
+
+        python/django)
+            log "Python style project detected"
+            find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+            ;;
+
+        *)
+            logerr "Oops, don't know what kind of project this is..."
+            exit 1
+            ;;
+
+    esac
 
 else
 
     log "Creating tags in ${GIT_DIR}/tags"
-
-    git ls-files | \
-        ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags > /dev/null 2>&1
+    git ls-files | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags > /dev/null 2>&1
 
 fi
 
