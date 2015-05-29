@@ -16,7 +16,10 @@ ide provides a powerful ide that gets out of your way.
 available sub commands:
 
     help            print this help and exit
+    init            initialize a git project for ide use
+    status          get the current ide status of your project
     ctags           (re)generates the tags file
     ctrlp           (re)generates the ctrlp cache file
-    symfony         provides checks for symfony2 based projects
+    hooks           enable, disable and execute git hooks
+    symfony2        provides checks for symfony2 based projects
 EOF
