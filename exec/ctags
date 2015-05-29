@@ -23,12 +23,12 @@ then
 
     case "$LANGUAGE" in
 
-        php/symfony2)
-            log "Symfony2 style project detected"
+        php/*)
+            log "Php style project detected"
             find vendor -type f -name '*.php' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
             ;;
 
-        python/django)
+        python/*)
             log "Python style project detected"
             find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
             ;;

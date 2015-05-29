@@ -1,0 +1,9 @@
+--recurse
+
+--php-kinds=cif
+--fields=+aimS
+--languages=php
+
+--exclude=.git
+--exclude=.hg
+--exclude=.svn
