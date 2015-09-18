@@ -37,7 +37,7 @@ shift
 
 case "$HOOK" in
     post-checkout)
-        exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK"
+        exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK" "$@"
         ;;
     *)
         log "Unsupported hook: $HOOK"

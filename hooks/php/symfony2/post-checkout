@@ -18,23 +18,21 @@
 #   differences from the previous HEAD if different, or set working dir
 #   metadata properties.
 
-
 # Only continue if this is a branch checkout
 [[ 0 -eq $3 ]] && exit 0
 
-
 # Warm up the ctags cache
-if [[ "true|yes" =~ "$(git config --local --null ide.ctags.warmup)" ]]
-then
+# if [[ "true|yes" =~ "$(git config --local --null ide.ctags.warmup)" ]]
+# then
     git ide ctags
-fi
+# fi
 
 
 # Warm up the ctrlp cache
-if [[ "true|yes" =~ "$(git config --local --null ide.ctrlp.warmup)" ]]
-then
+# if [[ "true|yes" =~ "$(git config --local --null ide.ctrlp.warmup)" ]]
+# then
     git ide ctrlp
-fi
+# fi
 
 
 # Check for changes in parameters.yml, database migrations and composer

@@ -1,8 +1,0 @@
---recurse
-
---python-kinds=-i
---languages=python
-
---exclude=.git
---exclude=.hg
---exclude=.svn

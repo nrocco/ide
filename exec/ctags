@@ -2,6 +2,7 @@
 
 # Include common functions
 . "$IDE_PATH/lib/functions.sh" || exit 1
+. "$IDE_PATH/lib/configs.sh" || exit 1
 
 
 #############################################################################
@@ -9,11 +10,11 @@
 
 
 LANGUAGE=$(__ide_config ide.project.language)
-CTAGS_CONFIG="$IDE_PATH/configs/$LANGUAGE/ctags"
+CTAGS_OPTS=$(__get_default_ctags_options "$LANGUAGE")
 
 
 log "Warming up the ctags cache..."
-log "Using ctags options file $CTAGS_CONFIG"
+log "Using ctags options: $CTAGS_OPTS"
 
 
 if [[ '--vendors' == "$1" ]]
@@ -25,12 +26,12 @@ then
 
         php/*)
             log "Php style project detected"
-            find vendor -type f -name '*.php' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+            find vendor -type f -name '*.php' | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
             ;;
 
         python/*)
             log "Python style project detected"
-            find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
+            find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${GIT_DIR}/tags_vendors > /dev/null 2>&1
             ;;
 
         *)
@@ -43,7 +44,7 @@ then
 else
 
     log "Creating tags in ${GIT_DIR}/tags"
-    git ls-files | ctags -L - --tag-relative --options=${CTAGS_CONFIG} -o ${GIT_DIR}/tags > /dev/null 2>&1
+    git ls-files | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${GIT_DIR}/tags > /dev/null 2>&1
 
 fi
 
