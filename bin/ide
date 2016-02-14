@@ -1,15 +1,24 @@
 #!/bin/bash
 
-# Calculate the directory where `ide` is located
-export IDE_PATH=$(dirname $(dirname $(readlink -f "${BASH_SOURCE[0]}")))
-
 # Get the subcommand, and default to `help` if none given
 COMMAND=${1-help}
 shift
 
+# Calculate the directory where `ide` is located
+export IDE_PATH=$(dirname $(dirname $(readlink -f "${BASH_SOURCE[0]}")))
+export IDE_GIT_DIR=$(git rev-parse --git-dir 2> /dev/null)
+export IDE_PREFIX=ide/$COMMAND
+
 if [ ! -f "$IDE_PATH/exec/$COMMAND" ]
 then
     echo "ERROR: subcommand $COMMAND does not exist" > /dev/stderr
+    exit 1
+fi
+
+# Make sure we are in a git repository
+if [ -z "$IDE_GIT_DIR" ]
+then
+    echo "ERROR: Not in a git repo!" > /dev/stderr
     exit 1
 fi
 

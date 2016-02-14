@@ -1,15 +1,7 @@
-#!/bin/bash -e
-
-# Include common functions
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-
-#############################################################################
-#############################################################################
-
+#!/usr/bin/env bash -e
 
 cat << EOF 1>&2
-usage: git ide [$(__ide_get_subcommands)]
+usage: git ide [$(ls "$IDE_PATH/exec" | xargs)]
 
 ide provides a powerful ide that gets out of your way.
 

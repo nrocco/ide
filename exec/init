@@ -1,12 +1,7 @@
-#!/bin/bash -e
-
-# Include common functions
+#!/usr/bin/env bash -e
 . "$IDE_PATH/lib/functions.sh" || exit 1
 
-
 #############################################################################
-#############################################################################
-
 
 if LANGUAGE=$(__ide_config ide.project.language)
 then
