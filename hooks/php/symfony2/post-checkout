@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
 . "$IDE_PATH/lib/functions.sh" || exit 1
 
 # Only continue if this is a branch checkout

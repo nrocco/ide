@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
 
 cat << EOF 1>&2
 usage: git ide [$(ls "$IDE_PATH/exec" | xargs)]

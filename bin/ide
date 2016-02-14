@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get the subcommand, and default to `help` if none given
 COMMAND=${1-help}
