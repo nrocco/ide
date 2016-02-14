@@ -29,12 +29,10 @@ LANGUAGE="$(__ide_config_local ide.project.language)"
 HOOK="$1"
 shift
 
+if [ ! -x "$IDE_PATH/hooks/$LANGUAGE/$HOOK" ]
+then
+    logerr "Unsupported hook: $HOOK"
+    exit 1
+fi
 
-case "$HOOK" in
-    post-checkout)
-        exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK" "$@"
-        ;;
-    *)
-        log "Unsupported hook: $HOOK"
-        ;;
-esac
+exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK" "$@"
