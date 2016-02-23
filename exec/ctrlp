@@ -28,6 +28,8 @@ do
     prune="$prune -name $dir -o"
 done
 
-find * -type d '(' $(echo $prune | sed "s/...$//g") ')' -prune -o -type f > "$CACHE_FILE"
+prune=$(echo $prune | sed "s/ -o$//g")
+
+find * -type d '(' $prune ')' -prune -o -type f > "$CACHE_FILE"
 
 log "Done."
