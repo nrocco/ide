@@ -27,3 +27,4 @@ fi
 
 log "Setting the project language to: $lang"
 git config --local ide.project.language "$lang"
+git config --local ide.ctrlp.ignore ".svn .git"
