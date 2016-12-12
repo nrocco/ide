@@ -3,7 +3,14 @@
 
 #############################################################################
 
+LANGUAGE="$(__ide_config_local ide.project.language)"
+
 if [ -z "$1" ]
+then
+    ls "$IDE_PATH/hooks/$LANGUAGE"
+    exit
+
+elif [[ "help" == "$1" ]]
 then
     echo "usage: git ide hooks [enable|disable] hook"
     echo "       git ide hooks [hook]"
@@ -25,7 +32,6 @@ then
 fi
 
 
-LANGUAGE="$(__ide_config_local ide.project.language)"
 HOOK="$1"
 shift
 
