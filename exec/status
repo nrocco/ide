@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-#############################################################################
 
 if ! LANGUAGE=$(__ide_config ide.project.language)
 then
     logerr "The repository is not initialized yet. Use 'git ide init' to initialize."
     exit 1
 fi
-
-function log_section() {
-    echo -e "\033[1;32m[$1]\033[0m"
-}
 
 log_section "local options"
 git config --local --get-regexp '^ide' | while read key value; do

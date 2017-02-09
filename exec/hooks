@@ -1,44 +1,54 @@
 #!/usr/bin/env bash
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-#############################################################################
 
 LANGUAGE="$(__ide_config_local ide.project.language)"
 
-if [ -z "$1" ]
+SUBCOMMAND="$1"
+shift
+
+if [ -z "${SUBCOMMAND}" ]
 then
+    echo "usage: git ide hooks list"
+    echo "       git ide hooks show [hook]"
+    echo "       git ide hooks [enable|disable] hook"
+    echo "       git ide hooks exec [hook]"
+    exit
+
+elif [[ "list" == "${SUBCOMMAND}" ]]
+then
+    log_section "Available hooks for ${LANGUAGE}"
     ls "$IDE_PATH/hooks/$LANGUAGE"
     exit
 
-elif [[ "help" == "$1" ]]
+elif [[ "show" == "${SUBCOMMAND}" ]]
 then
-    echo "usage: git ide hooks [enable|disable] hook"
-    echo "       git ide hooks [hook]"
-    exit 1
-
-elif [[ "enable" == "$1" ]]
-then
-    echo -e "#!/usr/bin/env bash\ngit ide hooks" '"$(basename $0)" "$@"' > ".git/hooks/$2" && \
-    chmod +x ".git/hooks/$2"
-    log "Enabled git ide hook .git/hooks/$2"
+    log_section "Show hook ${1} for ${LANGUAGE}"
+    cat "$IDE_PATH/hooks/$LANGUAGE/$1"
     exit
 
-elif [[ "disable" == "$1" ]]
+elif [[ "enable" == "${SUBCOMMAND}" ]]
 then
-
-    rm ".git/hooks/$2"
-    log "Disabled git ide hook .git/hooks/$2"
+    echo -e "#!/usr/bin/env bash\nexec git ide hooks exec $1" '"$@"' > ".git/hooks/$1" && \
+    chmod +x ".git/hooks/$1"
+    log "Enabled git ide hook .git/hooks/$1"
     exit
-fi
 
-
-HOOK="$1"
-shift
-
-if [ ! -x "$IDE_PATH/hooks/$LANGUAGE/$HOOK" ]
+elif [[ "disable" == "${SUBCOMMAND}" ]]
 then
-    logerr "Unsupported hook: $HOOK"
-    exit 1
-fi
+    rm ".git/hooks/$1"
+    log "Disabled git ide hook .git/hooks/$1"
+    exit
 
-exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK" "$@"
+elif [[ "exec" == "${SUBCOMMAND}" ]]
+then
+    HOOK="$1"
+    shift
+
+    if [ ! -x "$IDE_PATH/hooks/$LANGUAGE/$HOOK" ]
+    then
+        logerr "Unsupported hook: $HOOK"
+        exit 1
+    fi
+
+    exec "$IDE_PATH/hooks/$LANGUAGE/$HOOK" "$@"
+
+fi

@@ -1,13 +1,37 @@
 #!/usr/bin/env bash
 
-# Get the subcommand, and default to `help` if none given
-COMMAND=${1-help}
+set -e
+
+if [ -z "$1" ]
+then
+    cat << EOF 1>&2
+usage: git ide [command]
+
+ide provides a powerful ide that gets out of your way.
+
+available commands:
+
+    init            initialize a git project for ide use
+    status          get the current ide status of your project
+    ctags           (re)generates the tags file
+    ctrlp           (re)generates the ctrlp cache file
+    hooks           enable, disable and execute git hooks
+
+set the environment variable IDE_DEBUG=yes to have ide
+show verbose debug information.
+EOF
+    exit
+fi
+
+# Get the subcommand
+COMMAND="${1}"
 shift
 
 # Calculate the directory where `ide` is located
 export IDE_PATH=$(dirname $(dirname $(readlink -f "${BASH_SOURCE[0]}")))
 export IDE_GIT_DIR=$(git rev-parse --git-dir 2> /dev/null)
-export IDE_PREFIX=ide/$COMMAND
+export IDE_PREFIX="ide/${COMMAND}"
+export BASH_ENV="${IDE_PATH}/lib/functions.sh"
 
 if [ ! -f "$IDE_PATH/exec/$COMMAND" ]
 then

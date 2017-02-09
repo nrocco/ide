@@ -10,6 +10,10 @@ function log() {
     fi
 }
 
+function log_section() {
+    echo -e "==> \033[1;32m$1\033[0m"
+}
+
 function __ide_detect_project_language() {
     if   [ -f 'setup.py' ];          then echo 'python/package'
     elif [ -f 'app/AppKernel.php' ]; then echo 'php/symfony2'

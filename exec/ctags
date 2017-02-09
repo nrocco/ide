@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-#############################################################################
 
 LANGUAGE=$(__ide_config ide.project.language)
 CTAGS_OPTS=$(__get_default_ctags_options "$LANGUAGE")

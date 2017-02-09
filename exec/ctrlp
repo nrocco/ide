@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-#############################################################################
 
 # Determine location of the cache file
 PROJECT="$(git rev-parse --show-toplevel)"

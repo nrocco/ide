@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-. "$IDE_PATH/lib/functions.sh" || exit 1
-
-#############################################################################
 
 if LANGUAGE=$(__ide_config ide.project.language)
 then
@@ -27,4 +24,3 @@ fi
 
 log "Setting the project language to: $lang"
 git config --local ide.project.language "$lang"
-git config --local ide.ctrlp.ignore ".svn .git"
