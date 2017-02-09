@@ -27,6 +27,6 @@ done
 
 prune=$(echo $prune | sed "s/ -o$//g")
 
-find * -type d '(' $prune ')' -prune -o -type f > "$CACHE_FILE"
+find * -type d '(' $prune ')' -prune -o -type f | grep -vE '('$(IFS=\| ; echo "${PRUNE_DIRS[*]}")')$' > "$CACHE_FILE"
 
 log "Done."
