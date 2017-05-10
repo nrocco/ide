@@ -17,12 +17,12 @@ then
 
         php/*)
             log "Php style project detected"
-            find vendor -type f -name '*.php' | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags_vendors > /dev/null 2>&1
+            find vendor -type f -name '*.php' | ctags -L - --tag-relative=yes ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags_vendors > /dev/null
             ;;
 
         python/*)
             log "Python style project detected"
-            find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags_vendors > /dev/null 2>&1
+            find env/lib/*/site-packages -type f -name '*.py' | ctags -L - --tag-relative=yes ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags_vendors > /dev/null
             ;;
 
         *)
@@ -35,7 +35,7 @@ then
 else
 
     log "Creating tags in ${IDE_GIT_DIR}/tags"
-    git ls-files | ctags -L - --tag-relative ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags > /dev/null 2>&1
+    git ls-files | ctags -L - --tag-relative=yes ${CTAGS_OPTS} -o ${IDE_GIT_DIR}/tags > /dev/null
 
 fi
 
