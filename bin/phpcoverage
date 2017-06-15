@@ -20,6 +20,5 @@ exec docker run --rm --interactive --tty \
     --user '1000:100' \
     --volume "$PWD:$PWD" \
     --workdir "$PWD" \
-    --entrypoint='vendor/phpunit/phpunit/phpunit' \
     "$IDE_PHP_IMAGE" \
-    --coverage-html build/coverage "$@"
+    -dzend_extension=xdebug.so vendor/phpunit/phpunit/phpunit --coverage-html build/coverage "$@"

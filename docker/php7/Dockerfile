@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get -yq install \
         git \
         snmp \
+        php-xdebug \
         php7.0-bcmath \
         php7.0-cli \
         php7.0-curl \
@@ -19,6 +20,7 @@ RUN apt-get update && \
         php7.0-xsl \
         php7.0-xml \
         php7.0-zip && \
+    rm /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
     rm -rf /var/lib/apt/lists/*
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
