@@ -1,0 +1,58 @@
+---
+version: '3.2'
+
+services:
+  nginx:
+    image: nginx:alpine
+    networks:
+      - default
+    volumes:
+      - /home/nrocco/src/ide/docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+
+  apache22:
+    image: ide:apache22
+    networks:
+      - default
+    environment:
+      - APACHE_RUN_USER=user
+      - APACHE_RUN_GROUP=users
+    extra_hosts:
+      - git.ocom.com:10.0.3.19
+      - api.leaseweb.com:10.11.11.98
+      - auth.leaseweb.com:10.11.11.98
+    volumes:
+      - ~/www:/var/www/
+
+  apache24:
+    image: ide:apache24
+    networks:
+      - default
+    environment:
+      - APACHE_RUN_USER=user
+      - APACHE_RUN_GROUP=users
+    extra_hosts:
+      - git.ocom.com:10.0.3.19
+      - api.leaseweb.com:10.11.11.98
+      - auth.leaseweb.com:10.11.11.98
+    volumes:
+      - ~/www:/var/www/
+
+  mysql:
+    image: mysql:5.5
+    networks:
+      - default
+    environment:
+      - MYSQL_ROOT_PASSWORD=r00tw00t
+    volumes:
+      - mysql_state:/var/lib/mysql
+
+
+volumes:
+  mysql_state:
+
+
+networks:
+  default:
+    attachable: true
