@@ -24,7 +24,8 @@ RUN set -ex \
     && mkdir -p $APACHE_RUN_DIR \
     && ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log" \
     && ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log" \
-    && ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"
+    && ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log" \
+    && rm -f /etc/php/7.0/apache2/conf.d/20-xdebug.ini
 
 EXPOSE 80
 
