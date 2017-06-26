@@ -4,17 +4,7 @@ stack: containers
 
 
 .PHONY: containers
-containers: php5 php7 apache22 apache24 chefdk
-
-
-.PHONY: apache22
-apache22: php5
-	docker build -t ide:apache22 apache22
-
-
-.PHONY: apache24
-apache24: php7
-	docker build -t ide:apache24 apache24
+containers: php5 php7 chefdk
 
 
 .PHONY: php5

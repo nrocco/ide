@@ -12,11 +12,13 @@ services:
     ports:
       - 80:80
 
-  apache22:
-    image: ide:apache22
+  php5:
+    image: ide:php5
+    entrypoint: ["apache2", "-DFOREGROUND"]
     networks:
       - default
     environment:
+      - IDE_WEBROOT=/home/nrocco/www
       - APACHE_RUN_USER=user
       - APACHE_RUN_GROUP=users
     extra_hosts:
@@ -24,13 +26,15 @@ services:
       - api.leaseweb.com:10.11.11.98
       - auth.leaseweb.com:10.11.11.98
     volumes:
-      - ~/www:/var/www/
+      - /home/nrocco/www:/home/nrocco/www
 
-  apache24:
-    image: ide:apache24
+  php7:
+    image: ide:php7
+    entrypoint: ["apache2", "-DFOREGROUND"]
     networks:
       - default
     environment:
+      - IDE_WEBROOT=/home/nrocco/www
       - APACHE_RUN_USER=user
       - APACHE_RUN_GROUP=users
     extra_hosts:
@@ -38,7 +42,7 @@ services:
       - api.leaseweb.com:10.11.11.98
       - auth.leaseweb.com:10.11.11.98
     volumes:
-      - ~/www:/var/www/
+      - /home/nrocco/www:/home/nrocco/www
 
   mysql:
     image: mysql:5.5
