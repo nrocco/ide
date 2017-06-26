@@ -4,7 +4,7 @@ stack: containers
 
 
 .PHONY: containers
-containers: php5 php7 chefdk
+containers: php5 php7 chefdk ctags nodejs
 
 
 .PHONY: php5
