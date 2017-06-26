@@ -45,6 +45,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     php -r "unlink('composer-setup.php');"
 
+# HACK: get rid of this hard coded uid and gid
 RUN useradd -u 1000 -g 100 -s /bin/bash user && \
     echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && echo 'UserKnownHostsFile /dev/null' >> /etc/ssh/ssh_config && \
     a2enmod vhost_alias rewrite
@@ -59,5 +60,4 @@ RUN set -ex \
 
 COPY apache.conf /etc/apache2/sites-enabled/000-default.conf
 
-# ENTRYPOINT ["apache2", "-DFOREGROUND"]
 ENTRYPOINT ["php"]
