@@ -16,18 +16,16 @@ ENV PATH /composer/vendor/bin:$PATH
 # Install apt dependencies
 RUN apt-get update && \
     apt-get -yq install \
-        apache2 \
-        libapache2-mod-php5 \
-        apache2-utils \
         git \
         snmp \
         php5-cli \
         php5-curl \
-        php5-mcrypt \
-        php5-sqlite \
+        php5-fpm \
         php5-intl \
+        php5-mcrypt \
         php5-mysql \
         php5-snmp \
+        php5-sqlite \
         php5-xdebug \
         php5-xsl \
         php5-xmlrpc && \
@@ -41,17 +39,10 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 
 # HACK: get rid of this hard coded uid and gid
 RUN useradd -u 1000 -g 100 -s /bin/bash user && \
-    echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && echo 'UserKnownHostsFile /dev/null' >> /etc/ssh/ssh_config && \
-    a2enmod vhost_alias rewrite
+    echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && echo 'UserKnownHostsFile /dev/null' >> /etc/ssh/ssh_config
 
-# logs should go to stdout / stderr
-RUN set -ex \
-    && mkdir -p $APACHE_RUN_DIR \
-    && ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log" \
-    && ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log" \
-    && ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log" \
-    && rm -f /etc/php5/apache2/conf.d/xdebug.ini
+COPY fpm.conf /etc/php5/fpm/pool.d/www.conf
 
-COPY apache.conf /etc/apache2/sites-enabled/000-default
+EXPOSE 9000
 
 ENTRYPOINT ["php"]
