@@ -1,25 +1,2 @@
 #!/bin/sh
-
-if [ -z "$IDE_PHP_IMAGE" ]
-then
-    echo "[ERROR] IDE_PHP_IMAGE not set"
-    exit 1
-fi
-
-if [ ! -f vendor/phpunit/phpunit/phpunit ]
-then
-    echo "[ERROR] No vendor/phpunit/phpunit/phpunit"
-    exit 1
-fi
-
-exec docker run --rm --interactive --tty \
-    --add-host 'git.ocom.com:10.0.3.19' \
-    --add-host 'api.leaseweb.com:10.11.11.98' \
-    --add-host 'auth.leaseweb.com:10.11.11.98' \
-    --network ide_default \
-    --user '1000:100' \
-    --volume "$PWD:$PWD" \
-    --volume "ide_static:/static" \
-    --workdir "$PWD" \
-    "$IDE_PHP_IMAGE" \
-    -dzend_extension=xdebug.so vendor/phpunit/phpunit/phpunit --coverage-html "/static/coverage/$(basename $PWD)" "$@"
+exec php -dzend_extension=xdebug.so vendor/phpunit/phpunit/phpunit --coverage-html "/static/coverage/$(basename $PWD)" "$@"
