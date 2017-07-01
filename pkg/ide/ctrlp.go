@@ -45,7 +45,7 @@ func (project *Project) RefreshCtrlp() error {
 	location := project.Location()
 
 	filepath.Walk(location, func(path string, f os.FileInfo, err error) error {
-		if !f.IsDir() {
+		if !f.IsDir() && !strings.Contains(path, ".git") {
 			fmt.Fprintln(w, strings.Replace(path, location, "", -1))
 		}
 		return nil
