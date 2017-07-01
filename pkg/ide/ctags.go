@@ -1,34 +1,31 @@
 package ide
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
 
-type Ctags struct {
-	project        Project
-	TagsFile       string
-	VendorTagsFile string
+func (project *Project) GetCtagsFile() string {
+	if project.ctagsFile == "" {
+		project.ctagsFile = filepath.Join(project.repository.Path(), "tags")
+	}
+
+	return project.ctagsFile
 }
 
-func LoadCtags(project Project) (Ctags, error) {
-	gitDir := project.Repository.Path()
+func (project *Project) RefreshCtags() error {
+	if !project.IsConfigured() {
+		return errors.New("Project must be configured before you can RefreshCtags")
+	}
 
-	return Ctags{
-		project:        project,
-		TagsFile:       filepath.Join(gitDir, "tags"),
-		VendorTagsFile: filepath.Join(gitDir, "tags_vendors"),
-	}, nil
-}
-
-func (this *Ctags) Refresh() error {
 	options := []string{
 		"--recurse", "--tag-relative=yes", "--sort=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
-		"-f", this.TagsFile,
+		"-f", project.GetCtagsFile(),
 		"--kinds-php=cif", "--kinds-python=-i",
-		"--languages=" + this.project.Language,
+		"--languages=" + project.Language(),
 	}
 
 	cmd := exec.Command("ctags", options...)

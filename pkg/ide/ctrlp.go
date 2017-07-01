@@ -11,40 +11,30 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
-type Ctrlp struct {
-	project   Project
-	CacheFile string
+func (project *Project) GetCtrlpCachFile() string {
+	if project.ctrlpCacheFile == "" {
+		cacheDir, _ := homedir.Expand("~/.cache/ctrlp") // TODO: make project configurable
+		cacheDir, _ = filepath.Abs(cacheDir)
+
+		cacheFilename := project.Location()
+		cacheFilename = strings.TrimSuffix(cacheFilename, "/")
+		cacheFilename = strings.Replace(cacheFilename, "/", "%", -1)
+		cacheFilename = cacheFilename + ".txt"
+
+		project.ctrlpCacheFile = filepath.Join(cacheDir, cacheFilename)
+	}
+
+	return project.ctrlpCacheFile
 }
 
-func LoadCtrlp(project Project) (Ctrlp, error) {
+func (project *Project) RefreshCtrlp() error {
 	if !project.IsConfigured() {
-		return Ctrlp{}, errors.New("Project must be configured.")
+		return errors.New("Project must be configured before you can RefreshCtrlp")
 	}
 
-	if project.Location == "" {
-		return Ctrlp{}, errors.New("Project directory cannot be empty")
-	}
+	cacheFile := project.GetCtrlpCachFile()
 
-	cacheDir, _ := homedir.Expand("~/.cache/ctrlp") // TODO: make this configurable
-	cacheDir, _ = filepath.Abs(cacheDir)
-
-	cacheFilename := project.Location
-	cacheFilename = strings.TrimSuffix(cacheFilename, "/")
-	cacheFilename = strings.Replace(cacheFilename, "/", "%", -1)
-	cacheFilename = cacheFilename + ".txt"
-
-	return Ctrlp{
-		project:   project,
-		CacheFile: filepath.Join(cacheDir, cacheFilename),
-	}, nil
-}
-
-func (this *Ctrlp) Refresh() error {
-	if this.CacheFile == "" {
-		return errors.New("Cache file should not be empty")
-	}
-
-	file, err := os.Create(this.CacheFile)
+	file, err := os.Create(cacheFile)
 	if err != nil {
 		return err
 	}
@@ -52,9 +42,12 @@ func (this *Ctrlp) Refresh() error {
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
+	location := project.Location()
 
-	filepath.Walk(this.project.Location, func(path string, f os.FileInfo, err error) error {
-		fmt.Fprintln(w, strings.Replace(path, this.project.Location, "", -1))
+	filepath.Walk(location, func(path string, f os.FileInfo, err error) error {
+		if !f.IsDir() {
+			fmt.Fprintln(w, strings.Replace(path, location, "", -1))
+		}
 		return nil
 	})
 

@@ -18,12 +18,10 @@ var initCmd = &cobra.Command{
 		}
 
 		log.Println("Setting up the repository as a ide project...")
+		language := Project.AutoDetectLanguage()
 
-		Project.Language = Project.AutoDetectLanguage()
-
-		log.Printf("Setting the project language to %s\n", Project.Language)
-
-		Project.Save()
+		log.Printf("Setting the project language to %s\n", language)
+		Project.SetLanguage(language)
 
 		return nil
 	},

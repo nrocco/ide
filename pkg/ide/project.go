@@ -3,18 +3,21 @@ package ide
 import (
 	"errors"
 	"os"
-	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"gopkg.in/libgit2/git2go.v25"
 )
 
+// Project represents an ide project
 type Project struct {
-	Repository *git.Repository
-	Config     *git.Config
-	Location   string
-	Language   string
+	repository     *git.Repository
+	config         *git.Config
+	ctrlpCacheFile string
+	ctagsFile      string
 }
 
+// LoadProject instantiates a new instance of Project for a given directory
 func LoadProject(gitdir string) (Project, error) {
 	if gitdir == "" {
 		return Project{}, errors.New("Project directory cannot be empty")
@@ -30,21 +33,46 @@ func LoadProject(gitdir string) (Project, error) {
 		return Project{}, err
 	}
 
-	language, _ := config.LookupString("ide.language")
-
 	return Project{
-		Repository: repo,
-		Config:     config,
-		Language:   language,
-		Location:   repo.Workdir(),
+		repository: repo,
+		config:     config,
 	}, nil
 }
 
-func (this *Project) IsConfigured() bool {
-	return this.Language != ""
+// Name returns the name of the ide project, extracted from the parent directory name
+func (project *Project) Name() string {
+	return filepath.Base(project.Location())
 }
 
-func (this *Project) AutoDetectLanguage() string {
+// Branch returns the currently checked out branch of the ide project
+func (project *Project) Branch() string {
+	head, headErr := project.repository.Head()
+	if headErr != nil {
+		return ""
+	}
+
+	if head == nil {
+		return ""
+	}
+
+	//find the branch name
+	branch := ""
+	branchElements := strings.Split(head.Name(), "/")
+	if len(branchElements) == 3 {
+		branch = branchElements[2]
+	}
+
+	return branch
+}
+
+// IsConfigured returns true if the current git repository is setup as an ide project
+func (project *Project) IsConfigured() bool {
+	return project.Language() != ""
+}
+
+// AutoDetectLanguage guesses the language of a git repository based on some
+// standard files and defaults to plain
+func (project *Project) AutoDetectLanguage() string {
 	if _, err := os.Stat("setup.py"); err == nil {
 		return "python"
 	} else if _, err := os.Stat("composer.json"); err == nil {
@@ -58,17 +86,35 @@ func (this *Project) AutoDetectLanguage() string {
 	return "plain"
 }
 
-func (this *Project) ListHooks() error {
-	cmd := exec.Command("find", ".git/hooks", "-perm", "+0111", "-a", "-not", "-type", "d", "-a", "-not", "-name", "\\*.sample")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Run()
+// Language returns the language of the ide project as stored in .git/config file
+func (project *Project) Language() string {
+	language, _ := project.config.LookupString("ide.language")
 
-	return nil
+	return language
 }
 
-func (this *Project) Save() error {
-	err := this.Config.SetString("ide.language", this.Language)
+// Location returns the absolute file path of the ide project
+func (project *Project) Location() string {
+	return project.repository.Workdir()
+}
+
+// ListHooks returns an array of hooks which are enabled for the ide project
+func (project *Project) ListHooks() []string {
+	hooks := []string{}
+
+	filepath.Walk(filepath.Join(project.repository.Path(), "hooks"), func(path string, f os.FileInfo, err error) error {
+		if f.Mode()&os.ModeSymlink != 0 {
+			hooks = append(hooks, f.Name())
+		}
+		return nil
+	})
+
+	return hooks
+}
+
+// SetLanguage stores the given language in the .git/config file of the ide project
+func (project *Project) SetLanguage(language string) error {
+	err := project.config.SetString("ide.language", language)
 	if err != nil {
 		return err
 	}
@@ -76,8 +122,9 @@ func (this *Project) Save() error {
 	return nil
 }
 
-func (this *Project) Destroy() error {
-	err := this.Config.Delete("ide.language")
+// Destroy removes any trace of ide configuration from .git/config file
+func (project *Project) Destroy() error {
+	err := project.config.Delete("ide.language")
 	if err != nil {
 		return err
 	}
