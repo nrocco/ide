@@ -98,20 +98,6 @@ func (project *Project) Location() string {
 	return project.repository.Workdir()
 }
 
-// ListHooks returns an array of hooks which are enabled for the ide project
-func (project *Project) ListHooks() []string {
-	hooks := []string{}
-
-	filepath.Walk(filepath.Join(project.repository.Path(), "hooks"), func(path string, f os.FileInfo, err error) error {
-		if f.Mode()&os.ModeSymlink != 0 {
-			hooks = append(hooks, f.Name())
-		}
-		return nil
-	})
-
-	return hooks
-}
-
 // SetLanguage stores the given language in the .git/config file of the ide project
 func (project *Project) SetLanguage(language string) error {
 	err := project.config.SetString("ide.language", language)
