@@ -12,7 +12,7 @@ func main() {
 	if strings.Contains(os.Args[0], ".git/hooks") {
 		elems := strings.Split(os.Args[0], "/")
 
-		args := []string{os.Args[0], "hook", "exec", elems[2]}
+		args := []string{os.Args[0], "hook", "run", elems[2]}
 		os.Args = append(args, os.Args[1:]...)
 	}
 
