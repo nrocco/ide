@@ -9,7 +9,7 @@ import (
 
 func (project *Project) GetCtagsFile() string {
 	if project.ctagsFile == "" {
-		project.ctagsFile = filepath.Join(project.repository.Path(), "tags")
+		project.ctagsFile = filepath.Join(project.repository.Path(), "tags") // TODO: make location of the tags file configurable
 	}
 
 	return project.ctagsFile
@@ -20,6 +20,7 @@ func (project *Project) RefreshCtags() error {
 		return errors.New("Project must be configured before you can RefreshCtags")
 	}
 
+	// TODO: make default options for ctags configurable
 	options := []string{
 		"--recurse", "--tag-relative=yes", "--sort=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",

@@ -13,7 +13,7 @@ import (
 
 func (project *Project) GetCtrlpCachFile() string {
 	if project.ctrlpCacheFile == "" {
-		cacheDir, _ := homedir.Expand("~/.cache/ctrlp") // TODO: make project configurable
+		cacheDir, _ := homedir.Expand("~/.cache/ctrlp") // TODO: make location of the cache configurable
 		cacheDir, _ = filepath.Abs(cacheDir)
 
 		cacheFilename := project.Location()
@@ -45,6 +45,7 @@ func (project *Project) RefreshCtrlp() error {
 	location := project.Location()
 
 	filepath.Walk(location, func(path string, f os.FileInfo, err error) error {
+		// TODO: configure what sort of files to exclude
 		if !f.IsDir() && !strings.Contains(path, ".git") {
 			fmt.Fprintln(w, strings.Replace(path, location, "", -1))
 		}

@@ -18,12 +18,12 @@ type Project struct {
 }
 
 // LoadProject instantiates a new instance of Project for a given directory
-func LoadProject(gitdir string) (Project, error) {
-	if gitdir == "" {
+func LoadProject(directory string) (Project, error) {
+	if directory == "" {
 		return Project{}, errors.New("Project directory cannot be empty")
 	}
 
-	repo, err := git.OpenRepository(gitdir)
+	repo, err := git.OpenRepository(directory)
 	if err != nil {
 		return Project{}, err
 	}
