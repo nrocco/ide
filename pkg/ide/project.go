@@ -110,6 +110,10 @@ func (project *Project) SetLanguage(language string) error {
 
 // Destroy removes any trace of ide configuration from .git/config file
 func (project *Project) Destroy() error {
+	for _, hook := range project.ListHooks() {
+		project.DisableHook(hook)
+	}
+
 	err := project.config.Delete("ide.language")
 	if err != nil {
 		return err
