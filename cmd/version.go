@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the status command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Get the version of ide",

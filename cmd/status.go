@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get the current status of your ide project",

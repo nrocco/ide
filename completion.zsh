@@ -16,7 +16,6 @@ _ide() {
     'disable:Disable a git hook for this ide project'
     'enable:Enable a git hook for this ide project'
     'run:Run a git hook against an ide project'
-    'list:List all available hooks'
   )
 
   local -a hook_run_commands

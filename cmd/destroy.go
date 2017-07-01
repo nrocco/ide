@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// destroyCmd represents the status command
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "Remove all ide configuration for a repository",

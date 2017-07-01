@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
-// hookCmd represents the status command
 var enableHookCmd = &cobra.Command{
 	Use:   "enable",
 	Short: "Enable a git hook for this ide project",

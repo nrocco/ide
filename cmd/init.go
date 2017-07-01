@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the status command
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize a git repository as an ide project",
