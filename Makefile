@@ -4,7 +4,7 @@ VERSION := $(shell git describe --tags --always --dirty)
 PKG_LIST := $(shell go list ${PKG}/... | grep -v ${PKG}/vendor/)
 GO_FILES := $(shell find * -type d -name vendor -prune -or -name '*.go' -type f | grep -v vendor)
 
-LDFLAGS = "-X ${PKG}/cmd.Version=${VERSION}"
+LDFLAGS = "-d -s -w -X ${PKG}/cmd.Version=${VERSION}"
 
 PREFIX = /usr/local
 
@@ -61,9 +61,9 @@ uninstall:
 build:
 	mkdir -p build/
 	for GOOS in darwin linux; do \
-		for GOARCH in 386 amd64; do \
+		for GOARCH in amd64; do \
 		    echo "==> Building ide for $$GOOS $$GOARCH"; \
-			docker run --rm -v "$(PWD)":/go/src/$(PKG) -w /go/src/$(PKG) -e "GOOS=$$GOOS" -e "GOARCH=$$GOARCH" golang:1.9 \
-				go build -i -v -o build/${BIN}-$$GOOS-$$GOARCH -ldflags ${LDFLAGS} ${PKG}; \
+			docker run --rm -v "$(PWD)":/go/src/$(PKG) -w /go/src/$(PKG) -e "CGO_ENABLED=0" -e "GOOS=$$GOOS" -e "GOARCH=$$GOARCH" golang:1.9 \
+				go build -a -x -v -tags netgo -installsuffix netgo -o build/${BIN}-$$GOOS-$$GOARCH -ldflags ${LDFLAGS} ${PKG}; \
 		done; \
 	done
