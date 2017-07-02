@@ -13,6 +13,9 @@ PREFIX = /usr/local
 $(BINARY): $(GO_FILES)
 	go build -i -v -o ${BINARY} -ldflags ${LDFLAGS} ${PKG}
 
+deps:
+	dep ensure
+
 lint:
 	@for file in ${GO_FILES}; do \
 		golint $${file}; \

@@ -36,7 +36,7 @@ _ide() {
     fi
   elif (( CURRENT == 4))
   then
-    if [[ $words[2] == 'hook' && $words[3] == 'run' ]]
+    if [[ $words[2] == 'hook' ]]
     then
         _describe -t hook_run_commands 'hook_run_commands' hook_run_commands
     fi
