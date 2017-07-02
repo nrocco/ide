@@ -1,41 +1,42 @@
 package ide
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"gopkg.in/libgit2/git2go.v25"
+	homedir "github.com/mitchellh/go-homedir"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
 )
 
 // Project represents an ide project
 type Project struct {
 	repository     *git.Repository
-	config         *git.Config
+	config         *config.Config
+	location       string
 	ctrlpCacheFile string
 	ctagsFile      string
 }
 
 // LoadProject instantiates a new instance of Project for a given directory
 func LoadProject(directory string) (Project, error) {
-	if directory == "" {
-		return Project{}, errors.New("Project directory cannot be empty")
+	directory, _ = homedir.Expand(directory)
+	directory, _ = filepath.Abs(directory)
+
+	repo, openErr := git.PlainOpen(directory)
+	if openErr != nil {
+		return Project{}, openErr
 	}
 
-	repo, err := git.OpenRepository(directory)
-	if err != nil {
-		return Project{}, err
-	}
-
-	config, err := repo.Config()
-	if err != nil {
-		return Project{}, err
+	config, configErr := repo.Config()
+	if configErr != nil {
+		return Project{}, configErr
 	}
 
 	return Project{
 		repository: repo,
 		config:     config,
+		location:   directory,
 	}, nil
 }
 
@@ -55,14 +56,7 @@ func (project *Project) Branch() string {
 		return ""
 	}
 
-	//find the branch name
-	branch := ""
-	branchElements := strings.Split(head.Name(), "/")
-	if len(branchElements) == 3 {
-		branch = branchElements[2]
-	}
-
-	return branch
+	return head.Name().Short()
 }
 
 // IsConfigured returns true if the current git repository is setup as an ide project
@@ -88,22 +82,18 @@ func (project *Project) AutoDetectLanguage() string {
 
 // Language returns the language of the ide project as stored in .git/config file
 func (project *Project) Language() string {
-	language, _ := project.config.LookupString("ide.language")
-
-	return language
+	return project.config.Raw.Section("ide").Option("language")
 }
 
 // Location returns the absolute file path of the ide project
 func (project *Project) Location() string {
-	return project.repository.Workdir()
+	return project.location
 }
 
 // SetLanguage stores the given language in the .git/config file of the ide project
 func (project *Project) SetLanguage(language string) error {
-	err := project.config.SetString("ide.language", language)
-	if err != nil {
-		return err
-	}
+	project.config.Raw.Section("ide").SetOption("language", language)
+	project.repository.Storer.SetConfig(project.config)
 
 	return nil
 }
@@ -114,10 +104,8 @@ func (project *Project) Destroy() error {
 		project.DisableHook(hook)
 	}
 
-	err := project.config.Delete("ide.language")
-	if err != nil {
-		return err
-	}
+	project.config.Raw.RemoveSection("ide")
+	project.repository.Storer.SetConfig(project.config)
 
 	return nil
 }

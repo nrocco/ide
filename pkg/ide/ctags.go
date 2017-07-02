@@ -9,7 +9,7 @@ import (
 
 func (project *Project) GetCtagsFile() string {
 	if project.ctagsFile == "" {
-		project.ctagsFile = filepath.Join(project.repository.Path(), "tags") // TODO: make location of the tags file configurable
+		project.ctagsFile = filepath.Join(project.location, ".git", "tags") // TODO: make location of the tags file configurable
 	}
 
 	return project.ctagsFile

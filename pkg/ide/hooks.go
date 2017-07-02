@@ -10,7 +10,7 @@ import (
 func (project *Project) ListHooks() []string {
 	hooks := []string{}
 
-	filepath.Walk(filepath.Join(project.repository.Path(), "hooks"), func(path string, f os.FileInfo, err error) error {
+	filepath.Walk(filepath.Join(project.location, ".git", "hooks"), func(path string, f os.FileInfo, err error) error {
 		if f.Mode()&os.ModeSymlink != 0 {
 			hooks = append(hooks, f.Name())
 		}
@@ -37,7 +37,7 @@ func (project *Project) EnableHook(hook string) error {
 		return errors.New(hook + " is not a valid hook")
 	}
 
-	dest := filepath.Join(project.repository.Path(), "hooks", hook)
+	dest := filepath.Join(project.location, ".git", "hooks", hook)
 
 	if _, err := os.Stat(dest); err == nil {
 		return errors.New("Hook " + hook + " already exists for this project\n")
@@ -54,7 +54,7 @@ func (project *Project) DisableHook(hook string) error {
 		return errors.New(hook + " is not a valid hook")
 	}
 
-	dest := filepath.Join(project.repository.Path(), "hooks", hook)
+	dest := filepath.Join(project.location, ".git", "hooks", hook)
 
 	if _, err := os.Stat(dest); err == nil {
 		if err := os.Remove(dest); err != nil {
