@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +11,7 @@ var versionCmd = &cobra.Command{
 	Short: "Get the version of ide",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println(Version)
+		fmt.Printf("ide: %s\n", Version)
 	},
 }
 
