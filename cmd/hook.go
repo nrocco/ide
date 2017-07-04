@@ -11,5 +11,5 @@ var hookCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(hookCmd)
+	rootCmd.AddCommand(hookCmd)
 }

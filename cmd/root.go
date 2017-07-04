@@ -3,11 +3,13 @@ package cmd
 import (
 	"log"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/nrocco/ide/pkg/ide"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/nrocco/ide/pkg/ide"
 )
 
 var (
@@ -21,8 +23,7 @@ var (
 	Project ide.Project
 )
 
-// RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "ide",
 	Short: "ide provides a powerful ide that gets out of your way",
 	Long:  ``,
@@ -39,23 +40,30 @@ var RootCmd = &cobra.Command{
 	},
 }
 
-// init initializes the application
+// Execute executes the rootCmd logic and is the main entry point for ide
+func Execute() error {
+	if strings.Contains(os.Args[0], ".git/hooks") {
+		elems := strings.Split(os.Args[0], "/")
+
+		args := []string{os.Args[0], "hook", "run", elems[2]}
+		os.Args = append(args, os.Args[1:]...)
+	}
+
+	return rootCmd.Execute()
+}
+
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ide.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ide.yaml)")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		home, err := homedir.Dir()
-		if err != nil {
+		if err == nil {
 			viper.AddConfigPath(home)
 			viper.SetConfigName(".ide")
 		}

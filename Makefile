@@ -5,7 +5,7 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v ${PKG}/vendor/)
 GO_FILES := $(shell find * -type d -name vendor -prune -or -name '*.go' -type f | grep -v vendor)
 
 LDFLAGS = "-d -s -w -X ${PKG}/cmd.Version=${VERSION}"
-BUILD_ARGS = -a -x -v -tags netgo -installsuffix netgo -ldflags $(LDFLAGS)
+BUILD_ARGS = -a -tags netgo -installsuffix netgo -ldflags $(LDFLAGS)
 
 PREFIX = /usr/local
 
@@ -14,19 +14,24 @@ PREFIX = /usr/local
 build/$(BIN): $(GO_FILES)
 	CGO_ENABLED=0 go build ${BUILD_ARGS} -o build/${BIN} ${PKG}
 
+.PHONY: deps
 deps:
 	go get -u github.com/golang/dep/cmd/dep
 	dep ensure
 
+.PHONY: lint
 lint:
 	@for file in ${GO_FILES}; do golint $${file}; done
 
+.PHONY: vet
 vet:
 	@go vet ${PKG_LIST}
 
+.PHONY: test
 test:
-	@go test -short ${PKG_LIST}
+	@go test ${PKG_LIST}
 
+.PHONY: version
 version:
 	@echo $(VERSION)
 
