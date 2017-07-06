@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec docker run --rm -i -t --network ide_default -u "1000:100" -w "$PWD" -v "$PWD:$PWD" --entrypoint=node ide:nodejs "$@"

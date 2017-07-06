@@ -1,2 +1,0 @@
-#!/bin/sh
-exec php -dzend_extension=xdebug.so vendor/phpunit/phpunit/phpunit --coverage-html "/static/coverage/$(basename $PWD)" "$@"

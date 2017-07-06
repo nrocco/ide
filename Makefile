@@ -42,26 +42,14 @@ clean:
 install: build/$(BIN)
 	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
 	cp "$<" "$(DESTDIR)$(PREFIX)/bin/$(BIN)"
-	# cp bin/composer "$(DESTDIR)$(PREFIX)/bin/composer"
-	# cp bin/ctags "$(DESTDIR)$(PREFIX)/bin/ctags"
-	# cp bin/node "$(DESTDIR)$(PREFIX)/bin/node"
-	# cp bin/npm "$(DESTDIR)$(PREFIX)/bin/npm"
-	# cp bin/php "$(DESTDIR)$(PREFIX)/bin/php"
-	# cp bin/phpcoverage "$(DESTDIR)$(PREFIX)/bin/phpcoverage"
-	# cp bin/phpunit "$(DESTDIR)$(PREFIX)/bin/phpunit"
 	cp bin/rgit "$(DESTDIR)$(PREFIX)/bin/rgit"
+	cp bin/ctags "$(DESTDIR)$(PREFIX)/bin/ctags"
 	cp completion.zsh "$(DESTDIR)$(PREFIX)/share/zsh/site-functions/_$(BIN)"
 
 uninstall:
 	rm -f "$(DESTDIR)$(PREFIX)/bin/$(BIN)"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/composer"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/ctags"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/node"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/npm"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/php"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/phpcoverage"
-	# rm -f "$(DESTDIR)$(PREFIX)/bin/phpunit"
 	rm -f "$(DESTDIR)$(PREFIX)/bin/rgit"
+	rm -f "$(DESTDIR)$(PREFIX)/bin/ctags"
 	rm -f "$(DESTDIR)$(PREFIX)/share/zsh/site-functions/_$(BIN)"
 
 .PHONY: build

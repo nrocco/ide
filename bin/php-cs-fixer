@@ -1,2 +1,0 @@
-#!/bin/sh
-exec php /composer/vendor/bin/php-cs-fixer "$@"
