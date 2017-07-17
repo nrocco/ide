@@ -98,6 +98,24 @@ func (project *Project) SetLanguage(language string) error {
 	return nil
 }
 
+func (project *Project) GetExecutable(executable string) string {
+	return project.config.Raw.Section("ide").Subsection("executables").Option(executable)
+}
+
+func (project *Project) AddExecutable(executable string, container string) error {
+	project.config.Raw.Section("ide").Subsection("executables").AddOption(executable, container)
+	project.repository.Storer.SetConfig(project.config)
+
+	return nil
+}
+
+func (project *Project) RemoveExecutable(executable string) error {
+	project.config.Raw.Section("ide").Subsection("executables").RemoveOption(executable)
+	project.repository.Storer.SetConfig(project.config)
+
+	return nil
+}
+
 // Destroy removes any trace of ide configuration from .git/config file
 func (project *Project) Destroy() error {
 	for _, hook := range project.ListHooks() {
