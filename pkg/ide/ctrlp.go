@@ -42,7 +42,7 @@ func (project *Project) RefreshCtrlp() error {
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
-	location := project.Location()
+	location := project.Location() + "/"
 
 	filepath.Walk(location, func(path string, f os.FileInfo, err error) error {
 		// TODO: configure what sort of files to exclude
