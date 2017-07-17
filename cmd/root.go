@@ -24,9 +24,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "ide",
-	Short: "ide provides a powerful ide that gets out of your way",
-	Long:  ``,
+	Use:          "ide",
+	Short:        "ide provides a powerful ide that gets out of your way",
+	Long:         ``,
+	SilenceUsage: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		dir, err := os.Getwd()
 		if err != nil {
@@ -45,7 +46,10 @@ func Execute() error {
 	if strings.Contains(os.Args[0], ".git/hooks") {
 		elems := strings.Split(os.Args[0], "/")
 
-		args := []string{os.Args[0], "hook", "run", elems[2]}
+		args := []string{os.Args[0], "hook", "run", "--", elems[2]}
+		os.Args = append(args, os.Args[1:]...)
+	} else if !strings.Contains(os.Args[0], "ide") {
+		args := []string{os.Args[0], "env", "exec", "--", os.Args[0]}
 		os.Args = append(args, os.Args[1:]...)
 	}
 

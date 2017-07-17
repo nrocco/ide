@@ -51,7 +51,7 @@ build-all:
 	$(MAKE) build GOOS=darwin GOARCH=amd64
 
 .PHONY: install
-install: build/$(BIN)
+install: build/$(BIN)-$(GOOS)-$(GOARCH)
 	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
 	cp "$<" "$(DESTDIR)$(PREFIX)/bin/$(BIN)"
 	cp bin/rgit "$(DESTDIR)$(PREFIX)/bin/rgit"

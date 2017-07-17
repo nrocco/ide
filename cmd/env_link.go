@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/spf13/cobra"
+	"strings"
 )
 
 var linkEnvCmd = &cobra.Command{
@@ -17,13 +17,35 @@ var linkEnvCmd = &cobra.Command{
 			return nil
 		}
 
-		// TODO: check format of 2nd argument
-		//		 if php or /usr/bin/php5 create symlink to binary on host system
-		//       if container_name:php or container_name:/usr/bin/php5 create symlink to ide
-		// TODO: if latter, add git config php = container_name
+		var source string
+		var err error
+
+		parts := strings.SplitN(args[1], ":", 2)
+
+		if len(parts) == 1 {
+			source, err = filepath.Abs(args[1])
+			if err != nil {
+				return err
+			}
+
+			fileInfo, err := os.Stat(source)
+			if err != nil {
+				return err
+			}
+
+			if fileInfo.IsDir() {
+				return nil // TODO return an error here
+			}
+		} else {
+			source, err = os.Executable()
+			if err != nil {
+				return err
+			}
+
+			Project.AddExecutable(parts[1], parts[0])
+		}
 
 		executable := filepath.Join(".git", "bin", args[0])
-		source, _ := filepath.Abs(args[1])
 
 		log.Printf("Linking %s to %s", executable, source)
 		os.Symlink(source, executable)
