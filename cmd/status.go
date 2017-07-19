@@ -19,13 +19,14 @@ var statusCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Ide\n")
-		fmt.Printf("  Name:       %s\n", Project.Name())
-		fmt.Printf("  Branch:     %s\n", Project.Branch())
-		fmt.Printf("  Language:   %s\n", Project.Language())
-		fmt.Printf("  Location:   %s\n", Project.Location())
-		fmt.Printf("  Ctags:      %s\n", Project.GetCtagsFile())
-		fmt.Printf("  CtrlpCache: %s\n", Project.GetCtrlpCachFile())
-		fmt.Printf("  Hooks:      %s\n", strings.Join(Project.ListHooks(), " "))
+		fmt.Printf("  Name:        %s\n", Project.Name())
+		fmt.Printf("  Branch:      %s\n", Project.Branch())
+		fmt.Printf("  Language:    %s\n", Project.Language())
+		fmt.Printf("  Location:    %s\n", Project.Location())
+		fmt.Printf("  Ctags:       %s\n", Project.GetCtagsFile())
+		fmt.Printf("  CtrlpCache:  %s\n", Project.GetCtrlpCachFile())
+		fmt.Printf("  Hooks:       %s\n", strings.Join(Project.ListHooks(), " "))
+		fmt.Printf("  Executables: %s\n", strings.Join(Project.GetExecutables(), " "))
 
 		return nil
 	},

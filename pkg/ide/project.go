@@ -1,12 +1,12 @@
 package ide
 
 import (
-	"os"
-	"path/filepath"
-
 	homedir "github.com/mitchellh/go-homedir"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 // Project represents an ide project
@@ -96,6 +96,18 @@ func (project *Project) SetLanguage(language string) error {
 	project.repository.Storer.SetConfig(project.config)
 
 	return nil
+}
+
+func (project *Project) GetExecutables() []string {
+	var executables []string
+
+	files, _ := ioutil.ReadDir(".git/bin")
+
+	for _, file := range files {
+		executables = append(executables, file.Name())
+	}
+
+	return executables
 }
 
 func (project *Project) GetExecutable(executable string) string {
