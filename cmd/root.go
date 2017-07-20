@@ -46,7 +46,7 @@ func Execute() error {
 	if strings.Contains(os.Args[0], ".git/hooks") {
 		elems := strings.Split(os.Args[0], "/")
 
-		args := []string{os.Args[0], "hook", "run", "--", elems[2]}
+		args := []string{os.Args[0], "hook", "run", elems[2]}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
 		args := []string{os.Args[0], "env", "exec", "--", os.Args[0]}
