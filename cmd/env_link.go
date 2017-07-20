@@ -45,6 +45,7 @@ var linkEnvCmd = &cobra.Command{
 			Project.AddExecutable(parts[1], parts[0])
 		}
 
+		os.MkdirAll(filepath.Join(".git", "bin"), os.ModePerm)
 		executable := filepath.Join(".git", "bin", args[0])
 
 		log.Printf("Linking %s to %s", executable, source)
