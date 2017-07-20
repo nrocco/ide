@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
+	"io"
 	"os"
-	"os/exec"
 )
 
 var execEnvCmd = &cobra.Command{
@@ -16,14 +19,40 @@ var execEnvCmd = &cobra.Command{
 		}
 
 		container := Project.GetExecutable(args[0])
-		options := append([]string{"exec", "-i", "-t", container}, args...)
 
-		command := exec.Command("docker", options...)
-		command.Stdout = os.Stdout
-		command.Stdin = os.Stdin
-		command.Stderr = os.Stderr
+		ctx := context.Background()
+		cli, err := client.NewEnvClient()
+		if err != nil {
+			return err
+		}
 
-		return command.Run()
+		execOpts := types.ExecConfig{
+			Cmd:          args,
+			Tty:          true,
+			AttachStdin:  true,
+			AttachStdout: true,
+			AttachStderr: true,
+		}
+
+		execInstance, err := cli.ContainerExecCreate(ctx, container, execOpts)
+		if err != nil {
+			return err
+		}
+
+		att, err := cli.ContainerExecAttach(ctx, execInstance.ID, execOpts)
+		if err != nil {
+			return err
+		}
+
+		execStartOpts := types.ExecStartCheck{}
+		err = cli.ContainerExecStart(ctx, execInstance.ID, execStartOpts)
+		if err != nil {
+			return err
+		}
+
+		io.Copy(os.Stdout, att.Reader)
+
+		return nil
 	},
 }
 
