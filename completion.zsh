@@ -32,24 +32,21 @@ _ide() {
     'prepare-commit-msg:Run the prepare-commit-msg hook for the ide project'
   )
 
-  if (( CURRENT == 2 ))
+  if [[ CURRENT -eq 2 ]]
   then
     _describe -t commands 'commands' commands
-  elif (( CURRENT == 3))
+  elif [[ CURRENT -eq 3 && $words[2] == 'hook' ]]
   then
-    if [[ $words[2] == 'hook' ]]
-    then
-        _describe -t hook_commands 'hook_commands' hook_commands
-    elif [[ $words[2] == 'link' ]]
-    then
-        _describe -t link_commands 'link_commands' link_commands
-    fi
-  elif (( CURRENT == 4))
+    _describe -t hook_commands 'hook subcommands' hook_commands
+  elif [[ CURRENT -eq 3 && $words[2] == 'link' ]]
   then
-    if [[ $words[2] == 'hook' ]]
-    then
-        _describe -t hook_run_commands 'hook_run_commands' hook_run_commands
-    fi
+    _describe -t link_commands 'link subcommands' link_commands
+  elif [[ CURRENT -eq 4 && $words[2] == 'hook' ]]
+  then
+    _describe -t hook_run_commands 'hook run subcommands' hook_run_commands
+  elif [[ CURRENT -eq 4 && $words[2] == 'link' && $words[3] != 'add' ]]
+  then
+    _values 'linked executables' $(ls .git/bin)
   fi
 
   return 0
