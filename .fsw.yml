@@ -5,7 +5,7 @@ triggers:
   - '**/*.go'
   env:
     DEBUG: "1"
-  cmd: make build
+  cmd: go build -o build/ide-darwin-amd64 github.com/nrocco/ide
   shell: true
   delay: 100ms
   stop_timeout: 500ms
