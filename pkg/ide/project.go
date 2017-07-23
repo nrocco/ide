@@ -18,24 +18,24 @@ type Project struct {
 }
 
 // LoadProject instantiates a new instance of Project for a given directory
-func LoadProject(directory string) (Project, error) {
-	directory, _ = homedir.Expand(directory)
-	directory, _ = filepath.Abs(directory)
+func LoadProject(location string) (*Project, error) {
+	location, _ = homedir.Expand(location)
+	location, _ = filepath.Abs(location)
 
-	repo, openErr := git.PlainOpen(directory)
+	repository, openErr := git.PlainOpen(location)
 	if openErr != nil {
-		return Project{}, openErr
+		return &Project{}, openErr
 	}
 
-	config, configErr := repo.Config()
+	config, configErr := repository.Config()
 	if configErr != nil {
-		return Project{}, configErr
+		return &Project{}, configErr
 	}
 
-	return Project{
-		repository: repo,
+	return &Project{
+		repository: repository,
 		config:     config,
-		location:   directory,
+		location:   location,
 	}, nil
 }
 
