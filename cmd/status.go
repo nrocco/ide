@@ -26,7 +26,7 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("  Ctags:       %s\n", Project.GetCtagsFile())
 		fmt.Printf("  CtrlpCache:  %s\n", Project.GetCtrlpCachFile())
 		fmt.Printf("  Hooks:       %s\n", strings.Join(Project.ListHooks(), " "))
-		fmt.Printf("  Executables: %s\n", strings.Join(Project.GetExecutables(), " "))
+		fmt.Printf("  Executables: %s\n", strings.Join(Project.ListExecutables(), " "))
 
 		return nil
 	},

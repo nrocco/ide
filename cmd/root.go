@@ -1,15 +1,13 @@
 package cmd
 
 import (
+	homedir "github.com/mitchellh/go-homedir"
+	"github.com/nrocco/ide/pkg/ide"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
-
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	"github.com/nrocco/ide/pkg/ide"
 )
 
 var (
@@ -20,7 +18,7 @@ var (
 	cfgFile string
 
 	// Project represents an instance of ide.Project
-	Project ide.Project
+	Project *ide.Project
 )
 
 var rootCmd = &cobra.Command{
@@ -49,7 +47,7 @@ func Execute() error {
 		args := []string{os.Args[0], "hook", "run", elems[2]}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
-		args := []string{os.Args[0], "env", "exec", "--", os.Args[0]}
+		args := []string{os.Args[0], "link", "exec", "--", os.Args[0]}
 		os.Args = append(args, os.Args[1:]...)
 	}
 

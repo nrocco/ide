@@ -4,7 +4,6 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -92,37 +91,8 @@ func (project *Project) Location() string {
 
 // SetLanguage stores the given language in the .git/config file of the ide project
 func (project *Project) SetLanguage(language string) error {
+	// TODO add error handling here
 	project.config.Raw.Section("ide").SetOption("language", language)
-	project.repository.Storer.SetConfig(project.config)
-
-	return nil
-}
-
-func (project *Project) GetExecutables() []string {
-	var executables []string
-
-	files, _ := ioutil.ReadDir(".git/bin")
-
-	for _, file := range files {
-		executables = append(executables, file.Name())
-	}
-
-	return executables
-}
-
-func (project *Project) GetExecutable(executable string) string {
-	return project.config.Raw.Section("ide").Subsection("executables").Option(executable)
-}
-
-func (project *Project) AddExecutable(executable string, container string) error {
-	project.config.Raw.Section("ide").Subsection("executables").AddOption(executable, container)
-	project.repository.Storer.SetConfig(project.config)
-
-	return nil
-}
-
-func (project *Project) RemoveExecutable(executable string) error {
-	project.config.Raw.Section("ide").Subsection("executables").RemoveOption(executable)
 	project.repository.Storer.SetConfig(project.config)
 
 	return nil
@@ -132,6 +102,10 @@ func (project *Project) RemoveExecutable(executable string) error {
 func (project *Project) Destroy() error {
 	for _, hook := range project.ListHooks() {
 		project.DisableHook(hook)
+	}
+
+	for _, name := range project.ListExecutables() {
+		project.RemoveExecutable(name)
 	}
 
 	project.config.Raw.RemoveSection("ide")
