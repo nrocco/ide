@@ -13,7 +13,6 @@ _ide() {
 
   local -a hook_commands
   hook_commands=(
-    'help:Help about any command'
     'disable:Disable a git hook for this ide project'
     'enable:Enable a git hook for this ide project'
     'run:Run a git hook against an ide project'
@@ -23,7 +22,6 @@ _ide() {
   link_commands=(
     'add:Link to an executable and add it to this ide project'
     'exec:Execute a linked program in this ide projects environment'
-    'help:Help about any command'
     'rm:Remove a linked program from this ide project'
   )
 
@@ -51,9 +49,6 @@ _ide() {
     if [[ $words[2] == 'hook' ]]
     then
         _describe -t hook_run_commands 'hook_run_commands' hook_run_commands
-    elif [[ $words[2] == 'link' ]]
-    then
-        _files -f -g .git/bin/*
     fi
   fi
 
