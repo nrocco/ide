@@ -12,18 +12,7 @@ var runPostCheckoutHookCmd = &cobra.Command{
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log.Printf("Writing ctags file to %s\n", Project.GetCtagsFile())
-		errCtags := Project.RefreshCtags()
-		if errCtags != nil {
-			return errCtags
-		}
-
-		log.Printf("Writing ctrlp cache to %s\n", Project.GetCtrlpCachFile())
-		errCtrlp := Project.RefreshCtrlp()
-		if errCtrlp != nil {
-			return errCtrlp
-		}
-
-		return nil
+		return Project.RefreshCtags()
 	},
 }
 

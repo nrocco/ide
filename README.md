@@ -59,12 +59,11 @@ You can also view the current status of your ide project:
       Language:   go
       Location:   /home/nrocco/go/src/github.com/nrocco/ide
       Ctags:      /home/nrocco/go/src/github.com/nrocco/ide/.git/tags
-      CtrlpCache: /home/nrocco/.cache/ctrlp/%Users%nrocco%go%src%github.com%nrocco%ide.txt
       Hooks:
 
 
 In the above case no hooks are enabled for this project. In order to enable
-the `post-checkout` hook (which runs ctags and ctrlp) run:
+the `post-checkout` hook (which runs ctags) run:
 
     % ide hook enable post-checkout
     2017/07/04 20:17:37 Hook post-checkout enabled
