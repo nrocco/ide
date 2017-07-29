@@ -22,9 +22,9 @@ func (project *Project) RefreshCtags() error {
 
 	// TODO: make default options for ctags configurable
 	options := []string{
-		"--recurse", "--tag-relative=yes", "--sort=yes",
+		"--tag-relative=yes", "--sort=yes", "--totals=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
-		"-f", project.GetCtagsFile(),
+		"--recurse", "-f", project.GetCtagsFile(),
 		"--kinds-php=cif", "--kinds-python=-i",
 		"--languages=" + project.Language(),
 	}
