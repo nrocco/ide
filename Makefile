@@ -2,7 +2,7 @@ BIN := ide
 PKG := github.com/nrocco/ide
 VERSION := $(shell git describe --tags --always --dirty)
 PKG_LIST := $(shell go list ${PKG}/... | grep -v ${PKG}/vendor/)
-GO_FILES := $(shell find * -type d -name vendor -prune -or -name '*.go' -type f | grep -v vendor)
+GO_FILES := $(shell git ls-files '*.go')
 
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
@@ -13,7 +13,7 @@ PREFIX = /usr/local
 
 .DEFAULT_GOAL: build
 
-build/$(BIN)-$(GOOS)-$(GOARCH): $(GO_FILES)
+build/${BIN}-${GOOS}-${GOARCH}: $(GO_FILES)
 	mkdir -p build
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build ${BUILD_ARGS} -o $@ ${PKG}
 
@@ -24,26 +24,34 @@ deps:
 
 .PHONY: lint
 lint:
-	@for file in ${GO_FILES}; do golint $${file}; done
+	golint -set_exit_status ${PKG_LIST}
 
 .PHONY: vet
 vet:
-	@go vet ${PKG_LIST}
+	go vet -v ${PKG_LIST}
 
 .PHONY: test
 test:
-	@go test ${PKG_LIST}
+	go test -short ${PKG_LIST}
+
+.PHONY: coverage
+coverage:
+	mkdir -p coverage && rm -rf coverage/*
+	for package in ${PKG_LIST}; do go test -covermode=count -coverprofile "coverage/$${package##*/}.cov" "$$package"; done
+	echo mode: count > coverage/coverage.cov
+	tail -q -n +2 coverage/*.cov >> coverage/coverage.cov
+	go tool cover -func=coverage/coverage.cov
 
 .PHONY: version
 version:
-	@echo $(VERSION)
+	@echo ${VERSION}
 
 .PHONY: clean
 clean:
 	rm -rf build
 
 .PHONY: build
-build: build/$(BIN)-$(GOOS)-$(GOARCH)
+build: build/${BIN}-${GOOS}-${GOARCH}
 
 .PHONY: build-all
 build-all:

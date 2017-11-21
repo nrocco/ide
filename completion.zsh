@@ -6,7 +6,7 @@ _ide() {
     'help:Help about any command'
     'hook:Manage git hooks for an ide project'
     'init:Initialize a git repository as an ide project'
-    'link:Manage link to executables for this ide project'
+    'exec:Manage executables for this ide project'
     'status:Get the current status of your ide project'
     'version:Get the version of ide'
   )
@@ -18,11 +18,11 @@ _ide() {
     'run:Run a git hook against an ide project'
   )
 
-  local -a link_commands
-  link_commands=(
-    'add:Link to an executable and add it to this ide project'
-    'exec:Execute a linked program in this ide projects environment'
-    'rm:Remove a linked program from this ide project'
+  local -a exec_commands
+  exec_commands=(
+    'add:Add an executable to this ide project'
+    'exec:Execute a program in this ide projects environment'
+    'rm:Remove an executable from this ide project'
   )
 
   local -a hook_run_commands
@@ -38,15 +38,15 @@ _ide() {
   elif [[ CURRENT -eq 3 && $words[2] == 'hook' ]]
   then
     _describe -t hook_commands 'hook subcommands' hook_commands
-  elif [[ CURRENT -eq 3 && $words[2] == 'link' ]]
+  elif [[ CURRENT -eq 3 && $words[2] == 'exec' ]]
   then
-    _describe -t link_commands 'link subcommands' link_commands
+    _describe -t exec_commands 'exec subcommands' exec_commands
   elif [[ CURRENT -eq 4 && $words[2] == 'hook' ]]
   then
     _describe -t hook_run_commands 'hook run subcommands' hook_run_commands
-  elif [[ CURRENT -eq 4 && $words[2] == 'link' && $words[3] != 'add' ]]
+  elif [[ CURRENT -eq 4 && $words[2] == 'exec' && $words[3] != 'add' ]]
   then
-    _values 'linked executables' $(ls .git/bin)
+    _values 'executables' $(ls .git/bin)
   fi
 
   return 0

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/nrocco/ide/cmd"
 	"os"
+
+	"github.com/nrocco/ide/cmd"
 )
 
 func main() {

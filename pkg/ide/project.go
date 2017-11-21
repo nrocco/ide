@@ -1,11 +1,12 @@
 package ide
 
 import (
-	homedir "github.com/mitchellh/go-homedir"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/config"
 	"os"
 	"path/filepath"
+
+	homedir "github.com/mitchellh/go-homedir"
+	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
 )
 
 // Project represents an ide project

@@ -2,18 +2,19 @@ package cmd
 
 import (
 	"errors"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
-var linkLinkCmd = &cobra.Command{
+var execAddCmd = &cobra.Command{
 	Use:   "add [program] [name]",
-	Short: "Link to an executable and add it to this ide project",
-	Long:  "Link to an executable and add it to this ide project",
+	Short: "Add an executable to this ide project",
+	Long:  "Add an executable to this ide project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			cmd.Usage()
-			return errors.New("You must supply a program to link to")
+			return errors.New("You must supply a program to add")
 		} else if len(args) > 2 {
 			cmd.Usage()
 			return errors.New("Only 2 arguments expected.")
@@ -35,5 +36,5 @@ var linkLinkCmd = &cobra.Command{
 }
 
 func init() {
-	linkCmd.AddCommand(linkLinkCmd)
+	execCmd.AddCommand(execAddCmd)
 }

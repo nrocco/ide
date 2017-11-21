@@ -2,19 +2,20 @@ package cmd
 
 import (
 	"errors"
-	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
+
+	"github.com/spf13/cobra"
 )
 
-var execLinkCmd = &cobra.Command{
+var runExecCmd = &cobra.Command{
 	Use:   "exec [name]",
-	Short: "Execute a linked program in this ide project's environment",
-	Long:  "Execute a linked program in this ide project's environment",
+	Short: "Execute a program in this ide project's environment",
+	Long:  "Execute a program in this ide project's environment",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			cmd.Usage()
-			return errors.New("You must supply a name for a link to execute")
+			return errors.New("You must supply the name of the executable to run")
 		}
 
 		executable, err := Project.GetExecutable(args[0])
@@ -43,5 +44,5 @@ var execLinkCmd = &cobra.Command{
 }
 
 func init() {
-	linkCmd.AddCommand(execLinkCmd)
+	execCmd.AddCommand(runExecCmd)
 }

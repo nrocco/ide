@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"log"
+	"os"
+	"strings"
+
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/nrocco/ide/pkg/ide"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
-	"os"
-	"strings"
 )
 
 var (
@@ -47,7 +48,7 @@ func Execute() error {
 		args := []string{os.Args[0], "hook", "run", elems[2]}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
-		args := []string{os.Args[0], "link", "exec", "--", os.Args[0]}
+		args := []string{os.Args[0], "exec", "run", "--", os.Args[0]}
 		os.Args = append(args, os.Args[1:]...)
 	}
 
