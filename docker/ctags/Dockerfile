@@ -1,4 +1,4 @@
-FROM alpine:3.6 AS builder
+FROM alpine:edge AS builder
 RUN apk --no-cache add bash automake autoconf build-base git ca-certificates openssl && \
     wget https://github.com/universal-ctags/ctags/archive/master.tar.gz && \
     tar xzf master.tar.gz && \
@@ -8,7 +8,7 @@ RUN apk --no-cache add bash automake autoconf build-base git ca-certificates ope
     make && \
     make install
 
-FROM alpine:3.6
+FROM alpine:edge
 RUN apk --no-cache update
 COPY --from=builder /usr/local /usr/local
 ENTRYPOINT ["ctags"]
