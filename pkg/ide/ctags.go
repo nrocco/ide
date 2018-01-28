@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// GetCtagsFile returns the path to the ctags file of the current ide project
 func (project *Project) GetCtagsFile() string {
 	if project.ctagsFile == "" {
 		project.ctagsFile = filepath.Join(project.location, ".git", "tags") // TODO: make location of the tags file configurable
@@ -15,6 +16,7 @@ func (project *Project) GetCtagsFile() string {
 	return project.ctagsFile
 }
 
+// RefreshCtags generates a new ctags file for the current project
 func (project *Project) RefreshCtags() error {
 	if !project.IsConfigured() {
 		return errors.New("Project must be configured before you can RefreshCtags")

@@ -1,22 +1,29 @@
 sudo: false
 language: go
 go:
-  - 1.9.x
+- 1.9.x
+git:
+  depth: 3
 notifications:
   email:
     on_success: change
     on_failure: always
-install: make deps
-script: make test
-before_deploy: make build-all
+install:
+- go get -u github.com/golang/dep/cmd/dep
+- go get -u github.com/golang/lint/golint
+- dep ensure
+script:
+- make lint
+- make vet
+- make test
+before_deploy:
+- make build-all
 deploy:
   provider: releases
   api_key:
     secure: HX43TQdkovncvJANWoay6hZvRsGOtsq7eGNURisZAjh2KjeTYFq93665yjclgXzNOIc7A2bI9EOEnCvZ+ZyHYCxSv9z9fYB0M87757UJT7nB/8/fv9t4c1N2gqRheYg5TRAz/9yxUkGQ3VpXq7qjnztw1BmDmTtosWQDCjL8ngHXq9SIlObV+DHL/KAnDpXeU3RhPKKVovgD6ektWkWcDb/kGM1SlzHuZO8nF2Y754EQJaqydhbCviqhZQu+sUsnIJX1lTfpUEZ2ZVDKlathrI/NhPZqoMKbuN1IzRhnQvGzuqD+8cdUCN2YyHoqydT+QHkxVLDWOnyVrgyNssbTPpiaAar+8AHeELM7wBnQLj0KY5olM+Txj7fG+VK4b4EuNvq03BoiXzq573jR/3+rpiPkeJ3xb4AVDlhRb0zV6qE4BUi33EICsVPHKTnCxhCxNutC8TaGXCbSPXk+GERrmpReMu4FrSgHvv8PuszyBv6IwPOuw2MYvCNrZR4Qq3st1daujMKIpP09yAKsK0GlxBynpCs3naEhJiBDYDut85fHcRAYphMVWX96G183w/mrFfg33PdzORABbYE8DcrZR7NToqcR6aQJOOIq/t+P3AzcI/537XvBbO7RgPyySl57FXYvkWOzK2qHH2oYjg7bVMiILeXZ4vGZHP8I3aC3LSM=
-  file:
-    - "build/ide-darwin-amd64"
-    - "build/ide-linux-amd64"
+  file_glob: true
+  file: build/*
   skip_cleanup: true
   on:
     tags: true
-    repo: nrocco/ide

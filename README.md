@@ -4,7 +4,7 @@ ide
 ide provides a powerful tool set that gets out of your way
 
 [![Build Status](https://travis-ci.org/nrocco/ide.svg?branch=master)](https://travis-ci.org/nrocco/ide)
-[![GoDoc](https://godoc.org/github.com/nrocco/ide/pkg/client?status.svg)](https://godoc.org/github.com/nrocco/ide/pkg/client)
+[![GoDoc](https://godoc.org/github.com/nrocco/ide?status.svg)](https://godoc.org/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 
 > a tool that glues vim/git/ctags together to provide a powerful integrated

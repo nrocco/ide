@@ -17,7 +17,7 @@ var execAddCmd = &cobra.Command{
 			return errors.New("You must supply a program to add")
 		} else if len(args) > 2 {
 			cmd.Usage()
-			return errors.New("Only 2 arguments expected.")
+			return errors.New("Only 2 arguments expected")
 		}
 
 		if len(args) == 1 {
