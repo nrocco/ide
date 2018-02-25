@@ -9,6 +9,7 @@ _ide() {
     'exec:Manage executables for this ide project'
     'status:Get the current status of your ide project'
     'version:Get the version of ide'
+    'server:Run an ide server for processing long running operations'
   )
 
   local -a hook_commands
@@ -29,6 +30,7 @@ _ide() {
   hook_run_commands=(
     'commit-msg:Run the commit-msg hook for the ide project'
     'post-checkout:Run the post-checkout hook for the ide project'
+    'post-merge:Run the post-merge hook for the ide project'
     'prepare-commit-msg:Run the prepare-commit-msg hook for the ide project'
   )
 

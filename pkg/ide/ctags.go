@@ -61,6 +61,7 @@ func (project *Project) RefreshCtags() error {
 	}
 
 	cmd := exec.Command("ctags", options...)
+	cmd.Dir = project.Location()
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
