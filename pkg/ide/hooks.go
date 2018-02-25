@@ -25,6 +25,7 @@ func (project *Project) isValidHook(hook string) bool {
 	case
 		"commit-msg",
 		"post-checkout",
+		"post-merge",
 		"prepare-commit-msg":
 		return true
 	}
