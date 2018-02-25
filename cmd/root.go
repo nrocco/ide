@@ -15,8 +15,7 @@ import (
 
 var cfgFile string
 
-// Project represents an instance of ide.Project
-var Project *ide.Project
+var project *ide.Project
 
 var rootCmd = &cobra.Command{
 	Use:          "ide",
@@ -28,7 +27,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		Project, err = ide.LoadProject(dir)
+		project, err = ide.LoadProject(dir)
 		if err != nil {
 			return err
 		}

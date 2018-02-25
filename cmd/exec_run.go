@@ -18,7 +18,7 @@ var runExecCmd = &cobra.Command{
 			return errors.New("You must supply the name of the executable to run")
 		}
 
-		executable, err := Project.GetExecutable(args[0])
+		executable, err := project.GetExecutable(args[0])
 
 		if err != nil {
 			return err

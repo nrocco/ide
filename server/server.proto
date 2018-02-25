@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package server;
+
+service Server {
+  rpc RefreshCtags (RefreshCtagsRequest) returns (RefreshCtagsReply) {}
+}
+
+message RefreshCtagsRequest {
+  string directory = 1;
+}
+
+message RefreshCtagsReply {
+  string file = 1;
+}

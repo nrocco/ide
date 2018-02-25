@@ -14,7 +14,7 @@ import (
 var runCommitMsgHookCmd = &cobra.Command{
 	Use:   "commit-msg",
 	Short: "Run the commit-msg hook for the ide project",
-	Long:  ``,
+	Long:  "Run the commit-msg hook for the ide project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.New("You must specify at least one argument")

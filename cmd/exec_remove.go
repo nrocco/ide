@@ -12,7 +12,7 @@ var removeExecCmd = &cobra.Command{
 	Long:  "Remove an executable from this ide project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, name := range args {
-			err := Project.RemoveExecutable(name)
+			err := project.RemoveExecutable(name)
 			if err != nil {
 				log.Println(err)
 			} else {

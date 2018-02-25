@@ -14,7 +14,7 @@ import (
 var runPrepareCommitMsgHookCmd = &cobra.Command{
 	Use:   "prepare-commit-msg",
 	Short: "Run the prepare-commit-msg hook for the ide project",
-	Long:  ``,
+	Long:  "Run the prepare-commit-msg hook for the ide project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return nil
@@ -36,7 +36,7 @@ var runPrepareCommitMsgHookCmd = &cobra.Command{
 
 		re := regexp.MustCompile("[a-zA-Z]+-[0-9]+")
 
-		key := re.FindString(Project.Branch())
+		key := re.FindString(project.Branch())
 		if key != "" {
 			fmt.Fprintln(w, strings.ToUpper(key)+" ")
 		}

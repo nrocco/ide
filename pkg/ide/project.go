@@ -14,7 +14,6 @@ type Project struct {
 	repository *git.Repository
 	config     *config.Config
 	location   string
-	ctagsFile  string
 }
 
 // LoadProject instantiates a new instance of Project for a given directory

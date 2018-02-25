@@ -24,7 +24,7 @@ var execAddCmd = &cobra.Command{
 			args = append(args, "")
 		}
 
-		executable, err := Project.NewExecutable(args[0], args[1])
+		executable, err := project.NewExecutable(args[0], args[1])
 		if err != nil {
 			return err
 		}

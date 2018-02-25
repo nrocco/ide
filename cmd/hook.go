@@ -7,7 +7,7 @@ import (
 var hookCmd = &cobra.Command{
 	Use:   "hook",
 	Short: "Manage git hooks for an ide project",
-	Long:  ``,
+	Long:  "Manage git hooks for an ide project",
 }
 
 func init() {

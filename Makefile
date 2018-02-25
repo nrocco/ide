@@ -17,6 +17,7 @@ PREFIX = /usr/local
 
 build/${BIN}-$(GOOS)-$(GOARCH): $(GO_FILES)
 	mkdir -p build
+	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build ${BUILD_ARGS} -o $@ ${PKG}
 
 .PHONY: deps

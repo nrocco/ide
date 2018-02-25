@@ -5,15 +5,44 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
-// GetCtagsFile returns the path to the ctags file of the current ide project
-func (project *Project) GetCtagsFile() string {
-	if project.ctagsFile == "" {
-		project.ctagsFile = filepath.Join(project.location, ".git", "tags") // TODO: make location of the tags file configurable
+// CtagsFile returns the path to the ctags file of the current ide project
+func (project *Project) CtagsFile() string {
+	return filepath.Join(project.location, ".git", "tags") // TODO: make location of the tags file configurable
+}
+
+// CtagsFileAge returns the time the ctags file was last modified
+func (project *Project) CtagsFileAge() time.Time {
+	file, err := os.Open(project.CtagsFile())
+	if err != nil {
+		return time.Time{}
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return time.Time{}
 	}
 
-	return project.ctagsFile
+	return stat.ModTime()
+}
+
+// CtagsFileSize returns the size of the ctags file in bytes
+func (project *Project) CtagsFileSize() uint64 {
+	file, err := os.Open(project.CtagsFile())
+	if err != nil {
+		return 0
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return 0
+	}
+
+	return uint64(stat.Size())
 }
 
 // RefreshCtags generates a new ctags file for the current project
@@ -26,7 +55,7 @@ func (project *Project) RefreshCtags() error {
 	options := []string{
 		"--tag-relative=yes", "--sort=yes", "--totals=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
-		"--recurse", "-f", project.GetCtagsFile(),
+		"--recurse", "-f", project.CtagsFile(),
 		"--kinds-php=cif", "--kinds-python=-i",
 		"--languages=" + project.Language(),
 	}

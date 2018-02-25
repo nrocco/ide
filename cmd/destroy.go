@@ -9,14 +9,14 @@ import (
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "Remove all ide configuration for a repository",
-	Long:  ``,
+	Long:  "Remove all ide configuration for a repository",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if !Project.IsConfigured() {
+		if !project.IsConfigured() {
 			log.Fatalf("The repository is already destroyed")
 			return nil
 		}
 
-		err := Project.Destroy()
+		err := project.Destroy()
 		if err != nil {
 			return err
 		}

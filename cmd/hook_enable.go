@@ -9,10 +9,10 @@ import (
 var enableHookCmd = &cobra.Command{
 	Use:   "enable",
 	Short: "Enable a git hook for this ide project",
-	Long:  ``,
+	Long:  "Enable a git hook for this ide project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
-			err := Project.EnableHook(hook)
+			err := project.EnableHook(hook)
 
 			if err != nil {
 				log.Println(err)
