@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 language: go
 go:
 - 1.10.x
@@ -8,18 +8,12 @@ notifications:
   email:
     on_success: never
     on_failure: always
-before_install:
-- sudo apt-get update -q
-- sudo apt-get install protobuf-compiler
 install:
-- go get -u github.com/golang/protobuf/protoc-gen-go
 - go get -u github.com/golang/dep/cmd/dep
 - go get -u github.com/golang/lint/golint
 - dep ensure
 script:
-- make lint
-- make vet
-- make test
+- make lint vet test
 before_deploy:
 - make releases
 deploy:

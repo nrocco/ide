@@ -17,24 +17,25 @@ PREFIX = /usr
 
 build/${BIN}-$(GOOS)-$(GOARCH): $(GO_FILES)
 	mkdir -p build
-	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build ${BUILD_ARGS} -o $@ ${PKG}
 
 .PHONY: deps
 deps:
 	dep ensure
 
+server/server.pb.go: server/server.proto
+	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
+
 .PHONY: lint
-lint:
+lint: server/server.pb.go
 	golint -set_exit_status ${PKG_LIST}
 
 .PHONY: vet
-vet:
+vet: server/server.pb.go
 	go vet -v ${PKG_LIST}
 
 .PHONY: test
-test:
-	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
+test: server/server.pb.go
 	go test -short ${PKG_LIST}
 
 .PHONY: coverage
