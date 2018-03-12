@@ -18,11 +18,11 @@ var completionCmd = &cobra.Command{
 
 func generateCompletions(cmd *cobra.Command, names []string) {
 	names = append(names, cmd.Name())
-	full_name := strings.Join(names, "_")
+	fullName := strings.Join(names, "_")
 
 	if cmd.HasSubCommands() {
-		fmt.Printf("local -a %s_commands\n", full_name)
-		fmt.Printf("%s_commands=(\n", full_name)
+		fmt.Printf("local -a %s_commands\n", fullName)
+		fmt.Printf("%s_commands=(\n", fullName)
 		for _, command := range cmd.Commands() {
 			fmt.Printf("  '%s:%s'\n", command.Name(), strings.Replace(command.Short, "'", "", -1))
 		}
@@ -30,7 +30,7 @@ func generateCompletions(cmd *cobra.Command, names []string) {
 
 		fmt.Printf("if [[ CURRENT -eq %d && $words[%d] == '%s' ]]\n", len(names)+1, len(names), cmd.Name())
 		fmt.Printf("then\n")
-		fmt.Printf("    _describe '%s_commands' %s_commands\n", full_name, full_name)
+		fmt.Printf("    _describe '%s_commands' %s_commands\n", fullName, fullName)
 		fmt.Printf("fi\n\n")
 	} else if cmd.BashCompletionFunction != "" {
 		fmt.Printf("if [[ CURRENT -eq %d && $words[%d] == '%s' ]]\n", len(names)+1, len(names), cmd.Name())
