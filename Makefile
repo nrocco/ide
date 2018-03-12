@@ -34,6 +34,7 @@ vet:
 
 .PHONY: test
 test:
+	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
 	go test -short ${PKG_LIST}
 
 .PHONY: coverage
