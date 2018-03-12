@@ -17,13 +17,7 @@ script:
 - make vet
 - make test
 before_deploy:
-- make build-all
-- mkdir -p "build/ide-${TRAVIS_TAG}"
-- build/ide-linux-amd64 completion > "build/ide-${TRAVIS_TAG}/completion.zsh"
-- mv build/ide-linux-amd64 "build/ide-${TRAVIS_TAG}/ide"
-- tar czf "build/ide-${TRAVIS_TAG}-linux-amd64.tar.gz" -C build/ "ide-${TRAVIS_TAG}"
-- mv build/ide-darwin-amd64 "build/ide-${TRAVIS_TAG}/ide"
-- tar czf "build/ide-${TRAVIS_TAG}-darwin-amd64.tar.gz" -C build/ "ide-${TRAVIS_TAG}"
+- make releases
 deploy:
   provider: releases
   api_key:

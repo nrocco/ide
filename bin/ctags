@@ -1,7 +1,0 @@
-#!/bin/sh
-exec docker run --rm --interactive \
-    --user "$(id -u):$(id -g)" \
-    --volume "$PWD:$PWD" \
-    --workdir "$PWD" \
-    ide:ctags \
-    "$@"

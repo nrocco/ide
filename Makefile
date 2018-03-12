@@ -11,7 +11,7 @@ GOARCH := $(shell go env GOARCH)
 LDFLAGS = "-d -s -w -X ${PKG}/cmd.version=${VERSION} -X ${PKG}/cmd.commit=${COMMIT} -X ${PKG}/cmd.buildDate=${DATE}"
 BUILD_ARGS = -a -tags netgo -installsuffix netgo -ldflags $(LDFLAGS)
 
-PREFIX = /usr/local
+PREFIX = /usr
 
 .DEFAULT_GOAL: build
 
@@ -60,17 +60,26 @@ build-all:
 	$(MAKE) build GOOS=linux GOARCH=amd64
 	$(MAKE) build GOOS=darwin GOARCH=amd64
 
+.PHONY: releases
+releases: build-all
+	mkdir -p "build/${BIN}-${VERSION}"
+	cp bin/rgit "build/${BIN}-${VERSION}/rgit"
+	build/${BIN}-${GOOS}-${GOARCH} completion > "build/ide-${VERSION}/completion.zsh"
+	mv build/${BIN}-linux-amd64 "build/${BIN}-${VERSION}/${BIN}"
+	tar czf "build/${BIN}-${VERSION}-linux-amd64.tar.gz" -C build/ "${BIN}-${VERSION}"
+	mv build/${BIN}-darwin-amd64 "build/${BIN}-${VERSION}/${BIN}"
+	tar czf "build/${BIN}-${VERSION}-darwin-amd64.tar.gz" -C build/ "${BIN}-${VERSION}"
+	rm -rf "build/${BIN}-${VERSION}"
+
 .PHONY: install
 install: build/$(BIN)-$(GOOS)-$(GOARCH)
 	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
 	cp "$<" "$(DESTDIR)$(PREFIX)/bin/$(BIN)"
-	cp completion.zsh "$(DESTDIR)$(PREFIX)/share/zsh/site-functions/_$(BIN)"
+	build/${BIN}-${GOOS}-${GOARCH} completion > "$(DESTDIR)$(PREFIX)/share/zsh/site-functions/_$(BIN)"
 	cp bin/rgit "$(DESTDIR)$(PREFIX)/bin/rgit"
-	cp bin/ctags "$(DESTDIR)$(PREFIX)/bin/ctags"
 
 .PHONY: uninstall
 uninstall:
 	rm -f "$(DESTDIR)$(PREFIX)/bin/$(BIN)"
 	rm -f "$(DESTDIR)$(PREFIX)/share/zsh/site-functions/_$(BIN)"
 	rm -f "$(DESTDIR)$(PREFIX)/bin/rgit"
-	rm -f "$(DESTDIR)$(PREFIX)/bin/ctags"
