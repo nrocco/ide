@@ -10,6 +10,7 @@ var enableHookCmd = &cobra.Command{
 	Use:   "enable",
 	Short: "Enable a git hook for this ide project",
 	Long:  "Enable a git hook for this ide project",
+	BashCompletionFunction: "_describe 'ide_hook_run_commands' ide_hook_run_commands",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
 			err := project.EnableHook(hook)

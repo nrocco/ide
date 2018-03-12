@@ -103,10 +103,6 @@ func (project *Project) Destroy() error {
 		project.DisableHook(hook)
 	}
 
-	for _, name := range project.ListExecutables() {
-		project.RemoveExecutable(name)
-	}
-
 	project.config.Raw.RemoveSection("ide")
 	project.repository.Storer.SetConfig(project.config)
 

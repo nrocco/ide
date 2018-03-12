@@ -29,7 +29,6 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
 		fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
 		fmt.Printf("  Hooks: %s\n", strings.Join(project.ListHooks(), " "))
-		fmt.Printf("  Executables: %s\n", strings.Join(project.ListExecutables(), " "))
 
 		return nil
 	},
