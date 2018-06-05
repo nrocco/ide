@@ -66,7 +66,7 @@ build-all:
 releases: build-all
 	mkdir -p "build/${BIN}-${VERSION}"
 	cp bin/rgit "build/${BIN}-${VERSION}/rgit"
-	build/${BIN}-${GOOS}-${GOARCH} completion > "build/ide-${VERSION}/completion.zsh"
+	build/${BIN}-${GOOS}-${GOARCH} completion > "build/${BIN}-${VERSION}/completion.zsh"
 	mv build/${BIN}-linux-amd64 "build/${BIN}-${VERSION}/${BIN}"
 	tar czf "build/${BIN}-${VERSION}-linux-amd64.tar.gz" -C build/ "${BIN}-${VERSION}"
 	mv build/${BIN}-darwin-amd64 "build/${BIN}-${VERSION}/${BIN}"
