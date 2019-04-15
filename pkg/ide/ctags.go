@@ -5,12 +5,18 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
 // CtagsFile returns the path to the ctags file of the current ide project
 func (project *Project) CtagsFile() string {
-	return filepath.Join(project.location, ".git", "tags") // TODO: make location of the tags file configurable
+	return filepath.Join(project.location, ".git", "tags")
+}
+
+// CtagsOptions returns the language of the ide project as stored in .git/config file
+func (project *Project) CtagsOptions() []string {
+	return strings.Fields(project.config.Raw.Section("ide").Option("ctags"))
 }
 
 // CtagsFileAge returns the time the ctags file was last modified
@@ -51,20 +57,29 @@ func (project *Project) RefreshCtags() error {
 		return errors.New("Project must be configured before you can RefreshCtags")
 	}
 
-	// TODO: make default options for ctags configurable
-	options := []string{
+	tmpCtagsFile := project.CtagsFile() + ".new"
+
+	os.Remove(tmpCtagsFile)
+
+	options := append([]string{
 		"--tag-relative=yes", "--sort=yes", "--totals=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
-		"--recurse", "-f", project.CtagsFile(),
-		"--kinds-php=cif", "--kinds-python=-i",
+		"--recurse", "-f", tmpCtagsFile,
 		"--languages=" + project.Language(),
-	}
+	}, project.CtagsOptions()...)
 
 	cmd := exec.Command("ctags", options...)
 	cmd.Dir = project.Location()
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	if err := os.Rename(tmpCtagsFile, project.CtagsFile()); err != nil {
+		return err
+	}
 
 	return nil
 }

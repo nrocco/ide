@@ -69,7 +69,7 @@ func (project *Project) AutoDetectLanguage() string {
 		return "python"
 	} else if _, err := os.Stat("composer.json"); err == nil {
 		return "php"
-	} else if _, err := os.Stat("manage.py"); err == nil {
+	} else if _, err := os.Stat("setup.py"); err == nil {
 		return "python"
 	} else if _, err := os.Stat("main.go"); err == nil {
 		return "go"

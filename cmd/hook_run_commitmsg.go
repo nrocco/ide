@@ -36,7 +36,7 @@ var runCommitMsgHookCmd = &cobra.Command{
 
 		line = strings.Trim(line, "\n")
 
-		matched, regexErr := regexp.MatchString("^[A-Z]+-[0-9]+", line)
+		matched, regexErr := regexp.MatchString("^[A-Z]{2,}-[0-9]{1,}|^Merge.*[A-Z]{2,}-[0-9]{1,}", line)
 		if regexErr != nil {
 			return regexErr
 		}
