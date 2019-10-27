@@ -11,8 +11,8 @@ build:
 	mkdir -p build
 	go build -v -o build/$(BIN)-$(GOOS)-$(GOARCH) -ldflags "-X ${PKG}/cmd.version=${VERSION} -X ${PKG}/cmd.commit=${COMMIT} -X ${PKG}/cmd.buildDate=${DATE}"
 
-.PHONY: clean
-clean:
+.PHONY: clear
+clear:
 	rm -rf build
 
 # server/server.pb.go: server/server.proto
