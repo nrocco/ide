@@ -1,0 +1,32 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    errors=0;
+}
+
+/ $/ {
+    if (ENVIRON["SPACES"] != "ignore") {
+        errors+=1
+        print FILENAME " on line " NR " has trailing white spaces"
+    }
+}
+
+/\t/ {
+    if (ENVIRON["TABS"] != "ignore") {
+        errors+=1
+        print FILENAME " on line " NR " has literal tab characters"
+    }
+}
+
+/\r/ {
+    if (ENVIRON["CRLF"] != "ignore") {
+        errors+=1
+        print FILENAME " on line " NR " has windows line endings"
+    }
+}
+
+END {
+    if (errors > 0) {
+        exit 1
+    }
+}
