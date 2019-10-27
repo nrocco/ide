@@ -24,6 +24,7 @@ jobs:
           make clear
           GOOS=linux GOARCH=amd64 make build
           GOOS=darwin GOARCH=amd64 make build
+          build/ide-linux-amd64 completion > build/completion.zsh
       - name: Create Release
         id: create_release
         uses: actions/create-release@master
@@ -34,8 +35,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Upload Release Asset rgit
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,4 +43,40 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: bin/rgit
           asset_name: rgit
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset linter
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/linter
+          asset_name: linter
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset ide-linux-amd64
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/ide-linux-amd64
+          asset_name: ide-linux-amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset ide-darwin-amd64
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/ide-darwin-amd64
+          asset_name: ide-darwin-amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset completion.zsh
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/completion.zsh
+          asset_name: completion.zsh
           asset_content_type: application/octet-stream
