@@ -21,6 +21,10 @@ do
     fi
 done
 
+if [[ "yes" != "$opts_done" ]]
+then
+    repositories=(*)
+fi
 
 # If the action is status, use porcelain by default
 if [[ "status" == "$action" ]]
