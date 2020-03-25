@@ -57,4 +57,9 @@ do
         git --no-pager $action "${options[@]}"
         echo
     )
+
+    if [ ! -z "${RGIT_SLEEP}" ]
+    then
+        sleep "${RGIT_SLEEP}"
+    fi
 done
