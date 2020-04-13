@@ -2,7 +2,6 @@
 import argparse
 import json
 import os
-import pprint
 import subprocess
 import urllib.request
 
@@ -22,7 +21,6 @@ def create_release(repository, tag, draft, prerelease):
     request.data = json.dumps({
         'name': 'Release {}'.format(tag),
         'tag_name': tag,
-        'target_commitish': tag,
         'draft': draft,
         'prerelease': prerelease,
     }).encode()
