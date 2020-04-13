@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 import argparse
-import base64
 import json
 import os
 import pprint
 import subprocess
 import urllib.request
-
-
-def generate_auth_header():
-    return 'Basic {}'.format(base64.encodebytes(os.environ['GITHUB_TOKEN'].encode()).strip().decode())
 
 
 def get_release(repository, tag):
@@ -22,7 +17,7 @@ def get_release(repository, tag):
 
 def create_release(repository, tag, draft, prerelease):
     request = urllib.request.Request(method='POST', url='https://api.github.com/repos/{}/releases'.format(repository))
-    request.add_header('Authorization', generate_auth_header())
+    request.add_header('Authorization', 'Bearer {}'.format(os.environ['GITHUB_TOKEN']))
     request.add_header('Content-Type', 'application/json')
     request.data = json.dumps({
         'name': 'Release {}'.format(tag),
@@ -44,7 +39,7 @@ def upload_asset(repository, release_id, asset):
     file = open(asset, 'rb')
 
     request = urllib.request.Request(method='POST', url='https://uploads.github.com/repos/{}/releases/{}/assets?name={}'.format(repository, release_id, name), data=file)
-    request.add_header('Authorization', generate_auth_header())
+    request.add_header('Authorization', 'Bearer {}'.format(os.environ['GITHUB_TOKEN']))
     request.add_header('Content-Length', size)
     request.add_header('Content-Type', content_type)
 
