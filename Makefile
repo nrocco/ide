@@ -71,7 +71,7 @@ release: archive-all
 
 .PHONY: lint
 lint:
-	# TODO golint -set_exit_status ./...
+	golint -set_exit_status ./...
 
 .PHONY: vet
 vet:

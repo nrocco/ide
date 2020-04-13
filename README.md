@@ -3,7 +3,7 @@ ide
 
 ide provides a powerful tool set that gets out of your way
 
-[![Actions Status](https://github.com/nrocco/ide/workflows/go/badge.svg)](https://github.com/nrocco/ide/actions)
+[![Actions Status](https://github.com/nrocco/ide/workflows/master/badge.svg)](https://github.com/nrocco/ide/actions)
 [![GoDoc](https://godoc.org/github.com/nrocco/ide?status.svg)](https://godoc.org/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 

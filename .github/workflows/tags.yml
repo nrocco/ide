@@ -1,5 +1,5 @@
 ---
-name: Continuous Integration
+name: ci
 on:
   push:
     tags:
@@ -10,11 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.14
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
           go-version: 1.14
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
+      - name: Install tools
+        run: go get -u golang.org/x/lint/golint
       - name: Lint and Test
         run: make lint vet test
       - name: Create Release
