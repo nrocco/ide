@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	version   string
-	commit    string
-	buildDate string
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 var versionCmd = &cobra.Command{
@@ -20,7 +20,7 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("Ide:\n")
 		fmt.Printf("  Version: %s\n", version)
 		fmt.Printf("  Commit: %s\n", commit)
-		fmt.Printf("  Build Date: %s\n", buildDate)
+		fmt.Printf("  Build Date: %s\n", date)
 		fmt.Printf("  Platform: %s (%s)\n", runtime.GOOS, runtime.GOARCH)
 		fmt.Printf("  Build Info: %s (%s)\n", runtime.Version(), runtime.Compiler)
 	},

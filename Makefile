@@ -1,42 +1,81 @@
-BIN ?= ide
-PKG ?= github.com/nrocco/ide
-GOOS ?= $(shell go env GOOS)
-GOARCH ?= $(shell go env GOARCH)
-VERSION ?= $(shell git describe --tags --always --dirty)
-COMMIT ?= $(shell git describe --always --dirty)
-DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+.DEFAULT_GOAL := build
 
-.PHONY: build
-build:
-	mkdir -p build
-	go build -v -o build/$(BIN)-$(GOOS)-$(GOARCH) -ldflags "-X ${PKG}/cmd.version=${VERSION} -X ${PKG}/cmd.commit=${COMMIT} -X ${PKG}/cmd.buildDate=${DATE}"
+BIN ?= ide
+REPO ?= nrocco/ide
+PKG ?= github.com/$(REPO)
+
+BUILD_GOOS ?= $(shell go env GOOS)
+BUILD_GOARCH ?= $(shell go env GOARCH)
+BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
+BUILD_COMMIT ?= $(shell git describe --always --dirty)
+BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+BUILD_NAME ?= $(BIN)-$(BUILD_VERSION)-$(BUILD_GOOS)-$(BUILD_GOARCH)
+
+
+build: lint vet test dist/$(BUILD_NAME)/bin/$(BIN)
+
+
+archive: dist/$(BUILD_NAME).tar.gz
+	tar tf "$<"
+
+
+dist/$(BUILD_NAME)/bin/$(BIN):
+	mkdir -p "$(@D)"
+	go build \
+		-v \
+		-o "$@" \
+		-ldflags "-X ${PKG}/cmd.version=${BUILD_VERSION} -X ${PKG}/cmd.commit=${BUILD_COMMIT} -X ${PKG}/cmd.date=${BUILD_DATE}"
+
+
+dist/$(BUILD_NAME).tar.gz: dist/$(BUILD_NAME)/bin/$(BIN) dist/completion.zsh bin/* LICENSE README.md
+	mkdir -p "dist/$(BUILD_NAME)"
+	cp bin/* "dist/$(BUILD_NAME)/bin"
+	cp LICENSE README.md dist/completion.zsh "dist/$(BUILD_NAME)"
+	tar czf "dist/$(BUILD_NAME).tar.gz" -C dist/ "$(BUILD_NAME)"
+
+
+server/server.pb.go: server/server.proto
+	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
+
+
+dist/completion.zsh:
+	$(MAKE) build BUILD_GOARCH=$(shell go env GOARCH) BUILD_GOOS=$(shell go env GOOS)
+	dist/$(BIN)-$(BUILD_VERSION)-$(shell go env GOOS)-$(shell go env GOARCH)/bin/$(BIN) completion > "$@"
+
 
 .PHONY: clear
 clear:
-	rm -rf build
+	rm -rf dist
 
-# server/server.pb.go: server/server.proto
-# 	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
 
-# .PHONY: lint
-# lint: server/server.pb.go
-# 	golint -set_exit_status ${PKG_LIST}
+.PHONY: build-all
+build-all:
+	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=darwin
+	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=freebsd
+	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=linux
 
-# .PHONY: vet
-# vet: server/server.pb.go
-# 	go vet -v ./...
 
-# .PHONY: test
-# test: server/server.pb.go
-# 	go test -v -short ./...
+.PHONY: archive-all
+archive-all:
+	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=darwin
+	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=freebsd
+	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=linux
 
-# .PHONY: releases
-# releases: build-all
-# 	mkdir -p "build/${BIN}-${VERSION}"
-# 	cp bin/rgit "build/${BIN}-${VERSION}/rgit"
-# 	build/${BIN}-${GOOS}-${GOARCH} completion > "build/${BIN}-${VERSION}/completion.zsh"
-# 	mv build/${BIN}-linux-amd64 "build/${BIN}-${VERSION}/${BIN}"
-# 	tar czf "build/${BIN}-${VERSION}-linux-amd64.tar.gz" -C build/ "${BIN}-${VERSION}"
-# 	mv build/${BIN}-darwin-amd64 "build/${BIN}-${VERSION}/${BIN}"
-# 	tar czf "build/${BIN}-${VERSION}-darwin-amd64.tar.gz" -C build/ "${BIN}-${VERSION}"
-# 	rm -rf "build/${BIN}-${VERSION}"
+
+.PHONY: release
+release: archive-all
+	sha256sum dist/*.tar.gz > dist/checksums.txt
+	tools/release-to-github.py $(REPO) $(VERSION)
+
+
+.PHONY: lint
+lint:
+	golint -set_exit_status ./...
+
+.PHONY: vet
+vet:
+	go vet -v ./...
+
+.PHONY: test
+test:
+	go test -v -short ./...

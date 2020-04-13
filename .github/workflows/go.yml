@@ -9,83 +9,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.13
+      - name: Set up Go 1.14
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13
+          go-version: 1.14
         id: go
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
-      - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
-      - name: Build
-        run: |
-          make clear
-          GOOS=linux GOARCH=amd64 make build
-          GOOS=darwin GOARCH=amd64 make build
-          build/ide-linux-amd64 completion > build/completion.zsh
+      - name: Lint and Test
+        run: make lint vet test
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload Release Asset rgit
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/rgit
-          asset_name: rgit
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset linter
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/linter
-          asset_name: linter
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset compare
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/compare
-          asset_name: compare
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset ide-linux-amd64
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/ide-linux-amd64
-          asset_name: ide-linux-amd64
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset ide-darwin-amd64
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/ide-darwin-amd64
-          asset_name: ide-darwin-amd64
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset completion.zsh
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/completion.zsh
-          asset_name: completion.zsh
-          asset_content_type: application/octet-stream
+        run: make release
