@@ -1,5 +1,5 @@
 ---
-name: ci
+name: master
 on:
   push:
     branches:
