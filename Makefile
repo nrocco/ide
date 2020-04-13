@@ -4,6 +4,7 @@ BIN ?= ide
 REPO ?= nrocco/ide
 PKG ?= github.com/$(REPO)
 
+CGO_ENABLED ?= 0
 BUILD_GOOS ?= $(shell go env GOOS)
 BUILD_GOARCH ?= $(shell go env GOARCH)
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
@@ -21,7 +22,7 @@ archive: dist/$(BUILD_NAME).tar.gz
 
 dist/$(BUILD_NAME)/bin/$(BIN):
 	mkdir -p "$(@D)"
-	go build \
+	env GOOS=$(BUILD_GOOS) GOARCH=$(BUILD_GOARCH) CGO_ENABLED=$(CGO_ENABLED) go build \
 		-v \
 		-o "$@" \
 		-ldflags "-X ${PKG}/cmd.version=${BUILD_VERSION} -X ${PKG}/cmd.commit=${BUILD_COMMIT} -X ${PKG}/cmd.date=${BUILD_DATE}"
