@@ -64,7 +64,7 @@ def main():
     parser.add_argument('assets', nargs='+')
     args = parser.parse_args()
 
-    release = {'id': '25452576'}  # create_release(args.repository, args.version, args.draft, args.prerelease)
+    release = create_release(args.repository, args.version, args.draft, args.prerelease)
     print("==> Created release {} {} with id {}".format(args.repository, args.version, release['id']))
 
     for asset in args.assets:
