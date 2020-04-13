@@ -66,7 +66,7 @@ archive-all:
 .PHONY: release
 release: archive-all
 	sha256sum dist/*.tar.gz > dist/checksums.txt
-	tools/release-to-github.py $(REPO) $(VERSION)
+	tools/release-to-github.py $(REPO) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
 
 
 .PHONY: lint
