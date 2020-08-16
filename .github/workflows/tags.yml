@@ -18,7 +18,7 @@ jobs:
       - name: Install tools
         run: go get -u golang.org/x/lint/golint
       - name: Lint and Test
-        run: make lint vet test
+        run: make lint test
       - name: Create Release
         run: make release
         env:

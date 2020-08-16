@@ -18,6 +18,6 @@ jobs:
       - name: Install tools
         run: go get -u golang.org/x/lint/golint
       - name: Lint and Test
-        run: make lint vet test
+        run: make lint test
       - name: Build
         run: make build
