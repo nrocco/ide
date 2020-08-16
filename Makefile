@@ -13,7 +13,7 @@ BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_NAME ?= $(BIN)-$(BUILD_VERSION)-$(BUILD_GOOS)-$(BUILD_GOARCH)
 
 
-build: lint vet test dist/$(BUILD_NAME)/bin/$(BIN)
+build: lint test dist/$(BUILD_NAME)/bin/$(BIN)
 
 
 archive: dist/$(BUILD_NAME).tar.gz
@@ -72,11 +72,14 @@ release: archive-all
 .PHONY: lint
 lint:
 	golint -set_exit_status ./...
-
-.PHONY: vet
-vet:
 	go vet -v ./...
 
 .PHONY: test
 test:
 	go test -v -short ./...
+
+.PHONY: coverage
+coverage:
+	mkdir -p coverage
+	go test -covermode=count -coverprofile=coverage/coverage.out ./...
+	go tool cover -html=coverage/coverage.out -o coverage/coverage.html

@@ -5,8 +5,6 @@ import (
 	"os"
 	"strings"
 
-	homedir "github.com/mitchellh/go-homedir"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -36,7 +34,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// Execute executes the rootCmd logic and is the main entry point for ide
+// Execute executes the rootCmd logic and is the main entry point
 func Execute() {
 	if strings.Contains(os.Args[0], ".git/hooks") {
 		elems := strings.Split(os.Args[0], "/")
@@ -57,18 +55,17 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ide.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .ide.yaml in $PWD, $HOME, /etc)")
 }
 
 func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		home, err := homedir.Dir()
-		if err == nil {
-			viper.AddConfigPath(home)
-			viper.SetConfigName(".ide")
-		}
+		viper.SetConfigName(".ide")
+		viper.AddConfigPath(".")
+		viper.AddConfigPath("$HOME")
+		viper.AddConfigPath("/etc/")
 	}
 
 	viper.SetEnvPrefix("ide")

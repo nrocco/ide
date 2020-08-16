@@ -1,0 +1,47 @@
+#!/bin/bash
+
+case $# in
+    0)
+        SOURCE=origin/master
+        TARGET=HEAD
+        ;;
+    1)
+        SOURCE=origin/master
+        TARGET=HEAD
+        FILE=$1
+        ;;
+    2)
+        SOURCE=$1
+        TARGET=$2
+        ;;
+    3)
+        SOURCE=$1
+        TARGET=$2
+        FILE=$3
+        ;;
+    *)
+        cat <<EOERROR > /dev/stderr
+usage: $(basename $0) source target path/to/file.ext
+EOERROR
+        exit 1
+        ;;
+esac
+
+if [[ "${SOURCE}" == "${TARGET}" ]]
+then
+    echo "Source (${SOURCE}) and target (${TARGET}) commits are the same"
+    exit 1
+fi
+
+if [[ -z "$FILE" ]]
+then
+    echo "==> FILE changes between ${SOURCE} and ${TARGET}"
+    git diff --stat ${SOURCE}...${TARGET}
+    echo
+    echo "==> Commits between ${SOURCE} and ${TARGET}"
+    git lg ${SOURCE}...${TARGET}
+    echo
+    exit
+fi
+
+exec git difftool "${SOURCE}:${FILE}" "${TARGET}:${FILE}"
