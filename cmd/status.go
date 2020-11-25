@@ -28,7 +28,21 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("    File: %s\n", project.CtagsFile())
 		fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
 		fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
-		fmt.Printf("  Hooks: %s\n", strings.Join(project.ListHooks(), " "))
+
+		if hooks := project.ListHooks(); len(hooks) > 0 {
+			fmt.Printf("  Hooks: %s\n", strings.Join(hooks, " "))
+		} else {
+			fmt.Printf("  Hooks: ~\n")
+		}
+
+		if binaries := project.ListBinaries(); len(binaries) > 0 {
+			fmt.Printf("  Binaries:\n")
+			for binary, command := range binaries {
+				fmt.Printf("    %s: %s\n", binary, command)
+			}
+		} else {
+			fmt.Printf("  Binaries: ~\n")
+		}
 
 		return nil
 	},

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -42,12 +41,11 @@ func Execute() {
 		args := []string{os.Args[0], "hook", "run", elems[2]}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
-		args := []string{os.Args[0], "exec", "run", "--", os.Args[0]}
+		args := []string{os.Args[0], "binary", "run", "--", os.Args[0]}
 		os.Args = append(args, os.Args[1:]...)
 	}
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

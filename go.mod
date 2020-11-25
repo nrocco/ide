@@ -3,14 +3,15 @@ module github.com/nrocco/ide
 go 1.12
 
 require (
+	github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-git/go-git/v5 v5.2.0
 	github.com/golang/protobuf v1.4.2
-	github.com/json-iterator/go v1.1.9 // indirect
+	github.com/mattn/go-isatty v0.0.3
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
-	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.0.0
@@ -24,5 +25,4 @@ require (
 	google.golang.org/grpc v1.31.0
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/ini.v1 v1.58.0 // indirect
-	gopkg.in/src-d/go-git.v4 v4.13.1
 )

@@ -1,85 +1,40 @@
-.DEFAULT_GOAL := build
-
-BIN ?= ide
-REPO ?= nrocco/ide
-PKG ?= github.com/$(REPO)
-
-CGO_ENABLED ?= 0
-BUILD_GOOS ?= $(shell go env GOOS)
-BUILD_GOARCH ?= $(shell go env GOARCH)
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
 BUILD_COMMIT ?= $(shell git describe --always --dirty)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-BUILD_NAME ?= $(BIN)-$(BUILD_VERSION)-$(BUILD_GOOS)-$(BUILD_GOARCH)
 
+.PHONY: help
+help:
+	@echo 'make build-all dist/ide-amd64-freebsd dist/ide-amd64-darwin dist/ide-amd64-linux clear'
 
-build: lint test dist/$(BUILD_NAME)/bin/$(BIN)
+.PHONY: dist/ide-amd64-freebsd
+dist/ide-amd64-freebsd:
+	mkdir -p dist/ide-amd64-freebsd
+	docker build --platform freebsd/amd64 --output dist/ide-amd64-freebsd .
+	cp bin/* dist/ide-amd64-freebsd
+	cp LICENSE README.md dist/ide-amd64-freebsd
 
+.PHONY: dist/ide-amd64-darwin
+dist/ide-amd64-darwin:
+	mkdir -p dist/ide-amd64-darwin
+	docker build --platform darwin/amd64 --output dist/ide-amd64-darwin .
+	cp bin/* dist/ide-amd64-darwin
+	cp LICENSE README.md dist/ide-amd64-darwin
 
-archive: dist/$(BUILD_NAME).tar.gz
-	tar tf "$<"
-
-
-dist/$(BUILD_NAME)/bin/$(BIN):
-	mkdir -p "$(@D)"
-	env GOOS=$(BUILD_GOOS) GOARCH=$(BUILD_GOARCH) CGO_ENABLED=$(CGO_ENABLED) go build \
-		-v \
-		-o "$@" \
-		-ldflags "-X ${PKG}/cmd.version=${BUILD_VERSION} -X ${PKG}/cmd.commit=${BUILD_COMMIT} -X ${PKG}/cmd.date=${BUILD_DATE}"
-
-
-dist/$(BUILD_NAME).tar.gz: dist/$(BUILD_NAME)/bin/$(BIN) dist/completion.zsh bin/* LICENSE README.md
-	mkdir -p "dist/$(BUILD_NAME)"
-	cp bin/* "dist/$(BUILD_NAME)/bin"
-	cp LICENSE README.md dist/completion.zsh "dist/$(BUILD_NAME)"
-	tar czf "dist/$(BUILD_NAME).tar.gz" -C dist/ "$(BUILD_NAME)"
-
-
-server/server.pb.go: server/server.proto
-	protoc -I server/ server/server.proto --go_out=plugins=grpc:server
-
-
-dist/completion.zsh:
-	$(MAKE) build BUILD_GOARCH=$(shell go env GOARCH) BUILD_GOOS=$(shell go env GOOS)
-	dist/$(BIN)-$(BUILD_VERSION)-$(shell go env GOOS)-$(shell go env GOARCH)/bin/$(BIN) completion > "$@"
-
+.PHONY: dist/ide-amd64-linux
+dist/ide-amd64-linux:
+	mkdir -p dist/ide-amd64-linux
+	docker build --platform linux/amd64 --output dist/ide-amd64-linux .
+	cp bin/* dist/ide-amd64-linux
+	cp LICENSE README.md dist/ide-amd64-linux
 
 .PHONY: clear
 clear:
 	rm -rf dist
 
-
 .PHONY: build-all
-build-all:
-	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=darwin
-	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=freebsd
-	$(MAKE) build BUILD_GOARCH=amd64 BUILD_GOOS=linux
+build-all: dist/ide-amd64-freebsd dist/ide-amd64-darwin dist/ide-amd64-linux
 
-
-.PHONY: archive-all
-archive-all:
-	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=darwin
-	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=freebsd
-	$(MAKE) archive BUILD_GOARCH=amd64 BUILD_GOOS=linux
-
-
-.PHONY: release
-release: archive-all
-	sha256sum dist/*.tar.gz > dist/checksums.txt
-	tools/release-to-github.py $(REPO) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
-
-
-.PHONY: lint
-lint:
-	golint -set_exit_status ./...
-	go vet -v ./...
-
-.PHONY: test
-test:
-	go test -v -short ./...
-
-.PHONY: coverage
-coverage:
-	mkdir -p coverage
-	go test -covermode=count -coverprofile=coverage/coverage.out ./...
-	go tool cover -html=coverage/coverage.out -o coverage/coverage.html
+# .PHONY: release
+# release: archive-all
+# 	sha256sum dist/*.tar.gz > dist/checksums.txt
+# 	tools/release-to-github.py $(REPO) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz

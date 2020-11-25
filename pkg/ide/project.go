@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
+	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	homedir "github.com/mitchellh/go-homedir"
-	git "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/config"
 )
 
 // Project represents an ide project
@@ -21,7 +21,7 @@ func LoadProject(location string) (*Project, error) {
 	location, _ = homedir.Expand(location)
 	location, _ = filepath.Abs(location)
 
-	repository, openErr := git.PlainOpen(location)
+	repository, openErr := git.PlainOpenWithOptions(location, &git.PlainOpenOptions{DetectDotGit: true})
 	if openErr != nil {
 		return &Project{}, openErr
 	}
@@ -31,10 +31,15 @@ func LoadProject(location string) (*Project, error) {
 		return &Project{}, configErr
 	}
 
+	workTree, workTreeErr := repository.Worktree()
+	if configErr != nil {
+		return &Project{}, workTreeErr
+	}
+
 	return &Project{
 		repository: repository,
 		config:     config,
-		location:   location,
+		location:   workTree.Filesystem.Root(),
 	}, nil
 }
 
@@ -92,9 +97,8 @@ func (project *Project) Location() string {
 func (project *Project) SetLanguage(language string) error {
 	// TODO add error handling here
 	project.config.Raw.Section("ide").SetOption("language", language)
-	project.repository.Storer.SetConfig(project.config)
 
-	return nil
+	return project.repository.Storer.SetConfig(project.config)
 }
 
 // Destroy removes any trace of ide configuration from .git/config file
@@ -104,7 +108,6 @@ func (project *Project) Destroy() error {
 	}
 
 	project.config.Raw.RemoveSection("ide")
-	project.repository.Storer.SetConfig(project.config)
 
-	return nil
+	return project.repository.Storer.SetConfig(project.config)
 }

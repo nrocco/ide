@@ -7,9 +7,9 @@ import (
 )
 
 var disableHookCmd = &cobra.Command{
-	Use:   "disable",
-	Short: "Disable a git hook for this ide project",
-	Long:  "Disable a git hook for this ide project",
+	Use:                    "disable",
+	Short:                  "Disable a git hook for this ide project",
+	Long:                   "Disable a git hook for this ide project",
 	BashCompletionFunction: "_values 'executables' $(ls .git/hooks)",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
