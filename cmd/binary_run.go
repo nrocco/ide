@@ -46,20 +46,6 @@ func (b binaryContext) IsTTY() bool {
 	return true
 }
 
-func (b binaryContext) IfTTY(value string) string {
-	if b.IsTTY() {
-		return value
-	}
-	return ""
-}
-
-func (b binaryContext) IfNotTTY(value string) string {
-	if !b.IsTTY() {
-		return value
-	}
-	return ""
-}
-
 var runBinaryCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a binary in the context of an ide project",
