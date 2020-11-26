@@ -19,7 +19,7 @@ type binaryContext struct {
 	UID     int
 	GID     int
 	Project string
-	Dir		string
+	Dir     string
 }
 
 func (b binaryContext) RelDir() string {
@@ -46,10 +46,20 @@ func (b binaryContext) IsTTY() bool {
 	return true
 }
 
-// #!/bin/sh
-// set -xe
-// NAME="ide.binaries.$(basename $0)"
-// exec $(git config --local --get "${NAME}" || echo echo No configuration found for "${NAME}") "$@"
+func (b binaryContext) IfTTY(value string) string {
+	if b.IsTTY() {
+		return value
+	}
+	return ""
+}
+
+func (b binaryContext) IfNotTTY(value string) string {
+	if !b.IsTTY() {
+		return value
+	}
+	return ""
+}
+
 var runBinaryCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a binary in the context of an ide project",
@@ -71,7 +81,7 @@ var runBinaryCmd = &cobra.Command{
 			UID:     os.Getuid(),
 			GID:     os.Getgid(),
 			Project: project.Name(),
-			Dir:	project.Location(),
+			Dir:     project.Location(),
 		})
 		if err != nil {
 			return err

@@ -11,6 +11,7 @@ ide provides a powerful tool set that gets out of your way
 > development environment
 
 
+
 Usage
 -----
 
@@ -23,15 +24,18 @@ After installing `ide` you can invoke it without any arguments to get help:
       ide [command]
 
     Available Commands:
+      binary      Manage binaries for an ide project
+      completion  Output shell completion code for the specified shell
       destroy     Remove all ide configuration for a repository
       help        Help about any command
       hook        Manage git hooks for an ide project
       init        Initialize a git repository as an ide project
+      server      Run an ide server for processing long running operations
       status      Get the current status of your ide project
-      version     Get the version of ide
+      version     Display version and build information
 
     Flags:
-          --config string   config file (default is $HOME/.ide.yaml)
+          --config string   config file (default is .ide.yaml in $PWD, $HOME, /etc)
       -h, --help            help for ide
 
     Use "ide [command] --help" for more information about a command.
@@ -44,7 +48,7 @@ To setup an existing git repository as an `ide` project run:
     2017/07/04 20:15:12 Setting the project language to go
 
 
-The remove any traces of `ide` run:
+To remove any traces of `ide` run:
 
     % ide destroy
     2017/07/04 20:16:18 Repository is no longer an ide project
@@ -52,14 +56,22 @@ The remove any traces of `ide` run:
 
 You can also view the current status of your ide project:
 
-    % ide status
+    $ ide status
     Ide
-      Name:       ide
-      Branch:     master
-      Language:   go
-      Location:   /home/nrocco/go/src/github.com/nrocco/ide
-      Ctags:      /home/nrocco/go/src/github.com/nrocco/ide/.git/tags
-      Hooks:
+      Name: my-project
+      Branch: master
+      Language: go
+      Location: /Users/nrocco/dev/my-project
+      Ctags:
+        File: /Users/nrocco/dev/my-project/.git/tags
+        Age: 5 days ago
+        Size: 18 kB
+      Hooks: ~
+      Binaries:
+        go: docker-compose exec --workdir=$PWD backend go
+        goimports: docker-compose exec --workdir=$PWD backend goimports
+        gofmt: docker-compose exec --workdir=$PWD backend gofmt
+        npm: docker-compose exec --workdir=$PWD frontend npm
 
 
 In the above case no hooks are enabled for this project. In order to enable
@@ -73,6 +85,20 @@ You can see the hook is enabled:
 
     % ls -ilah .git/hooks/post-checkout
     29546377 lrwxr-xr-x 1 nrocco staff 52 Jul  4 20:17 .git/hooks/post-checkout -> /usr/local/bin/ide
+
+
+
+Alternatives
+------------
+
+Execute a command defined in `.git/config` can alternatively achieved with a
+simple bash script:
+
+    #!/bin/sh
+    set -xe
+    NAME="ide.binaries.$(basename $0)"
+    exec $(git config --local --get "${NAME}" || echo echo No configuration found for "${NAME}") "$@"
+
 
 
 Contributing

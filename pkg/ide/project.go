@@ -74,8 +74,6 @@ func (project *Project) AutoDetectLanguage() string {
 		return "python"
 	} else if _, err := os.Stat("composer.json"); err == nil {
 		return "php"
-	} else if _, err := os.Stat("setup.py"); err == nil {
-		return "python"
 	} else if _, err := os.Stat("main.go"); err == nil {
 		return "go"
 	}
@@ -105,6 +103,10 @@ func (project *Project) SetLanguage(language string) error {
 func (project *Project) Destroy() error {
 	for _, hook := range project.ListHooks() {
 		project.DisableHook(hook)
+	}
+
+	for binary := range project.ListBinaries() {
+		project.DisableBinary(binary)
 	}
 
 	project.config.Raw.RemoveSection("ide")

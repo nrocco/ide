@@ -34,7 +34,10 @@ clear:
 .PHONY: build-all
 build-all: dist/ide-amd64-freebsd dist/ide-amd64-darwin dist/ide-amd64-linux
 
-# .PHONY: release
-# release: archive-all
-# 	sha256sum dist/*.tar.gz > dist/checksums.txt
-# 	tools/release-to-github.py $(REPO) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
+.PHONY: release
+release: clear build-all
+	tar czf "dist/ide-amd64-darwin.tar.gz" -C dist/ "ide-amd64-darwin"
+	tar czf "dist/ide-amd64-freebsd.tar.gz" -C dist/ "ide-amd64-freebsd"
+	tar czf "dist/ide-amd64-linux.tar.gz" -C dist/ "ide-amd64-linux"
+	sha256sum dist/*.tar.gz > dist/checksums.txt
+	tools/release-to-github.py nrocco/ide $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
