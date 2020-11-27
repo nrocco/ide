@@ -50,6 +50,15 @@ var runBinaryCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a binary in the context of an ide project",
 	Long:  "Run a binary in the context of an ide project",
+	Args:  cobra.MinimumNArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		binaries := []string{}
+		for binary := range project.ListBinaries() {
+			binaries = append(binaries, binary)
+		}
+		return binaries, cobra.ShellCompDirectiveNoFileComp // TODO project is not initialized at this point
+	},
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		command := project.GetBinary(args[0])
 		if command == "" {

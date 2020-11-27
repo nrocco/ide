@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,34 +15,35 @@ var cfgFile string
 
 var project *ide.Project
 
+func loadProject(cmd *cobra.Command, args []string) error {
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	project, err = ide.LoadProject(dir)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:          "ide",
 	Short:        "ide provides a powerful ide that gets out of your way",
 	SilenceUsage: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		dir, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-
-		project, err = ide.LoadProject(dir)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
 }
 
 // Execute executes the rootCmd logic and is the main entry point
 func Execute() {
 	if strings.Contains(os.Args[0], ".git/hooks") {
-		elems := strings.Split(os.Args[0], "/")
-
-		args := []string{os.Args[0], "hook", "run", elems[2]}
+		name := path.Base(os.Args[0])
+		args := []string{os.Args[0], "hook", "run", name, "--"}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
-		args := []string{os.Args[0], "binary", "run", "--", os.Args[0]}
+		name := path.Base(os.Args[0])
+		args := []string{os.Args[0], "binary", "run", "--", name}
 		os.Args = append(args, os.Args[1:]...)
 	}
 

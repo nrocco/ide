@@ -10,6 +10,10 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize a git repository as an ide project",
 	Long:  "Initialize a git repository as an ide project",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if project.IsConfigured() {
 			log.Fatalln("The repository is already setup")

@@ -13,6 +13,10 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get the current status of your ide project",
 	Long:  "Get the current status of your ide project",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !project.IsConfigured() {
 			log.Fatalf("The project is not configured yet\n")

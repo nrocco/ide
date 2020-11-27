@@ -13,6 +13,9 @@ import (
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Run an ide server for processing long running operations",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		port := viper.GetString("server.address")
 		if port == "" {

@@ -16,6 +16,9 @@ var (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Display version and build information",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Ide:\n")
 		fmt.Printf("  Version: %s\n", version)

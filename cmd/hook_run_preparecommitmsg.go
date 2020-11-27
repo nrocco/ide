@@ -15,6 +15,10 @@ var runPrepareCommitMsgHookCmd = &cobra.Command{
 	Use:   "prepare-commit-msg",
 	Short: "Run the prepare-commit-msg hook for the ide project",
 	Long:  "Run the prepare-commit-msg hook for the ide project",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return nil

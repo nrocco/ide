@@ -7,10 +7,14 @@ import (
 )
 
 var disableHookCmd = &cobra.Command{
-	Use:                    "disable",
-	Short:                  "Disable a git hook for this ide project",
-	Long:                   "Disable a git hook for this ide project",
-	BashCompletionFunction: "_values 'executables' $(ls .git/hooks)",
+	Use:   "disable",
+	Short: "Disable a git hook for this ide project",
+	Long:  "Disable a git hook for this ide project",
+	Args:  cobra.MinimumNArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return project.ListHooks(), cobra.ShellCompDirectiveNoFileComp // TODO project is not initialized at this point
+	},
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
 			err := project.DisableHook(hook)

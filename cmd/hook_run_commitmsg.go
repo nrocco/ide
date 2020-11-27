@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"errors"
 	"log"
 	"os"
 	"regexp"
@@ -15,11 +14,12 @@ var runCommitMsgHookCmd = &cobra.Command{
 	Use:   "commit-msg",
 	Short: "Run the commit-msg hook for the ide project",
 	Long:  "Run the commit-msg hook for the ide project",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
+	Args:    cobra.ExactArgs(1),
+	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return errors.New("You must specify at least one argument")
-		}
-
 		commitMsgFile, osErr := os.Open(args[0])
 		if osErr != nil {
 			return osErr
