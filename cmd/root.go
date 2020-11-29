@@ -16,6 +16,10 @@ var cfgFile string
 var project *ide.Project
 
 func loadProject(cmd *cobra.Command, args []string) error {
+	if project != nil {
+		return nil
+	}
+
 	dir, err := os.Getwd()
 	if err != nil {
 		return err

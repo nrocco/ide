@@ -11,8 +11,6 @@ func (project *Project) ListBinaries() map[string]string {
 	binaries := map[string]string{}
 
 	for _, option := range project.config.Raw.Section("ide").Subsection("binaries").Options {
-		// TODO check if .git/bin directory exists
-
 		binaries[option.Key] = option.Value
 	}
 

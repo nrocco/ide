@@ -93,7 +93,6 @@ func (project *Project) Location() string {
 
 // SetLanguage stores the given language in the .git/config file of the ide project
 func (project *Project) SetLanguage(language string) error {
-	// TODO add error handling here
 	project.config.Raw.Section("ide").SetOption("language", language)
 
 	return project.repository.Storer.SetConfig(project.config)

@@ -12,7 +12,10 @@ var disableHookCmd = &cobra.Command{
 	Long:  "Disable a git hook for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return project.ListHooks(), cobra.ShellCompDirectiveNoFileComp // TODO project is not initialized at this point
+		if err := loadProject(cmd, args); err == nil {
+			return []string{}, cobra.ShellCompDirectiveNoFileComp
+		}
+		return project.ListHooks(), cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {

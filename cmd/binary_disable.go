@@ -13,10 +13,14 @@ var disableBinaryCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		binaries := []string{}
-		for binary := range project.ListBinaries() {
-			binaries = append(binaries, binary)
+		if len(args) == 0 {
+			if err := loadProject(cmd, args); err == nil {
+				for binary := range project.ListBinaries() {
+					binaries = append(binaries, binary)
+				}
+			}
 		}
-		return binaries, cobra.ShellCompDirectiveNoFileComp // TODO project is not initialized at this point
+		return binaries, cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {

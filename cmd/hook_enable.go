@@ -12,7 +12,7 @@ var enableHookCmd = &cobra.Command{
 	Long:  "Enable a git hook for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"commit-msg", "post-checkout", "post-merge", "prepare-commit-msg"}, cobra.ShellCompDirectiveNoFileComp // TODO make this dynamic, hide already enabled hooks
+		return []string{"commit-msg", "post-checkout", "post-merge", "prepare-commit-msg"}, cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
