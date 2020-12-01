@@ -9,16 +9,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.14
-        uses: actions/setup-go@v2-beta
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
         with:
-          go-version: 1.14
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
-      - name: Install tools
-        run: go get -u golang.org/x/lint/golint
-      - name: Lint and Test
-        run: make lint test
+          install: true
+      - name: Build All
+        run: make clear build-all
       - name: Create Release
         run: make release
         env:

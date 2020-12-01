@@ -35,7 +35,7 @@ clear:
 build-all: dist/ide-amd64-freebsd dist/ide-amd64-darwin dist/ide-amd64-linux
 
 .PHONY: release
-release: clear build-all
+release:
 	tar czf "dist/ide-amd64-darwin.tar.gz" -C dist/ "ide-amd64-darwin"
 	tar czf "dist/ide-amd64-freebsd.tar.gz" -C dist/ "ide-amd64-freebsd"
 	tar czf "dist/ide-amd64-linux.tar.gz" -C dist/ "ide-amd64-linux"
