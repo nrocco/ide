@@ -26,6 +26,7 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("Ide\n")
 		fmt.Printf("  Name: %s\n", project.Name())
 		fmt.Printf("  Branch: %s\n", project.Branch())
+		fmt.Printf("  Email: %s\n", project.Email())
 		fmt.Printf("  Language: %s\n", project.Language())
 		fmt.Printf("  Location: %s\n", project.Location())
 		fmt.Printf("  Ctags:\n")

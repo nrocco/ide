@@ -74,7 +74,11 @@ func (project *Project) AutoDetectLanguage() string {
 		return "python"
 	} else if _, err := os.Stat("composer.json"); err == nil {
 		return "php"
+	} else if _, err := os.Stat("package.json"); err == nil {
+		return "javascript"
 	} else if _, err := os.Stat("main.go"); err == nil {
+		return "go"
+	} else if _, err := os.Stat("go.mod"); err == nil {
 		return "go"
 	}
 
@@ -84,6 +88,11 @@ func (project *Project) AutoDetectLanguage() string {
 // Language returns the language of the ide project as stored in .git/config file
 func (project *Project) Language() string {
 	return project.config.Raw.Section("ide").Option("language")
+}
+
+// Email returns the email of the user of the ide project
+func (project *Project) Email() string {
+	return project.config.Raw.Section("user").Option("email")
 }
 
 // Location returns the absolute file path of the ide project
