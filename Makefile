@@ -18,6 +18,9 @@ build-all: \
 dist/ide-amd64-freebsd:
 	mkdir -p dist/ide-amd64-freebsd
 	docker image build --pull \
+		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
+		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
+		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
 		--target bin \
 		--platform freebsd/amd64 \
 		--output dist/ide-amd64-freebsd \
