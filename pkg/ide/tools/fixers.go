@@ -11,7 +11,7 @@ func FixClrf(path string) error {
 
 // FixWhitespace TODO
 func FixWhitespace(path string) error {
-	return exec.Command("sed", "-i", "--", "s/[ \t]*$//", path).Run()
+	return exec.Command("sed", "-i", "", "-e", "s/[ \t]*$//", path).Run()
 }
 
 // FixPhpcsfixer TODO
