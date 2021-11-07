@@ -59,17 +59,19 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .ide.yaml in $PWD, $HOME, /etc)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is config.yaml in $PWD, $HOME/.config/ide, /etc/ide)")
 }
 
 func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.SetConfigName(".ide")
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+
 		viper.AddConfigPath(".")
-		viper.AddConfigPath("$HOME")
-		viper.AddConfigPath("/etc/")
+		viper.AddConfigPath("$HOME/.config/ide/")
+		viper.AddConfigPath("/etc/ide/")
 	}
 
 	viper.SetEnvPrefix("ide")
