@@ -12,7 +12,7 @@ var (
 	reLintGolint = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintGovet = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintJq = regexp.MustCompile(`^parse error: (.*) at line (\d+), .*$`)
-	reLintPhp = regexp.MustCompile(`^Parse error: (.*) in (.*) on line (\d+)$`)
+	reLintPhp = regexp.MustCompile(`^PHP Parse error: (.*) in (.*) on line (\d+)$`)
 	reLintRubocop = regexp.MustCompile(`^([^:]*):(\d+):\d+: (.*)$`)
 	reLintShellcheck = regexp.MustCompile(`^(.*):(\d+):\d+: (.*)$`)
 	reLintYaml = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
