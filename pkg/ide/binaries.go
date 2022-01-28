@@ -22,6 +22,37 @@ func (project *Project) GetBinary(binary string) string {
 	return project.config.Raw.Section("ide").Subsection("binaries").Option(binary)
 }
 
+// RefreshBinaries syncs the binaries from .git/config with .git/bin
+func (project *Project) RefreshBinaries() error {
+	binaries := project.ListBinaries()
+
+	if len(binaries) == 0 {
+		return nil
+	}
+
+	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {
+		if err := os.Mkdir(".git/bin", 0755); err != nil {
+			return err
+		}
+	}
+
+	source, _ := os.Executable()
+
+	for binary := range binaries {
+		dest := filepath.Join(project.location, ".git", "bin", binary)
+		if _, err := os.Lstat(dest); err == nil {
+			if err := os.Remove(dest); err != nil {
+				return err
+			}
+		}
+		if err := os.Symlink(source, dest); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // EnableBinary adds a binary to this project
 func (project *Project) EnableBinary(binary string, command string) error {
 	dest := filepath.Join(project.location, ".git", "bin", binary)
@@ -51,7 +82,7 @@ func (project *Project) EnableBinary(binary string, command string) error {
 func (project *Project) DisableBinary(binary string) error {
 	dest := filepath.Join(project.location, ".git", "bin", binary)
 
-	if _, err := os.Stat(dest); err == nil {
+	if _, err := os.Lstat(dest); err == nil {
 		if err := os.Remove(dest); err != nil {
 			return err
 		}
