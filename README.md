@@ -30,7 +30,6 @@ After installing `ide` you can invoke it without any arguments to get help:
       help        Help about any command
       hook        Manage git hooks for an ide project
       init        Initialize a git repository as an ide project
-      server      Run an ide server for processing long running operations
       status      Get the current status of your ide project
       version     Display version and build information
 

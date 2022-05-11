@@ -4,7 +4,7 @@ services:
   go:
     build:
       context: .
-      target: gobase
+      target: godev
     init: true
     command: ["sleep", "infinite"]
     volumes:

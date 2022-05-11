@@ -7,14 +7,26 @@ BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 .PHONY: help
 help:
-	@echo 'make build-all dist/$(NAME)-arm64-darwin dist/$(NAME)-amd64-darwin dist/$(NAME)-amd64-linux clear container push'
+	@awk -F: '/^[a-zA-Z0-9_-]+:.*$$/{print "make " $$1}' $(MAKEFILE_LIST)
 
 .PHONY: build-all
 build-all: \
-	dist/$(NAME)-amd64-freebsd \
-	dist/$(NAME)-arm64-darwin \
-	dist/$(NAME)-amd64-darwin \
-	dist/$(NAME)-amd64-linux
+	build-amd64-freebsd \
+	build-arm64-darwin \
+	build-amd64-darwin \
+	build-amd64-linux
+
+.PHONY: build-amd64-freebsd
+build-amd64-freebsd: dist/$(NAME)-amd64-freebsd
+
+.PHONY: build-arm64-darwin
+build-arm64-darwin: dist/$(NAME)-arm64-darwin
+
+.PHONY: build-amd64-darwin
+build-amd64-darwin: dist/$(NAME)-amd64-darwin
+
+.PHONY: build-amd64-linux
+build-amd64-linux: dist/$(NAME)-amd64-linux
 
 .PHONY: dist/$(NAME)-amd64-freebsd
 dist/$(NAME)-amd64-freebsd:
@@ -72,9 +84,15 @@ dist/$(NAME)-amd64-linux:
 	cp bin/* dist/$(NAME)-amd64-linux
 	cp LICENSE README.md dist/$(NAME)-amd64-linux
 
+.PHONY: coverage
+coverage:
+	mkdir -p coverage
+	go test ./... -v -coverpkg=./... -coverprofile=coverage/coverage.out
+	go tool cover -html=coverage/coverage.out -o coverage/coverage.html
+
 .PHONY: clear
 clear:
-	rm -rf dist
+	rm -rf dist coverage
 
 .PHONY: release
 release:
