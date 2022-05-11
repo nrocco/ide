@@ -25,7 +25,7 @@ func loadProject(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	project, err = ide.LoadProject(dir)
+	project, err = ide.NewProject(dir)
 	if err != nil {
 		return err
 	}

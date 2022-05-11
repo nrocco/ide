@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"os"
 	"os/exec"
 )
 
@@ -21,7 +22,17 @@ func FixPhpcsfixer(path string) error {
 
 // FixJq TODO
 func FixJq(path string) error {
-	return nil
+	file, err := os.Create(path + ".tmp")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	cmd := exec.Command("jq", "--sort-keys", "--monochrome-output", ".", path)
+	cmd.Stdout = file
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return os.Rename(path+".tmp", path)
 }
 
 // FixGoimports TODO

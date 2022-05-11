@@ -16,8 +16,8 @@ type Project struct {
 	location   string
 }
 
-// LoadProject instantiates a new instance of Project for a given directory
-func LoadProject(location string) (*Project, error) {
+// NewProject instantiates a new instance of Project for a given directory
+func NewProject(location string) (*Project, error) {
 	location, _ = homedir.Expand(location)
 	location, _ = filepath.Abs(location)
 
@@ -76,8 +76,6 @@ func (project *Project) AutoDetectLanguage() string {
 		return "php"
 	} else if _, err := os.Stat("package.json"); err == nil {
 		return "javascript"
-	} else if _, err := os.Stat("main.go"); err == nil {
-		return "go"
 	} else if _, err := os.Stat("go.mod"); err == nil {
 		return "go"
 	}

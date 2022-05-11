@@ -1,14 +1,14 @@
 ide
 ===
 
-ide provides a powerful tool set that gets out of your way
+ide provides a tool set that gets out of your way
 
 [![Actions Status](https://github.com/nrocco/ide/actions/workflows/master.yml/badge.svg)](https://github.com/nrocco/ide/actions/workflows/master.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nrocco/ide.svg)](https://pkg.go.dev/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 
-> a tool that glues vim/git/ctags together to provide a powerful integrated
-> development environment
+> a tool that glues vim/git/direnv/docker/ctags together to provide a powerful
+> integrated development environment
 
 
 
