@@ -24,7 +24,7 @@ var enableBinaryCmd = &cobra.Command{
 
 		log.Printf("Binary %s enabled\n", args[0])
 
-		return nil
+		return project.AddGitBinToPath()
 	},
 }
 
