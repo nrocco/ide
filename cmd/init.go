@@ -21,7 +21,11 @@ var initCmd = &cobra.Command{
 		}
 
 		log.Println("Setting up the repository as a ide project...")
-		language := project.AutoDetectLanguage()
+
+		language := viper.GetString("language")
+		if language == "" {
+			language = project.AutoDetectLanguage()
+		}
 
 		log.Printf("Setting the project language to %s\n", language)
 		project.SetLanguage(language)
@@ -31,5 +35,7 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
+	initCmd.Flags().String("language", "", "Language of the ide project")
+
 	rootCmd.AddCommand(initCmd)
 }
