@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var enableHookCmd = &cobra.Command{
-	Use:   "enable",
-	Short: "Enable a git hook for this ide project",
-	Long:  "Enable a git hook for this ide project",
+var addHookCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add a git hook for this ide project",
+	Long:  "Add a git hook for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"commit-msg", "post-checkout", "post-merge", "prepare-commit-msg"}, cobra.ShellCompDirectiveNoFileComp
@@ -17,11 +17,11 @@ var enableHookCmd = &cobra.Command{
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
-			err := project.EnableHook(hook)
+			err := project.AddHook(hook)
 			if err != nil {
 				log.Println(err)
 			} else {
-				log.Printf("Hook %s enabled\n", hook)
+				log.Printf("Hook %s add\n", hook)
 			}
 		}
 
@@ -30,5 +30,5 @@ var enableHookCmd = &cobra.Command{
 }
 
 func init() {
-	hookCmd.AddCommand(enableHookCmd)
+	hookCmd.AddCommand(addHookCmd)
 }

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// ListHooks returns an array of hooks which are enabled for the ide project
+// ListHooks returns an array of hooks which are added to this ide project
 func (project *Project) ListHooks() []string {
 	hooks := []string{}
 
@@ -32,8 +32,8 @@ func (project *Project) isValidHook(hook string) bool {
 	return false
 }
 
-// EnableHook enables a git repository hook
-func (project *Project) EnableHook(hook string) error {
+// AddHook adds a git repository hook
+func (project *Project) AddHook(hook string) error {
 	if !project.isValidHook(hook) {
 		return errors.New(hook + " is not a valid hook")
 	}
@@ -49,8 +49,8 @@ func (project *Project) EnableHook(hook string) error {
 	return os.Symlink(source, dest)
 }
 
-// DisableHook disables a git repository hook
-func (project *Project) DisableHook(hook string) error {
+// RemoveHook removes a git repository hook
+func (project *Project) RemoveHook(hook string) error {
 	if !project.isValidHook(hook) {
 		return errors.New(hook + " is not a valid hook")
 	}

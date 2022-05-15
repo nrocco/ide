@@ -66,7 +66,7 @@ var runBinaryCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		command := project.GetBinary(args[0])
 		if command == "" {
-			return errors.New("Binary does not exist. Did you forget to enable it?")
+			return errors.New("Binary does not exist. Did you forget to add it?")
 		}
 
 		tmpl, err := template.New("command").Parse(command)

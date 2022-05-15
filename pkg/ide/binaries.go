@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// ListBinaries returns an array of binaries which are enabled for the ide project
+// ListBinaries returns an array of binaries which are added to this ide project
 func (project *Project) ListBinaries() map[string]string {
 	binaries := map[string]string{}
 
@@ -53,8 +53,8 @@ func (project *Project) RefreshBinaries() error {
 	return nil
 }
 
-// EnableBinary adds a binary to this project
-func (project *Project) EnableBinary(binary string, command string) error {
+// AddBinary adds a binary to this project
+func (project *Project) AddBinary(binary string, command string) error {
 	dest := filepath.Join(project.location, ".git", "bin", binary)
 
 	if _, err := os.Stat(dest); err == nil {
@@ -78,8 +78,8 @@ func (project *Project) EnableBinary(binary string, command string) error {
 	return project.repository.Storer.SetConfig(project.config)
 }
 
-// DisableBinary removes a binary from this project
-func (project *Project) DisableBinary(binary string) error {
+// RemoveBinary removes a binary from this project
+func (project *Project) RemoveBinary(binary string) error {
 	dest := filepath.Join(project.location, ".git", "bin", binary)
 
 	if _, err := os.Lstat(dest); err == nil {

@@ -75,11 +75,11 @@ func (project *Project) Location() string {
 // Destroy removes any trace of ide configuration from .git/config file
 func (project *Project) Destroy() error {
 	for _, hook := range project.ListHooks() {
-		project.DisableHook(hook)
+		project.RemoveHook(hook)
 	}
 
 	for binary := range project.ListBinaries() {
-		project.DisableBinary(binary)
+		project.RemoveBinary(binary)
 	}
 
 	project.config.Raw.RemoveSection("ide")

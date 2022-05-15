@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var disableBinaryCmd = &cobra.Command{
-	Use:   "disable",
-	Short: "Disable a binary for this ide project",
-	Long:  "Disable a binary for this ide project",
+var removeBinaryCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove a binary for this ide project",
+	Long:  "Remove a binary for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		binaries := []string{}
@@ -25,11 +25,11 @@ var disableBinaryCmd = &cobra.Command{
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, binary := range args {
-			err := project.DisableBinary(binary)
+			err := project.RemoveBinary(binary)
 			if err != nil {
 				log.Println(err)
 			} else {
-				log.Printf("Binary %s disabled\n", binary)
+				log.Printf("Binary %s removed\n", binary)
 			}
 		}
 
@@ -38,5 +38,5 @@ var disableBinaryCmd = &cobra.Command{
 }
 
 func init() {
-	binaryCmd.AddCommand(disableBinaryCmd)
+	binaryCmd.AddCommand(removeBinaryCmd)
 }
