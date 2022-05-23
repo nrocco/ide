@@ -34,6 +34,18 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
 		fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
 
+		if project.HasDirEnv() {
+			fmt.Printf("  HasDirEnv: yes\n")
+		} else {
+			fmt.Printf("  HasDirEnv: no\n")
+		}
+
+		if project.HasGitBinInPath() {
+			fmt.Printf("  GitBinInPath: yes\n")
+		} else {
+			fmt.Printf("  GitBinInPath: no\n")
+		}
+
 		if hooks := project.ListHooks(); len(hooks) > 0 {
 			fmt.Printf("  Hooks: %s\n", strings.Join(hooks, " "))
 		} else {

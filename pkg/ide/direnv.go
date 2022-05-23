@@ -2,6 +2,7 @@ package ide
 
 import (
 	"bufio"
+	"path/filepath"
 	"os"
 	"strings"
 )
@@ -29,4 +30,15 @@ func (project *Project) AddGitBinToPath() error {
 	}
 
 	return nil
+}
+
+// HasGitBinInPath checks if $PATH contains the current .git/bin directory
+func (project *Project) HasGitBinInPath() bool {
+	return strings.Contains(os.Getenv("PATH"), filepath.Join(project.location, ".git", "bin", "bin"))
+}
+
+// HasDirEnv checks if the current project has a .envrc file
+func (project *Project) HasDirEnv() bool {
+	_, err := os.Stat(".envrc")
+	return !os.IsNotExist(err)
 }
