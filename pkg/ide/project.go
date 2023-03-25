@@ -57,11 +57,6 @@ func (project *Project) Branch() string {
 	return head.Name().Short()
 }
 
-// IsConfigured returns true if the current git repository is setup as an ide project
-func (project *Project) IsConfigured() bool {
-	return project.config.Raw.HasSection("ide")
-}
-
 // Email returns the email of the user of the ide project
 func (project *Project) Email() string {
 	return project.config.Raw.Section("user").Option("email")

@@ -1,7 +1,6 @@
 package ide
 
 import (
-	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,7 +13,7 @@ func (project *Project) CtagsFile() string {
 	return filepath.Join(project.location, ".git", "tags")
 }
 
-// CtagsOptions returns the language of the ide project as stored in .git/config file
+// CtagsOptions returns project specific ctags flags from .git/config file
 func (project *Project) CtagsOptions() []string {
 	return strings.Fields(project.config.Raw.Section("ide").Option("ctags"))
 }
@@ -53,10 +52,6 @@ func (project *Project) CtagsFileSize() uint64 {
 
 // RefreshCtags generates a new ctags file for the current project
 func (project *Project) RefreshCtags() error {
-	if !project.IsConfigured() {
-		return errors.New("Project must be configured before you can RefreshCtags")
-	}
-
 	tmpCtagsFile := project.CtagsFile() + ".new"
 
 	os.Remove(tmpCtagsFile)
@@ -65,7 +60,6 @@ func (project *Project) RefreshCtags() error {
 		"--tag-relative=yes", "--sort=yes", "--totals=yes",
 		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
 		"--recurse", "-f", tmpCtagsFile,
-		"--languages=" + project.Language(),
 	}, project.CtagsOptions()...)
 
 	cmd := exec.Command("ctags", options...)

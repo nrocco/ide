@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/nrocco/ide/pkg/ide"
 )
@@ -54,28 +53,4 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func init() {
-	cobra.OnInitialize(initConfig)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is config.yaml in $PWD, $HOME/.config/ide, /etc/ide)")
-}
-
-func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("$HOME/.config/ide/")
-		viper.AddConfigPath("/etc/ide/")
-	}
-
-	viper.SetEnvPrefix("ide")
-	viper.AutomaticEnv()
-
-	viper.ReadInConfig()
 }

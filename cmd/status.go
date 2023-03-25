@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	humanize "github.com/dustin/go-humanize"
@@ -18,16 +17,10 @@ var statusCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if !project.IsConfigured() {
-			log.Fatalf("The project is not configured yet\n")
-			return nil
-		}
-
 		fmt.Printf("Ide\n")
 		fmt.Printf("  Name: %s\n", project.Name())
 		fmt.Printf("  Branch: %s\n", project.Branch())
 		fmt.Printf("  Email: %s\n", project.Email())
-		fmt.Printf("  Language: %s\n", project.Language())
 		fmt.Printf("  Location: %s\n", project.Location())
 		fmt.Printf("  Ctags:\n")
 		fmt.Printf("    File: %s\n", project.CtagsFile())

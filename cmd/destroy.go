@@ -15,11 +15,6 @@ var destroyCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if !project.IsConfigured() {
-			log.Fatalf("The repository is already destroyed")
-			return nil
-		}
-
 		err := project.Destroy()
 		if err != nil {
 			return err

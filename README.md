@@ -29,7 +29,6 @@ After installing `ide` you can invoke it without any arguments to get help:
       destroy     Remove all ide configuration for a repository
       help        Help about any command
       hook        Manage git hooks for an ide project
-      init        Initialize a git repository as an ide project
       status      Get the current status of your ide project
       version     Display version and build information
 
@@ -38,13 +37,6 @@ After installing `ide` you can invoke it without any arguments to get help:
       -h, --help            help for ide
 
     Use "ide [command] --help" for more information about a command.
-
-
-To setup an existing git repository as an `ide` project run:
-
-    % ide init
-    2017/07/04 20:15:12 Setting up the repository as a ide project...
-    2017/07/04 20:15:12 Setting the project language to go
 
 
 To remove any traces of `ide` run:
@@ -59,7 +51,6 @@ You can also view the current status of your ide project:
     Ide
       Name: my-project
       Branch: master
-      Language: go
       Location: /Users/nrocco/dev/my-project
       Ctags:
         File: /Users/nrocco/dev/my-project/.git/tags

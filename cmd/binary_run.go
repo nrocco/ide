@@ -34,15 +34,32 @@ func (b binaryContext) RelDir() string {
 	return rel
 }
 
+func (b binaryContext) DockerRunOrExec(container string) string {
+	fafa, _ := exec.Command("docker", "container", "ps", "--quiet", "--filter", "status=running", container).Output()
+	if len(fafa) == 0 {
+		return "docker container run --rm"
+	}
+	return "docker container exec"
+}
+
+func (b binaryContext) DockerComposeRunOrExec(service string) string {
+	fafa, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
+	if len(fafa) == 0 {
+		return "docker compose run --rm"
+	}
+	return "docker compose exec"
+}
+
 func (b binaryContext) IsTTY() bool {
 	if !isatty.IsTerminal(os.Stdin.Fd()) {
 		return false
-	} else if !isatty.IsTerminal(os.Stdout.Fd()) {
-		return false
-	} else if !isatty.IsTerminal(os.Stderr.Fd()) {
+	}
+	if !isatty.IsTerminal(os.Stdout.Fd()) {
 		return false
 	}
-
+	if !isatty.IsTerminal(os.Stderr.Fd()) {
+		return false
+	}
 	return true
 }
 
