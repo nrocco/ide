@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	humanize "github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize"
 	"github.com/spf13/cobra"
 )
 
@@ -22,10 +22,14 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("  Branch: %s\n", project.Branch())
 		fmt.Printf("  Email: %s\n", project.Email())
 		fmt.Printf("  Location: %s\n", project.Location())
-		fmt.Printf("  Ctags:\n")
-		fmt.Printf("    File: %s\n", project.CtagsFile())
-		fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
-		fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
+		if project.HasCtagsFile() {
+			fmt.Printf("  Ctags:\n")
+			fmt.Printf("    File: %s\n", project.CtagsFile())
+			fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
+			fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
+		} else {
+			fmt.Printf("  Ctags: ~\n")
+		}
 
 		if project.HasDirEnv() {
 			fmt.Printf("  HasDirEnv: yes\n")

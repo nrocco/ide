@@ -18,6 +18,22 @@ func (project *Project) CtagsOptions() []string {
 	return strings.Fields(project.config.Raw.Section("ide").Option("ctags"))
 }
 
+// HasCtagsFile returns true if a ctags file exists
+func (project *Project) HasCtagsFile() bool {
+	if _, err := os.Stat(project.CtagsFile()); err == nil {
+		return true
+	}
+	return false
+}
+
+// DeleteCtagsFile deletes a ctags file if one exists
+func (project *Project) DeleteCtagsFile() error {
+	if project.HasCtagsFile() {
+		return os.Remove(project.CtagsFile())
+	}
+	return nil
+}
+
 // CtagsFileAge returns the time the ctags file was last modified
 func (project *Project) CtagsFileAge() time.Time {
 	file, err := os.Open(project.CtagsFile())

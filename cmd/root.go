@@ -41,12 +41,16 @@ var rootCmd = &cobra.Command{
 // Execute executes the rootCmd logic and is the main entry point
 func Execute() {
 	if strings.Contains(os.Args[0], ".git/hooks") {
-		name := path.Base(os.Args[0])
-		args := []string{os.Args[0], "hook", "run", name, "--"}
+		args := []string{os.Args[0], "hook", "run", path.Base(os.Args[0]), "--"}
+		os.Args = append(args, os.Args[1:]...)
+	} else if os.Args[0] == "compare" {
+		args := []string{"ide", "compare", "--"}
+		os.Args = append(args, os.Args[1:]...)
+	} else if os.Args[0] == "rgit" {
+		args := []string{"ide", "rgit", "--"}
 		os.Args = append(args, os.Args[1:]...)
 	} else if !strings.Contains(os.Args[0], "ide") {
-		name := path.Base(os.Args[0])
-		args := []string{os.Args[0], "binary", "run", "--", name}
+		args := []string{os.Args[0], "binary", "run", "--", path.Base(os.Args[0])}
 		os.Args = append(args, os.Args[1:]...)
 	}
 
