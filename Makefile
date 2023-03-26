@@ -1,5 +1,5 @@
 NAME = ide
-DOCKER_IMAGE = nrocco/ide
+DOCKER_IMAGE = nrocco/$(NAME)
 DOCKER_IMAGE_VERSION = latest
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
 BUILD_COMMIT ?= $(shell git describe --always --dirty)
@@ -7,7 +7,7 @@ BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 .PHONY: help
 help:
-	@awk -F: '/^[a-zA-Z0-9_-]+:.*$$/{print "make " $$1}' $(MAKEFILE_LIST)
+	@LC_ALL=C $(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 .PHONY: build-all
 build-all: \
@@ -79,7 +79,7 @@ dist/$(NAME)-amd64-linux:
 .PHONY: coverage
 coverage:
 	mkdir -p coverage
-	go test ./... -v -coverpkg=./... -coverprofile=coverage/coverage.out
+	go test -v -coverpkg=./... -coverprofile=coverage/coverage.out ./...
 	go tool cover -html=coverage/coverage.out -o coverage/coverage.html
 
 .PHONY: clear
