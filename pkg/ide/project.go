@@ -75,8 +75,8 @@ func (project *Project) Destroy() error {
 		}
 	}
 
-	for binary := range project.ListBinaries() {
-		if err := project.RemoveBinary(binary); err != nil {
+	for shim := range project.ListShims() {
+		if err := project.RemoveShim(shim); err != nil {
 			return err
 		}
 	}

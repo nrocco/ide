@@ -49,13 +49,13 @@ var statusCmd = &cobra.Command{
 			fmt.Printf("  Hooks: ~\n")
 		}
 
-		if binaries := project.ListBinaries(); len(binaries) > 0 {
-			fmt.Printf("  Binaries:\n")
-			for binary, command := range binaries {
-				fmt.Printf("    %s: %s\n", binary, command)
+		if shims := project.ListShims(); len(shims) > 0 {
+			fmt.Printf("  Shims:\n")
+			for shim, command := range shims {
+				fmt.Printf("    %s: %s\n", shim, command)
 			}
 		} else {
-			fmt.Printf("  Binaries: ~\n")
+			fmt.Printf("  Shims: ~\n")
 		}
 
 		return nil

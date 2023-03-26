@@ -34,7 +34,7 @@ func (project *Project) AddGitBinToPath() error {
 
 // HasGitBinInPath checks if $PATH contains the current .git/bin directory
 func (project *Project) HasGitBinInPath() bool {
-	return strings.Contains(os.Getenv("PATH"), filepath.Join(project.location, ".git", "bin", "bin"))
+	return strings.Contains(os.Getenv("PATH"), filepath.Join(project.location, ".git", "bin"))
 }
 
 // HasDirEnv checks if the current project has a .envrc file

@@ -6,30 +6,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var removeBinaryCmd = &cobra.Command{
+var removeShimCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Remove a binary for this ide project",
-	Long:  "Remove a binary for this ide project",
+	Short: "Remove a shim for this ide project",
+	Long:  "Remove a shim for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		binaries := []string{}
+		shims := []string{}
 		if len(args) == 0 {
 			if err := loadProject(cmd, args); err == nil {
-				for binary := range project.ListBinaries() {
-					binaries = append(binaries, binary)
+				for shim := range project.ListShims() {
+					shims = append(shims, shim)
 				}
 			}
 		}
-		return binaries, cobra.ShellCompDirectiveNoFileComp
+		return shims, cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		for _, binary := range args {
-			err := project.RemoveBinary(binary)
+		for _, shim := range args {
+			err := project.RemoveShim(shim)
 			if err != nil {
 				log.Println(err)
 			} else {
-				log.Printf("Binary %s removed\n", binary)
+				log.Printf("Shim %s removed\n", shim)
 			}
 		}
 
@@ -38,5 +38,5 @@ var removeBinaryCmd = &cobra.Command{
 }
 
 func init() {
-	binaryCmd.AddCommand(removeBinaryCmd)
+	shimCmd.AddCommand(removeShimCmd)
 }

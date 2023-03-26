@@ -6,7 +6,7 @@ services:
       context: .
       target: godev
     init: true
-    command: ["sleep", "infinite"]
+    command: ["sleep", "infinity"]
     volumes:
       - ".:/src"
       - "go_cache:/go/pkg"

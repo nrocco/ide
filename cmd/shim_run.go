@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/anmitsu/go-shlex"
@@ -13,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type binaryContext struct {
+type shimContext struct {
 	User    string
 	Group   string
 	UID     int
@@ -22,7 +23,7 @@ type binaryContext struct {
 	Dir     string
 }
 
-func (b binaryContext) RelDir() string {
+func (b shimContext) RelDir() string {
 	dir, err := os.Getwd()
 	if err != nil {
 		return ""
@@ -34,23 +35,22 @@ func (b binaryContext) RelDir() string {
 	return rel
 }
 
-func (b binaryContext) DockerRunOrExec(container string) string {
-	fafa, _ := exec.Command("docker", "container", "ps", "--quiet", "--filter", "status=running", container).Output()
-	if len(fafa) == 0 {
-		return "docker container run --rm"
-	}
-	return "docker container exec"
-}
-
-func (b binaryContext) DockerComposeRunOrExec(service string) string {
+func (b shimContext) RunOrExec(service string) string {
 	fafa, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
+	command := []string{"docker", "compose"}
 	if len(fafa) == 0 {
-		return "docker compose run --rm"
+		command = append(command, "run", "--rm")
+	} else {
+		command = append(command, "exec")
 	}
-	return "docker compose exec"
+	if !b.IsTTY() {
+		command = append(command, "-T")
+	}
+	command = append(command, service)
+	return strings.Join(command, " ")
 }
 
-func (b binaryContext) IsTTY() bool {
+func (b shimContext) IsTTY() bool {
 	if !isatty.IsTerminal(os.Stdin.Fd()) {
 		return false
 	}
@@ -63,27 +63,27 @@ func (b binaryContext) IsTTY() bool {
 	return true
 }
 
-var runBinaryCmd = &cobra.Command{
+var runShimCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run a binary in the context of an ide project",
-	Long:  "Run a binary in the context of an ide project",
+	Short: "Run a shim in the context of an ide project",
+	Long:  "Run a shim in the context of an ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		binaries := []string{}
+		shims := []string{}
 		if len(args) == 0 {
 			if err := loadProject(cmd, args); err == nil {
-				for binary := range project.ListBinaries() {
-					binaries = append(binaries, binary)
+				for shim := range project.ListShims() {
+					shims = append(shims, shim)
 				}
 			}
 		}
-		return binaries, cobra.ShellCompDirectiveNoFileComp
+		return shims, cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		command := project.GetBinary(args[0])
+		command := project.GetShim(args[0])
 		if command == "" {
-			return errors.New("Binary does not exist. Did you forget to add it?")
+			return errors.New("Shim does not exist. Did you forget to add it?")
 		}
 
 		tmpl, err := template.New("command").Parse(command)
@@ -93,7 +93,7 @@ var runBinaryCmd = &cobra.Command{
 
 		var b bytes.Buffer
 
-		err = tmpl.Execute(&b, binaryContext{
+		err = tmpl.Execute(&b, shimContext{
 			UID:     os.Getuid(),
 			GID:     os.Getgid(),
 			Project: project.Name(),
@@ -128,5 +128,5 @@ var runBinaryCmd = &cobra.Command{
 }
 
 func init() {
-	binaryCmd.AddCommand(runBinaryCmd)
+	shimCmd.AddCommand(runShimCmd)
 }

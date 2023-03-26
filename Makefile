@@ -39,8 +39,6 @@ dist/$(NAME)-amd64-freebsd:
 		--platform freebsd/amd64 \
 		--output dist/$(NAME)-amd64-freebsd \
 		.
-	cp bin/* dist/$(NAME)-amd64-freebsd
-	cp LICENSE README.md dist/$(NAME)-amd64-freebsd
 
 .PHONY: dist/$(NAME)-arm64-darwin
 dist/$(NAME)-arm64-darwin:
@@ -53,8 +51,6 @@ dist/$(NAME)-arm64-darwin:
 		--platform darwin/arm64 \
 		--output dist/$(NAME)-arm64-darwin \
 		.
-	cp bin/* dist/$(NAME)-arm64-darwin
-	cp LICENSE README.md dist/$(NAME)-arm64-darwin
 
 .PHONY: dist/$(NAME)-amd64-darwin
 dist/$(NAME)-amd64-darwin:
@@ -67,8 +63,6 @@ dist/$(NAME)-amd64-darwin:
 		--platform darwin/amd64 \
 		--output dist/$(NAME)-amd64-darwin \
 		.
-	cp bin/* dist/$(NAME)-amd64-darwin
-	cp LICENSE README.md dist/$(NAME)-amd64-darwin
 
 .PHONY: dist/$(NAME)-amd64-linux
 dist/$(NAME)-amd64-linux:
@@ -81,8 +75,6 @@ dist/$(NAME)-amd64-linux:
 		--platform linux/amd64 \
 		--output dist/$(NAME)-amd64-linux \
 		.
-	cp bin/* dist/$(NAME)-amd64-linux
-	cp LICENSE README.md dist/$(NAME)-amd64-linux
 
 .PHONY: coverage
 coverage:

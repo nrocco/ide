@@ -6,27 +6,27 @@ import (
 	"path/filepath"
 )
 
-// ListBinaries returns an array of binaries which are added to this ide project
-func (project *Project) ListBinaries() map[string]string {
-	binaries := map[string]string{}
+// ListShims returns an array of shims which are added to this ide project
+func (project *Project) ListShims() map[string]string {
+	shims := map[string]string{}
 
-	for _, option := range project.config.Raw.Section("ide").Subsection("binaries").Options {
-		binaries[option.Key] = option.Value
+	for _, option := range project.config.Raw.Section("ide").Subsection("shims").Options {
+		shims[option.Key] = option.Value
 	}
 
-	return binaries
+	return shims
 }
 
-// GetBinary returns the command for a binary
-func (project *Project) GetBinary(binary string) string {
-	return project.config.Raw.Section("ide").Subsection("binaries").Option(binary)
+// GetShim returns the command for a shim
+func (project *Project) GetShim(shim string) string {
+	return project.config.Raw.Section("ide").Subsection("shims").Option(shim)
 }
 
-// RefreshBinaries syncs the binaries from .git/config with .git/bin
-func (project *Project) RefreshBinaries() error {
-	binaries := project.ListBinaries()
+// RefreshShims syncs the shims from .git/config with .git/bin
+func (project *Project) RefreshShims() error {
+	shims := project.ListShims()
 
-	if len(binaries) == 0 {
+	if len(shims) == 0 {
 		return nil
 	}
 
@@ -38,8 +38,8 @@ func (project *Project) RefreshBinaries() error {
 
 	source, _ := os.Executable()
 
-	for binary := range binaries {
-		dest := filepath.Join(project.location, ".git", "bin", binary)
+	for shim := range shims {
+		dest := filepath.Join(project.location, ".git", "bin", shim)
 		if _, err := os.Lstat(dest); err == nil {
 			if err := os.Remove(dest); err != nil {
 				return err
@@ -53,12 +53,12 @@ func (project *Project) RefreshBinaries() error {
 	return nil
 }
 
-// AddBinary adds a binary to this project
-func (project *Project) AddBinary(binary string, command string) error {
-	dest := filepath.Join(project.location, ".git", "bin", binary)
+// AddShim adds a shim to this project
+func (project *Project) AddShim(shim string, command string) error {
+	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Stat(dest); err == nil {
-		return errors.New("Binary " + binary + " already exists for this project")
+		return errors.New("Shim " + shim + " already exists for this project")
 	}
 
 	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {
@@ -73,14 +73,14 @@ func (project *Project) AddBinary(binary string, command string) error {
 		return err
 	}
 
-	project.config.Raw.SetOption("ide", "binaries", binary, command)
+	project.config.Raw.SetOption("ide", "shims", shim, command)
 
 	return project.repository.Storer.SetConfig(project.config)
 }
 
-// RemoveBinary removes a binary from this project
-func (project *Project) RemoveBinary(binary string) error {
-	dest := filepath.Join(project.location, ".git", "bin", binary)
+// RemoveShim removes a shim from this project
+func (project *Project) RemoveShim(shim string) error {
+	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Lstat(dest); err == nil {
 		if err := os.Remove(dest); err != nil {
@@ -88,7 +88,7 @@ func (project *Project) RemoveBinary(binary string) error {
 		}
 	}
 
-	project.config.Raw.Section("ide").Subsection("binaries").RemoveOption(binary)
+	project.config.Raw.Section("ide").Subsection("shims").RemoveOption(shim)
 
 	return project.repository.Storer.SetConfig(project.config)
 }
