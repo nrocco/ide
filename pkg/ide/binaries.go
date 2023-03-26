@@ -58,7 +58,7 @@ func (project *Project) AddShim(shim string, command string) error {
 	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Stat(dest); err == nil {
-		return errors.New("Shim " + shim + " already exists for this project")
+		return errors.New("shim " + shim + " already exists for this project")
 	}
 
 	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {

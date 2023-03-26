@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     && true
 RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
+RUN go install honnef.co/go/tools/cmd/staticcheck@latest
 WORKDIR /src
 
 
@@ -23,6 +24,8 @@ ARG TARGETARCH
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build golint -set_exit_status ./...
 RUN --mount=type=cache,target=/root/.cache/go-build go vet -v ./...
+RUN --mount=type=cache,target=/root/.cache/go-build staticcheck ./...
+RUN --mount=type=cache,target=/root/.cache/go-build go test -v -short ./...
 RUN mkdir -p dist
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -x -o dist \
         -ldflags "\

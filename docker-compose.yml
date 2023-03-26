@@ -9,6 +9,8 @@ services:
     command: ["sleep", "infinity"]
     volumes:
       - ".:/src"
-      - "go_cache:/go/pkg"
+      - "go_cache:/root/.cache"
+      - "go_pkg:/go/pkg"
 volumes:
   go_cache:
+  go_pkg:

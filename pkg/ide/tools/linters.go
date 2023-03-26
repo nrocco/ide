@@ -10,7 +10,7 @@ var (
 	reLintFoodcritic = regexp.MustCompile(`^(.*): ([^:]+):(\d+)$`)
 	reLintGobuild = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintGolint = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
-	reLintGovet = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
+	// reLintGovet = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintJq = regexp.MustCompile(`^parse error: (.*) at line (\d+), .*$`)
 	reLintPhp = regexp.MustCompile(`^PHP Parse error: (.*) in (.*) on line (\d+)$`)
 	reLintRubocop = regexp.MustCompile(`^([^:]*):(\d+):\d+: (.*)$`)
@@ -40,9 +40,9 @@ func LintRubocop(path string) error {
 }
 
 // LintPhpstan TODO
-func LintPhpstan(path string) error {
-	return nil
-}
+// func LintPhpstan(path string) error {
+// 	return nil
+// }
 
 // LintPhp uses `php` to lint php files
 func LintPhp(path string) error {

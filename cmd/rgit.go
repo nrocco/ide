@@ -31,7 +31,7 @@ var rgitCmd = &cobra.Command{
 		}
 
 		if len(options) == 0 {
-			return errors.New("No git options given")
+			return errors.New("no git options given")
 		}
 
 		if len(repositories) == 0 {
@@ -42,6 +42,12 @@ var rgitCmd = &cobra.Command{
 
 		// For every repository execute the git command
 		for _, repo := range repositories {
+			if repoStat, err := os.Stat(repo); err == nil {
+				if !repoStat.IsDir() {
+					continue
+				}
+			}
+
 			if _, err := os.Stat(filepath.Join(repo, ".git")); err != nil {
 				fmt.Fprintf(os.Stderr, "[ERROR] Skipping %s as it is not a git repository\n", repo)
 				continue

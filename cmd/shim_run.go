@@ -83,7 +83,7 @@ var runShimCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		command := project.GetShim(args[0])
 		if command == "" {
-			return errors.New("Shim does not exist. Did you forget to add it?")
+			return errors.New("shim does not exist. Did you forget to add it?")
 		}
 
 		tmpl, err := template.New("command").Parse(command)

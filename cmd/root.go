@@ -10,8 +10,6 @@ import (
 	"github.com/nrocco/ide/pkg/ide"
 )
 
-var cfgFile string
-
 var project *ide.Project
 
 func loadProject(cmd *cobra.Command, args []string) error {

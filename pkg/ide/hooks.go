@@ -41,7 +41,7 @@ func (project *Project) AddHook(hook string) error {
 	dest := filepath.Join(project.location, ".git", "hooks", hook)
 
 	if _, err := os.Stat(dest); err == nil {
-		return errors.New("Hook " + hook + " already exists for this project")
+		return errors.New("hook " + hook + " already exists for this project")
 	}
 
 	source, _ := os.Executable()

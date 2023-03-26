@@ -32,7 +32,7 @@ var lintCmd = &cobra.Command{
 			case ".php":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintPhp(path)
-				tools.LintPhpstan(path)
+				// tools.LintPhpstan(path)
 			case ".py":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintFlake8(path)
