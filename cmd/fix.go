@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,8 +15,11 @@ var fixCmd = &cobra.Command{
 	Long:  "Fix source code",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, path := range args {
-			if _, err := os.Stat(path); os.IsNotExist(err) {
+			fileInfo, err := os.Stat(path)
+			if err != nil {
 				return err
+			} else if fileInfo.IsDir() {
+				return fmt.Errorf("%s is a directory", path)
 			}
 
 			switch filepath.Ext(path) {

@@ -7,13 +7,12 @@ import (
 var (
 	reLintEslin = regexp.MustCompile(`^[^:]+: line (\d+), col \d+, (.*)$`)
 	reLintFlake8 = regexp.MustCompile(`^(.*):(\d+):\d+:(.*)$`)
-	reLintFoodcritic = regexp.MustCompile(`^(.*): ([^:]+):(\d+)$`)
+	reLintCookstyle = regexp.MustCompile(`^(.*):([\d]+):[\d]+:\s+(.+)$`)
 	reLintGobuild = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintGolint = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
-	// reLintGovet = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
+	reLintGovet = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 	reLintJq = regexp.MustCompile(`^parse error: (.*) at line (\d+), .*$`)
 	reLintPhp = regexp.MustCompile(`^PHP Parse error: (.*) in (.*) on line (\d+)$`)
-	reLintRubocop = regexp.MustCompile(`^([^:]*):(\d+):\d+: (.*)$`)
 	reLintShellcheck = regexp.MustCompile(`^(.*):(\d+):\d+: (.*)$`)
 	reLintYaml = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
 )
@@ -28,13 +27,6 @@ func LintYaml(path string) error {
 // LintShellcheck uses `shellcheck` to format bash/sh files
 func LintShellcheck(path string) error {
 	return execLinter("shellcheck", "--format", "gcc", path).ForEach(reLintShellcheck, func(err []string) {
-		reportViolation(err[1], err[2], err[3])
-	})
-}
-
-// LintRubocop uses `rubocop` to lint ruby files
-func LintRubocop(path string) error {
-	return execLinter("jq", ".", path).ForEach(reLintRubocop, func(err []string) {
 		reportViolation(err[1], err[2], err[3])
 	})
 }
@@ -58,10 +50,10 @@ func LintJq(path string) error {
 	})
 }
 
-// LintFoodcritic uses `foodcritic` to lint chef ruby files
-func LintFoodcritic(path string) error {
-	return execLinter("jq", ".", path).ForEach(reLintFoodcritic, func(err []string) {
-		reportViolation(err[2], err[3], err[1])
+// LintCookstyle uses `cookstyle` to lint chef ruby files
+func LintCookstyle(path string) error {
+	return execLinter("cookstyle", "--display-cop-names", "--no-color", "--format", "emacs", path).ForEach(reLintCookstyle, func(err []string) {
+		reportViolation(path, err[2], err[3])
 	})
 }
 
@@ -88,7 +80,7 @@ func LintEslint(path string) error {
 
 // LintGovet uses the `go vet` tool to lint go files
 func LintGovet(path string) error {
-	return execLinter("go", "vet", "./...").ForEach(reLintJq, func(err []string) {
+	return execLinter("go", "vet", "./...").ForEach(reLintGovet, func(err []string) { // TODO test this!!!!
 		reportViolation(err[1], err[2], err[3])
 	})
 }

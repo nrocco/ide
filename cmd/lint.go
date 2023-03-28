@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,8 +15,11 @@ var lintCmd = &cobra.Command{
 	Long:  "Lint source code and report errors",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, path := range args {
-			if _, err := os.Stat(path); os.IsNotExist(err) {
+			fileInfo, err := os.Stat(path)
+			if err != nil {
 				return err
+			} else if fileInfo.IsDir() {
+				return fmt.Errorf("%s is a directory", path)
 			}
 
 			switch filepath.Ext(path) {
@@ -38,8 +42,7 @@ var lintCmd = &cobra.Command{
 				tools.LintFlake8(path)
 			case ".rb":
 				tools.LintWhitespace(path, true, true, true)
-				tools.LintRubocop(path)
-				tools.LintFoodcritic(path)
+				tools.LintCookstyle(path)
 			case ".sh":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintShellcheck(path)
