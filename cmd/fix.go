@@ -48,13 +48,11 @@ var fixCmd = &cobra.Command{
 			case ".sh":
 				tools.FixWhitespace(path)
 				tools.FixClrf(path)
-			case ".ts":
+			case ".ts", ".vue", ".js":
 				tools.FixWhitespace(path)
 				tools.FixClrf(path)
-			case ".yaml":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
-			case ".yml":
+				tools.FixEslint(path)
+			case ".yaml", ".yml":
 				tools.FixWhitespace(path)
 				tools.FixClrf(path)
 			default:

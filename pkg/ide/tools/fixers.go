@@ -44,3 +44,8 @@ func FixGoimports(path string) error {
 func FixGofmt(path string) error {
 	return exec.Command("gofmt", "-w", "-s", path).Run()
 }
+
+// FixEslint TODO
+func FixEslint(path string) error {
+	return exec.Command("eslint", "--fix", path).Run()
+}

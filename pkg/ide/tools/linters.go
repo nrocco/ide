@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	reLintEslin = regexp.MustCompile(`^[^:]+: line (\d+), col \d+, (.*)$`)
+	reLintEslint = regexp.MustCompile(`^[^:]+: line (\d+), col \d+, (.*)$`)
 	reLintFlake8 = regexp.MustCompile(`^(.*):(\d+):\d+:(.*)$`)
 	reLintCookstyle = regexp.MustCompile(`^(.*):([\d]+):[\d]+:\s+(.+)$`)
 	reLintGobuild = regexp.MustCompile(`^([^:]+):(\d+):\d+: (.*)$`)
@@ -71,9 +71,9 @@ func LintFlake8(path string) error {
 	})
 }
 
-// LintEslint uses `eslint` to lint typescript files
+// LintEslint uses `eslint` to lint javascript, typescript and vue files
 func LintEslint(path string) error {
-	return execLinter("eslint", "--format=compact", path).ForEach(reLintEslin, func(err []string) {
+	return execLinter("eslint", "--format=compact", path).ForEach(reLintEslint, func(err []string) {
 		reportViolation(path, err[1], err[2])
 	})
 }

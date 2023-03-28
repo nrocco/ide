@@ -36,7 +36,7 @@ var lintCmd = &cobra.Command{
 			case ".php":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintPhp(path)
-				// tools.LintPhpstan(path)
+				// TODO tools.LintPhpstan(path)
 			case ".py":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintFlake8(path)
@@ -46,13 +46,10 @@ var lintCmd = &cobra.Command{
 			case ".sh":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintShellcheck(path)
-			case ".ts":
+			case ".ts", ".vue", ".js":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintEslint(path)
-			case ".yaml":
-				tools.LintWhitespace(path, true, true, true)
-				tools.LintYaml(path)
-			case ".yml":
+			case ".yaml", ".yml":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintYaml(path)
 			default:
