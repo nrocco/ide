@@ -55,6 +55,7 @@ var rgitCmd = &cobra.Command{
 			fmt.Printf("==> Working on \033[0;32m%s\033[0m\n", repo)
 			cmd := exec.Command("git", options...)
 			cmd.Dir = repo
+			cmd.Stdin = os.Stdin
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Run()
