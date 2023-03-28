@@ -53,6 +53,9 @@ var fixCmd = &cobra.Command{
 			case ".yml":
 				tools.FixWhitespace(path)
 				tools.FixClrf(path)
+			default:
+				tools.FixWhitespace(path)
+				tools.FixClrf(path)
 			}
 		}
 

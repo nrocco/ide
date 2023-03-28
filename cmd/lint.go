@@ -52,6 +52,8 @@ var lintCmd = &cobra.Command{
 			case ".yml":
 				tools.LintWhitespace(path, true, true, true)
 				tools.LintYaml(path)
+			default:
+				tools.LintWhitespace(path, true, true, true)
 			}
 		}
 
