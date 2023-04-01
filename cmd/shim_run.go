@@ -15,30 +15,42 @@ import (
 )
 
 type shimContext struct {
-	User    string
-	Group   string
-	UID     int
-	GID     int
-	Project string
-	Dir     string
+	User     string
+	Group    string
+	UID      int
+	GID      int
+	Project  string
+	Location string
 }
 
+// RelDir calculates the relative directory in the ide/git repo
 func (b shimContext) RelDir() string {
 	dir, err := os.Getwd()
 	if err != nil {
 		return ""
 	}
-	rel, err := filepath.Rel(b.Dir, dir)
+	rel, err := filepath.Rel(b.Location, dir)
 	if err != nil {
 		return ""
 	}
 	return rel
 }
 
-func (b shimContext) RunOrExec(service string) string {
-	fafa, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
+// Run uses docker compose run to execute the given command
+func (b shimContext) ComposeRun(service string) string {
+	command := []string{"docker", "compose", "run", "--rm"}
+	if !b.IsTTY() {
+		command = append(command, "-T")
+	}
+	command = append(command, service)
+	return strings.Join(command, " ")
+}
+
+// RunOrExec figures out if the service is running, use exec, else fallback to docker run
+func (b shimContext) ComposeRunOrExec(service string) string {
+	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
 	command := []string{"docker", "compose"}
-	if len(fafa) == 0 {
+	if len(runningContainers) == 0 {
 		command = append(command, "run", "--rm")
 	} else {
 		command = append(command, "exec")
@@ -50,6 +62,7 @@ func (b shimContext) RunOrExec(service string) string {
 	return strings.Join(command, " ")
 }
 
+// IsTTY detects if the current file descriptors are attached to a TTY
 func (b shimContext) IsTTY() bool {
 	if !isatty.IsTerminal(os.Stdin.Fd()) {
 		return false
@@ -86,7 +99,7 @@ var runShimCmd = &cobra.Command{
 			return errors.New("shim does not exist. Did you forget to add it?")
 		}
 
-		tmpl, err := template.New("command").Parse(command)
+		tmpl, err := template.New("shim").Parse(command)
 		if err != nil {
 			return err
 		}
@@ -94,10 +107,10 @@ var runShimCmd = &cobra.Command{
 		var b bytes.Buffer
 
 		err = tmpl.Execute(&b, shimContext{
-			UID:     os.Getuid(),
-			GID:     os.Getgid(),
-			Project: project.Name(),
-			Dir:     project.Location(),
+			UID:      os.Getuid(),
+			GID:      os.Getgid(),
+			Project:  project.Name(),
+			Location: project.Location(),
 		})
 		if err != nil {
 			return err
@@ -112,11 +125,11 @@ var runShimCmd = &cobra.Command{
 
 		parts = append(parts, args[1:]...)
 
-		fafa := exec.Command(parts[0], parts[1:]...)
-		fafa.Stdin = os.Stdin
-		fafa.Stdout = os.Stdout
-		fafa.Stderr = os.Stderr
-		if err := fafa.Run(); err != nil {
+		runner := exec.Command(parts[0], parts[1:]...)
+		runner.Stdin = os.Stdin
+		runner.Stdout = os.Stdout
+		runner.Stderr = os.Stderr
+		if err := runner.Run(); err != nil {
 			if exiterr, ok := err.(*exec.ExitError); ok {
 				os.Exit(exiterr.ExitCode())
 			}
