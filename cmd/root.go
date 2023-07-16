@@ -47,6 +47,8 @@ func Execute() {
 	} else if os.Args[0] == "rgit" {
 		args := []string{"ide", "rgit", "--"}
 		os.Args = append(args, os.Args[1:]...)
+	} else if strings.Contains(os.Args[0], "/tmp/go-build") {
+		// TODO this exists for development only
 	} else if !strings.Contains(os.Args[0], "ide") {
 		args := []string{os.Args[0], "shim", "run", "--", path.Base(os.Args[0])}
 		os.Args = append(args, os.Args[1:]...)

@@ -74,7 +74,6 @@ func (project *Project) RefreshCtags() error {
 
 	options := append([]string{
 		"--tag-relative=yes", "--sort=yes", "--totals=yes",
-		"--exclude=.git", "--exclude=.hg", "--exclude=.svn",
 		"--recurse", "-f", tmpCtagsFile,
 	}, project.CtagsOptions()...)
 

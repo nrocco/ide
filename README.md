@@ -72,6 +72,31 @@ You can see the hook is enabled:
     $ ls -ilah .git/hooks/post-checkout
     29546377 lrwxr-xr-x 1 nrocco staff 52 Jul  4 20:17 .git/hooks/post-checkout -> /usr/local/bin/ide
 
+## Use docker-compose
+
+In your local `.envrc`:
+
+    PATH_add .git/bin
+    export COMPOSE_FILE=${PWD}/.git/docker-compose.yml
+
+In `.git/docker-compose.yml`:
+
+    ---
+    version: "3.8"
+    services:
+      ruby:
+        image: "ruby:3"
+        platform: "linux/amd64"
+        init: true
+        command: ["sleep", "infinity"]
+        working_dir: "${PWD}"
+        volumes:
+          - "${PWD}:${PWD}"
+          - "ruby_cache:/usr/local/bundle"
+    volumes:
+      ruby_cache:
+
+
 ## Alternatives
 
 Execute a command defined in `.git/config` can alternatively achieved with a
