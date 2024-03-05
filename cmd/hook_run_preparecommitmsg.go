@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -24,7 +23,7 @@ var runPrepareCommitMsgHookCmd = &cobra.Command{
 			return nil
 		}
 
-		commitMsgBytes, readErr := ioutil.ReadFile(args[0])
+		commitMsgBytes, readErr := os.ReadFile(args[0])
 		if readErr != nil {
 			return readErr
 		}
