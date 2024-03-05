@@ -6,9 +6,10 @@ RUN apk add --no-cache \
         musl-dev \
     && true
 RUN go install golang.org/x/lint/golint@latest
+RUN go install golang.org/x/tools/cmd/deadcode@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
-RUN go install honnef.co/go/tools/cmd/staticcheck@latest
 RUN go install golang.org/x/vuln/cmd/govulncheck@latest
+RUN go install honnef.co/go/tools/cmd/staticcheck@latest
 WORKDIR /src
 
 
@@ -27,6 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build golint -set_exit_status ./..
 RUN --mount=type=cache,target=/root/.cache/go-build go vet -v ./...
 RUN --mount=type=cache,target=/root/.cache/go-build staticcheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build govulncheck ./...
+RUN --mount=type=cache,target=/root/.cache/go-build deadcode .
 RUN --mount=type=cache,target=/root/.cache/go-build go test -v -short ./...
 RUN mkdir -p dist
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -x -o dist \
@@ -41,13 +43,3 @@ RUN --mount=type=cache,target=/root/.cache/go-build go test -v -cover -short ./.
 
 FROM scratch AS bin
 COPY --from=gobuilder /src/dist/ /
-
-
-
-FROM alpine:edge
-RUN apk add --no-cache \
-        ca-certificates \
-        sqlite \
-    && true
-COPY --from=gobuilder /src/dist/ide /usr/bin/ide
-ENTRYPOINT ["/usr/bin/ide"]

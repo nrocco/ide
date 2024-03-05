@@ -11,34 +11,14 @@ help:
 
 .PHONY: build-all
 build-all: \
-	build-amd64-freebsd \
 	build-arm64-darwin \
-	build-amd64-darwin \
 	build-amd64-linux
-
-.PHONY: build-amd64-freebsd
-build-amd64-freebsd: dist/$(NAME)-amd64-freebsd
 
 .PHONY: build-arm64-darwin
 build-arm64-darwin: dist/$(NAME)-arm64-darwin
 
-.PHONY: build-amd64-darwin
-build-amd64-darwin: dist/$(NAME)-amd64-darwin
-
 .PHONY: build-amd64-linux
 build-amd64-linux: dist/$(NAME)-amd64-linux
-
-.PHONY: dist/$(NAME)-amd64-freebsd
-dist/$(NAME)-amd64-freebsd:
-	mkdir -p dist/$(NAME)-amd64-freebsd
-	docker image build --pull \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--target bin \
-		--platform freebsd/amd64 \
-		--output dist/$(NAME)-amd64-freebsd \
-		.
 
 .PHONY: dist/$(NAME)-arm64-darwin
 dist/$(NAME)-arm64-darwin:
@@ -50,18 +30,6 @@ dist/$(NAME)-arm64-darwin:
 		--target bin \
 		--platform darwin/arm64 \
 		--output dist/$(NAME)-arm64-darwin \
-		.
-
-.PHONY: dist/$(NAME)-amd64-darwin
-dist/$(NAME)-amd64-darwin:
-	mkdir -p dist/$(NAME)-amd64-darwin
-	docker image build --pull \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--target bin \
-		--platform darwin/amd64 \
-		--output dist/$(NAME)-amd64-darwin \
 		.
 
 .PHONY: dist/$(NAME)-amd64-linux
@@ -88,8 +56,7 @@ clear:
 
 .PHONY: release
 release:
-	tar czf "dist/$(NAME)-amd64-darwin.tar.gz" -C dist/ "$(NAME)-amd64-darwin"
-	tar czf "dist/$(NAME)-amd64-freebsd.tar.gz" -C dist/ "$(NAME)-amd64-freebsd"
+	tar czf "dist/$(NAME)-arm64-darwin.tar.gz" -C dist/ "$(NAME)-arm64-darwin"
 	tar czf "dist/$(NAME)-amd64-linux.tar.gz" -C dist/ "$(NAME)-amd64-linux"
 	sha256sum dist/*.tar.gz > dist/checksums.txt
 	tools/release-to-github.py nrocco/$(NAME) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz

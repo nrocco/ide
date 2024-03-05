@@ -7,8 +7,9 @@ services:
       target: godev
     init: true
     command: ["sleep", "infinity"]
+    working_dir: "${PWD}"
     volumes:
-      - ".:/src"
+      - "${PWD}:${PWD}"
       - "go_cache:/root/.cache"
       - "go_pkg:/go/pkg"
 volumes:
