@@ -6,8 +6,8 @@ ide provides a tool set that gets out of your way
 [![Go Reference](https://pkg.go.dev/badge/github.com/nrocco/ide.svg)](https://pkg.go.dev/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 
-> a tool that glues vim/git/direnv/docker/ctags together to provide a powerful
-> integrated development environment
+> a tool that glues vim, git, direnv, docker compose and ctags together
+> to provide a powerful integrated development environment
 
 ## Usage
 
@@ -77,12 +77,12 @@ You can see the hook is enabled:
 In your local `.envrc`:
 
     PATH_add .git/bin
-    export COMPOSE_FILE=${PWD}/.git/docker-compose.yml
+    export COMPOSE_FILE=${PWD}/.git/compose.yaml
 
-In `.git/docker-compose.yml`:
+In `.git/compose.yaml`:
 
     ---
-    version: "3.8"
+    name: "my-name"
     services:
       ruby:
         image: "ruby:3"
@@ -96,16 +96,6 @@ In `.git/docker-compose.yml`:
     volumes:
       ruby_cache:
 
-
-## Alternatives
-
-Execute a command defined in `.git/config` can alternatively achieved with a
-simple bash script:
-
-    #!/bin/sh
-    set -xe
-    NAME="ide.binaries.$(basename $0)"
-    exec $(git config --local --get "${NAME}" || echo echo No configuration found for "${NAME}") "$@"
 
 ## Contributing
 
