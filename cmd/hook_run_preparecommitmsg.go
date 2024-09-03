@@ -37,9 +37,9 @@ var runPrepareCommitMsgHookCmd = &cobra.Command{
 
 		w := bufio.NewWriter(commitMsgFile)
 
-		re := regexp.MustCompile("[a-zA-Z]+-[0-9]+")
+		jiraKeyRegexp := regexp.MustCompile("[a-zA-Z]{2,}-[0-9]{1,}")
 
-		key := re.FindString(project.Branch())
+		key := jiraKeyRegexp.FindString(project.Branch())
 		if key != "" {
 			fmt.Fprintln(w, strings.ToUpper(key)+" ")
 		}

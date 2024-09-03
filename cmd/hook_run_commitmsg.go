@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bufio"
-	"log"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -20,32 +20,39 @@ var runCommitMsgHookCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		commitMsgFile, osErr := os.Open(args[0])
-		if osErr != nil {
-			return osErr
+		if strings.Contains(args[0], "MERGE_MSG") {
+			return nil
 		}
 
+		commitMsgBytes, readErr := os.ReadFile(args[0])
+		if readErr != nil {
+			return readErr
+		}
+
+		firstLine, _, _ := strings.Cut(string(commitMsgBytes[:]), "\n")
+
+		jiraKeyRegexp := regexp.MustCompile("[a-zA-Z]{2,}-[0-9]{1,}")
+
+		if jiraKeyRegexp.MatchString(firstLine) {
+			return nil
+		}
+
+		key := strings.ToUpper(jiraKeyRegexp.FindString(project.Branch()))
+		if key == "" {
+			return fmt.Errorf("aborting commit, missing JIRA key in: %s", firstLine)
+		}
+
+		commitMsgFile, createErr := os.Create(args[0])
+		if createErr != nil {
+			return createErr
+		}
 		defer commitMsgFile.Close()
 
-		reader := bufio.NewReader(commitMsgFile)
+		w := bufio.NewWriter(commitMsgFile)
+		w.WriteString(key+" ")
+		w.Write(commitMsgBytes)
 
-		line, readError := reader.ReadString('\n')
-		if readError != nil {
-			return readError
-		}
-
-		line = strings.Trim(line, "\n")
-
-		matched, regexErr := regexp.MatchString("^[a-zA-Z]{2,}-[0-9]{1,}|^Merge.*[a-zA-Z]{2,}-[0-9]{1,}", line)
-		if regexErr != nil {
-			return regexErr
-		}
-
-		if !matched {
-			log.Fatalf("Aborting commit due to invalid commit message: %s\n", line)
-		}
-
-		return nil
+		return w.Flush()
 	},
 }
 

@@ -1,7 +1,9 @@
 # syntax = docker/dockerfile:1-experimental
 FROM --platform=${BUILDPLATFORM} golang:alpine AS godev
-RUN apk add --no-cache \
+RUN apk upgrade \
+    && apk add --no-cache \
         ca-certificates \
+        ctags \
         gcc \
         musl-dev \
     && true
@@ -29,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build go vet -v ./...
 RUN --mount=type=cache,target=/root/.cache/go-build staticcheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build govulncheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build deadcode .
-RUN --mount=type=cache,target=/root/.cache/go-build go test -v -short ./...
+RUN --mount=type=cache,target=/root/.cache/go-build go test -v -cover -short ./...
 RUN mkdir -p dist
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -x -o dist \
         -ldflags "\
@@ -37,7 +39,6 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=${TARGETOS} GOARCH=${TA
             -X github.com/nrocco/ide/cmd.commit=${BUILD_COMMIT} \
             -X github.com/nrocco/ide/cmd.date=${BUILD_DATE} \
             -s -w"
-RUN --mount=type=cache,target=/root/.cache/go-build go test -v -cover -short ./...
 
 
 

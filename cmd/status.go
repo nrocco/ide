@@ -27,6 +27,7 @@ var statusCmd = &cobra.Command{
 			fmt.Printf("    File: %s\n", project.CtagsFile())
 			fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
 			fmt.Printf("    Size: %s\n", humanize.Bytes(project.CtagsFileSize()))
+			fmt.Printf("    Options: %s\n", strings.Join(project.CtagsOptions(), " "))
 		} else {
 			fmt.Printf("  Ctags: ~\n")
 		}
