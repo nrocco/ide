@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 import subprocess
-import urllib
+import urllib.request
 
 
 def create_release(repository, tag, draft, prerelease):
