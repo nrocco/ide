@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 import subprocess
-import urllib.request
+import urllib
 
 
 def create_release(repository, tag, draft, prerelease):
@@ -21,6 +21,7 @@ def create_release(repository, tag, draft, prerelease):
         raise Exception("Could not create release")
     return json.load(response)
 
+
 def upload_asset(repository, release_id, asset):
     name = os.path.basename(asset)
     size = os.path.getsize(asset)
@@ -35,6 +36,7 @@ def upload_asset(repository, release_id, asset):
         raise Exception("Could not upload asset {}".format(asset))
     return json.load(response)
 
+
 def main():
     parser = argparse.ArgumentParser(description='Create a new github release and upload assets')
     parser.add_argument('--draft', action='store_true')
@@ -48,6 +50,7 @@ def main():
     for asset in args.assets:
         print("==> Uploading {}".format(asset))
         result = upload_asset(args.repository, release['id'], asset)
+
 
 if __name__ == '__main__':
     main()
