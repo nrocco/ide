@@ -12,7 +12,7 @@ var addHookCmd = &cobra.Command{
 	Long:  "Add a git hook for this ide project",
 	Args:  cobra.MinimumNArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"commit-msg", "post-checkout", "post-merge", "prepare-commit-msg"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{"commit-msg", "prepare-commit-msg"}, cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {

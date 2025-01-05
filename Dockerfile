@@ -3,7 +3,6 @@ FROM --platform=${BUILDPLATFORM} golang:alpine AS godev
 RUN apk upgrade \
     && apk add --no-cache \
         ca-certificates \
-        ctags \
         gcc \
         musl-dev \
     && true

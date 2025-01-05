@@ -22,7 +22,6 @@ After installing `ide` you can invoke it without any arguments to get help:
     Available Commands:
       compare     Compare a file in the current project with another project
       completion  Output shell completion code for the specified shell
-      ctags       Update ctags for the ide project
       destroy     Remove all ide configuration for a repository
       fix         Fix source code
       help        Help about any command
@@ -62,15 +61,15 @@ You can also view the current status of your ide project:
         npm: docker-compose exec --workdir=$PWD frontend npm
 
 In the above case no hooks are enabled for this project. In order to enable
-the `post-checkout` hook (which runs ctags) run:
+the `prepare-commit-msg` hook run:
 
-    $ ide hook enable post-checkout
-    2017/07/04 20:17:37 Hook post-checkout enabled
+    $ ide hook enable prepare-commit-msg
+    2017/07/04 20:17:37 Hook prepare-commit-msg enabled
 
 You can see the hook is enabled:
 
-    $ ls -ilah .git/hooks/post-checkout
-    29546377 lrwxr-xr-x 1 nrocco staff 52 Jul  4 20:17 .git/hooks/post-checkout -> /usr/local/bin/ide
+    $ ls -ilah .git/hooks/prepare-commit-msg
+    29546377 lrwxr-xr-x 1 nrocco staff 52 Jul  4 20:17 .git/hooks/prepare-commit-msg -> /usr/local/bin/ide
 
 ## Use docker-compose
 

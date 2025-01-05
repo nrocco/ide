@@ -81,10 +81,6 @@ func (project *Project) Destroy() error {
 		}
 	}
 
-	if err := project.DeleteCtagsFile(); err != nil {
-		return err
-	}
-
 	project.config.Raw.RemoveSection("ide")
 
 	return project.repository.Storer.SetConfig(project.config)
