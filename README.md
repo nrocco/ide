@@ -75,7 +75,7 @@ You can see the hook is enabled:
 
 In your local `.envrc`:
 
-    PATH_add .git/bin
+    layout ide
     export COMPOSE_FILE=${PWD}/.git/compose.yaml
 
 In `.git/compose.yaml`:
