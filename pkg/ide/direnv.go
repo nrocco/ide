@@ -17,7 +17,7 @@ func (project *Project) AddGitBinToPath() error {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "PATH_add .git/bin") {
+		if strings.Contains(scanner.Text(), "layout ide") {
 			return nil
 		}
 	}
@@ -25,7 +25,7 @@ func (project *Project) AddGitBinToPath() error {
 		return err
 	}
 
-	if _, err := file.Write([]byte("PATH_add .git/bin\n")); err != nil {
+	if _, err := file.Write([]byte("layout ide\n")); err != nil {
 		return err
 	}
 
