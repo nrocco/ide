@@ -9,7 +9,6 @@ var fafaCmd = &cobra.Command{
 	Hidden:  true,
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// return project.AddGitBinToPath()
 		return nil
 	},
 }

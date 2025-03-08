@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -58,6 +59,12 @@ func (project *Project) RefreshShims() error {
 
 // AddShim adds a shim to this project
 func (project *Project) AddShim(shim string, command string) error {
+	validShimRegexp := regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9._-]*$")
+
+	if !validShimRegexp.MatchString("kak%ker") {
+		return errors.New("not a valid shim name: " + shim)
+	}
+
 	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Stat(dest); err == nil {
