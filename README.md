@@ -73,11 +73,6 @@ You can see the hook is enabled:
 
 ## Use docker-compose
 
-In your local `.envrc`:
-
-    layout ide
-    export COMPOSE_FILE=${PWD}/.git/compose.yaml
-
 In `.git/compose.yaml`:
 
     ---
