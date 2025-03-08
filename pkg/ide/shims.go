@@ -12,7 +12,7 @@ func (project *Project) ListShims() map[string]string {
 	shims := map[string]string{}
 
 	for _, option := range project.config.Raw.Section("ide").Subsection("shims").Options {
-		option.Key = strings.Replace(option.Key, "-----", ".", -1)
+		option.Key = strings.ReplaceAll(option.Key, "%2E", ".", -1)
 		shims[option.Key] = option.Value
 	}
 
@@ -21,7 +21,7 @@ func (project *Project) ListShims() map[string]string {
 
 // GetShim returns the command for a shim
 func (project *Project) GetShim(shim string) string {
-	shim = strings.Replace(shim, ".", "-----", -1)
+	shim = strings.ReplaceAll(shim, ".", "%2E", -1)
 	return project.config.Raw.Section("ide").Subsection("shims").Option(shim)
 }
 
@@ -76,7 +76,7 @@ func (project *Project) AddShim(shim string, command string) error {
 		return err
 	}
 
-	project.config.Raw.SetOption("ide", "shims", strings.Replace(shim, ".", "-----", -1), command)
+	project.config.Raw.SetOption("ide", "shims", strings.ReplaceAll(shim, ".", "%2E", -1), command)
 
 	return project.repository.Storer.SetConfig(project.config)
 }
@@ -91,7 +91,7 @@ func (project *Project) RemoveShim(shim string) error {
 		}
 	}
 
-	project.config.Raw.Section("ide").Subsection("shims").RemoveOption(strings.Replace(shim, ".", "-----", -1))
+	project.config.Raw.Section("ide").Subsection("shims").RemoveOption(strings.ReplaceAll(shim, ".", "%2E", -1))
 
 	return project.repository.Storer.SetConfig(project.config)
 }
