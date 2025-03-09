@@ -3,6 +3,8 @@ package cmd
 import (
 	"bytes"
 	"errors"
+	"context"
+	"regexp"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,9 +12,34 @@ import (
 	"text/template"
 
 	"github.com/anmitsu/go-shlex"
+	"github.com/docker/cli/cli/command"
+	"github.com/docker/cli/cli/flags"
+	"github.com/docker/compose/v2/pkg/api"
+	"github.com/docker/compose/v2/pkg/compose"
+	"github.com/docker/docker/client"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
+
+// NewBackend returns a new docker compose backend
+func NewBackend() (api.Service, error) {
+	client, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	cli, err := command.NewDockerCli(command.WithAPIClient(client))
+	if err != nil {
+		return nil, err
+	}
+	if err := cli.Initialize(flags.NewClientOptions()); err != nil {
+		return nil, err
+	}
+	backend := compose.NewComposeService(cli)
+	if err != nil {
+		return nil, err
+	}
+	return backend, nil
+}
 
 type shimContext struct {
 	User     string
@@ -36,32 +63,6 @@ func (b shimContext) RelDir() string {
 	return rel
 }
 
-// Run uses docker compose run to execute the given command
-func (b shimContext) ComposeRun(service string) string {
-	command := []string{"docker", "compose", "run", "--rm"}
-	if !b.IsTTY() {
-		command = append(command, "-T")
-	}
-	command = append(command, service)
-	return strings.Join(command, " ")
-}
-
-// RunOrExec figures out if the service is running, use exec, else fallback to docker run
-func (b shimContext) ComposeRunOrExec(service string) string {
-	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
-	command := []string{"docker", "compose"}
-	if len(runningContainers) == 0 {
-		command = append(command, "run", "--rm")
-	} else {
-		command = append(command, "exec")
-	}
-	if !b.IsTTY() {
-		command = append(command, "-T")
-	}
-	command = append(command, service)
-	return strings.Join(command, " ")
-}
-
 // IsTTY detects if the current file descriptors are attached to a TTY
 func (b shimContext) IsTTY() bool {
 	if !isatty.IsTerminal(os.Stdin.Fd()) {
@@ -74,6 +75,76 @@ func (b shimContext) IsTTY() bool {
 		return false
 	}
 	return true
+}
+
+func runPlainShim(command string, args []string) error {
+	tmpl, err := template.New("shim").Parse(command)
+	if err != nil {
+		return err
+	}
+
+	var b bytes.Buffer
+
+	err = tmpl.Execute(&b, shimContext{
+		UID:      os.Getuid(),
+		GID:      os.Getgid(),
+		Project:  project.Name(),
+		Location: project.Location(),
+	})
+	if err != nil {
+		return err
+	}
+
+	command = os.ExpandEnv(b.String())
+
+	parts, err := shlex.Split(command, true)
+	if err != nil {
+		return err
+	}
+
+	parts = append(parts, args[1:]...)
+
+	runner := exec.Command(parts[0], parts[1:]...)
+	runner.Stdin = os.Stdin
+	runner.Stdout = os.Stdout
+	runner.Stderr = os.Stderr
+	if err := runner.Run(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			os.Exit(exiterr.ExitCode())
+		}
+		return err
+	}
+
+	return nil
+}
+
+func runComposeShim(command string, args []string) error {
+	re := regexp.MustCompile(`\[(.+)\]:(.+)`)
+	matches := re.FindStringSubmatch(command)
+	if len(matches) != 3 {
+		return errors.New("no bueno")
+	}
+
+	service := matches[1]
+	command = os.ExpandEnv(matches[2])
+	parts, err := shlex.Split(command, true)
+	if err != nil {
+		return err
+	}
+
+	parts = append(parts, args[1:]...)
+
+	backend, err := NewBackend()
+	if err != nil {
+		return err
+	}
+
+	_, err = backend.Exec(context.Background(), "ide", api.RunOptions{
+		Service: service,
+		Command: parts,
+	})
+
+	return err
 }
 
 var runShimCmd = &cobra.Command{
@@ -96,47 +167,11 @@ var runShimCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		command := project.GetShim(args[0])
 		if command == "" {
-			return errors.New("shim does not exist. Did you forget to add it?")
+			return errors.New("shim does not exist")
+		} else if strings.HasPrefix(command, "compose[") {
+			return runComposeShim(command, args)
 		}
-
-		tmpl, err := template.New("shim").Parse(command)
-		if err != nil {
-			return err
-		}
-
-		var b bytes.Buffer
-
-		err = tmpl.Execute(&b, shimContext{
-			UID:      os.Getuid(),
-			GID:      os.Getgid(),
-			Project:  project.Name(),
-			Location: project.Location(),
-		})
-		if err != nil {
-			return err
-		}
-
-		command = os.ExpandEnv(b.String())
-
-		parts, err := shlex.Split(command, true)
-		if err != nil {
-			return err
-		}
-
-		parts = append(parts, args[1:]...)
-
-		runner := exec.Command(parts[0], parts[1:]...)
-		runner.Stdin = os.Stdin
-		runner.Stdout = os.Stdout
-		runner.Stderr = os.Stderr
-		if err := runner.Run(); err != nil {
-			if exiterr, ok := err.(*exec.ExitError); ok {
-				os.Exit(exiterr.ExitCode())
-			}
-			return err
-		}
-
-		return nil
+		return runPlainShim(command, args)
 	},
 }
 

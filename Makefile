@@ -1,6 +1,4 @@
 NAME = ide
-DOCKER_IMAGE = nrocco/$(NAME)
-DOCKER_IMAGE_VERSION = latest
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
 BUILD_COMMIT ?= $(shell git describe --always --dirty)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -23,7 +21,7 @@ build-amd64-linux: dist/$(NAME)-amd64-linux
 .PHONY: dist/$(NAME)-arm64-darwin
 dist/$(NAME)-arm64-darwin:
 	mkdir -p dist/$(NAME)-arm64-darwin
-	docker image build --pull \
+	docker image build \
 		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
 		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
 		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
@@ -35,7 +33,7 @@ dist/$(NAME)-arm64-darwin:
 .PHONY: dist/$(NAME)-amd64-linux
 dist/$(NAME)-amd64-linux:
 	mkdir -p dist/$(NAME)-amd64-linux
-	docker image build --pull \
+	docker image build \
 		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
 		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
 		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
@@ -60,16 +58,3 @@ release:
 	tar czf "dist/$(NAME)-amd64-linux.tar.gz" -C dist/ "$(NAME)-amd64-linux"
 	sha256sum dist/*.tar.gz > dist/checksums.txt
 	tools/release-to-github.py nrocco/$(NAME) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
-
-.PHONY: container
-container:
-	docker image build --pull \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--tag "$(DOCKER_IMAGE):$(DOCKER_IMAGE_VERSION)" \
-		.
-
-.PHONY: push
-push: container
-	docker image push "$(DOCKER_IMAGE):$(DOCKER_IMAGE_VERSION)"

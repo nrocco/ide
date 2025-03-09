@@ -9,6 +9,7 @@ services:
     working_dir: "${PWD}"
     volumes:
       - "${PWD}:${PWD}"
+      - "/var/run/docker.sock:/var/run/docker.sock"
       - "go_cache:/root/.cache"
       - "go_pkg:/go/pkg"
 volumes:
