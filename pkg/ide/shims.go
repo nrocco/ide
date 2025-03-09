@@ -61,7 +61,7 @@ func (project *Project) RefreshShims() error {
 func (project *Project) AddShim(shim string, command string) error {
 	validShimRegexp := regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9._-]*$")
 
-	if !validShimRegexp.MatchString("kak%ker") {
+	if !validShimRegexp.MatchString(shim) {
 		return errors.New("not a valid shim name: " + shim)
 	}
 

@@ -139,7 +139,8 @@ func runComposeShim(command string, args []string) error {
 		return err
 	}
 
-	_, err = backend.Exec(context.Background(), "ide", api.RunOptions{
+	// TODO: add support for project name other then the directory name
+	_, err = backend.Exec(context.Background(), project.Name(), api.RunOptions{
 		Service: service,
 		Command: parts,
 	})
