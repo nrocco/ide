@@ -2,44 +2,20 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"context"
-	"regexp"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/anmitsu/go-shlex"
-	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/flags"
 	"github.com/docker/compose/v2/pkg/api"
-	"github.com/docker/compose/v2/pkg/compose"
-	"github.com/docker/docker/client"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
-
-// NewBackend returns a new docker compose backend
-func NewBackend() (api.Service, error) {
-	client, err := client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		return nil, err
-	}
-	cli, err := command.NewDockerCli(command.WithAPIClient(client))
-	if err != nil {
-		return nil, err
-	}
-	if err := cli.Initialize(flags.NewClientOptions()); err != nil {
-		return nil, err
-	}
-	backend := compose.NewComposeService(cli)
-	if err != nil {
-		return nil, err
-	}
-	return backend, nil
-}
 
 type shimContext struct {
 	User     string
@@ -134,15 +110,45 @@ func runComposeShim(command string, args []string) error {
 
 	parts = append(parts, args[1:]...)
 
-	backend, err := NewBackend()
+	composeClient, err := project.DockerComposeClient()
+	if err != nil {
+		return err
+	}
+
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	rel, err := filepath.Rel(project.Location(), dir)
+	if err != nil {
+		return err
+	}
+
+	containers, err := composeClient.Ps(context.Background(), project.Name(), api.PsOptions{
+		Services: []string{service},
+	})
+	if err != nil {
+		return err
+	}
+	if len(containers) != 1 {
+		return errors.New("blaaaat") // TODO
+	}
+
+	dockerClient, err := project.DockerClient()
+	if err != nil {
+		return err
+	}
+
+	containerSpec, err := dockerClient.ContainerInspect(context.Background(), containers[0].Name)
 	if err != nil {
 		return err
 	}
 
 	// TODO: add support for project name other then the directory name
-	_, err = backend.Exec(context.Background(), project.Name(), api.RunOptions{
-		Service: service,
-		Command: parts,
+	_, err = composeClient.Exec(context.Background(), project.Name(), api.RunOptions{
+		Service:    service,
+		Command:    parts,
+		WorkingDir: filepath.Join(containerSpec.Config.WorkingDir, rel),
 	})
 
 	return err
