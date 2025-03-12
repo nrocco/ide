@@ -17,7 +17,7 @@ var addShimCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := project.AddShim(args[0], strings.Join(args[1:], " "))
+		err := project.ShimAdd(args[0], strings.Join(args[1:], " "))
 		if err != nil {
 			return err
 		}

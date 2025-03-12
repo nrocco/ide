@@ -22,7 +22,7 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("  Branch: %s\n", project.Branch())
 		fmt.Printf("  Email: %s\n", project.Email())
 		fmt.Printf("  Location: %s\n", project.Location())
-		if project.HasCtagsFile() {
+		if project.CtagsFileExists() {
 			fmt.Printf("  Ctags:\n")
 			fmt.Printf("    File: %s\n", project.CtagsFile())
 			fmt.Printf("    Age: %s\n", humanize.Time(project.CtagsFileAge()))
@@ -43,13 +43,13 @@ var statusCmd = &cobra.Command{
 			fmt.Printf("  GitBinInPath: no\n")
 		}
 
-		if hooks := project.ListHooks(); len(hooks) > 0 {
+		if hooks := project.HookList(); len(hooks) > 0 {
 			fmt.Printf("  Hooks: %s\n", strings.Join(hooks, " "))
 		} else {
 			fmt.Printf("  Hooks: ~\n")
 		}
 
-		if shims := project.ListShims(); len(shims) > 0 {
+		if shims := project.ShimList(); len(shims) > 0 {
 			fmt.Printf("  Shims:\n")
 			for shim, command := range shims {
 				fmt.Printf("    %s: %s\n", shim, command)

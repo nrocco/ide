@@ -15,7 +15,7 @@ var removeHookCmd = &cobra.Command{
 		if err := loadProject(cmd, args); err == nil {
 			return []string{}, cobra.ShellCompDirectiveNoFileComp
 		}
-		return project.ListHooks(), cobra.ShellCompDirectiveNoFileComp
+		return project.HookList(), cobra.ShellCompDirectiveNoFileComp
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {

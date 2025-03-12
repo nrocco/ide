@@ -17,7 +17,7 @@ var addHookCmd = &cobra.Command{
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, hook := range args {
-			err := project.AddHook(hook)
+			err := project.HookAdd(hook)
 			if err != nil {
 				log.Println(err)
 			} else {

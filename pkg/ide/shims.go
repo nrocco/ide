@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// ListShims returns an array of shims which are added to this ide project
-func (project *Project) ListShims() map[string]string {
+// ShimList returns an array of shims which are added to this ide project
+func (project *Project) ShimList() map[string]string {
 	shims := map[string]string{}
 
 	for _, option := range project.config.Raw.Section("ide").Subsection("shims").Options {
@@ -20,15 +20,15 @@ func (project *Project) ListShims() map[string]string {
 	return shims
 }
 
-// GetShim returns the command for a shim
-func (project *Project) GetShim(shim string) string {
+// ShimGet returns the command for a shim
+func (project *Project) ShimGet(shim string) string {
 	shim = strings.ReplaceAll(shim, ".", "-----")
 	return project.config.Raw.Section("ide").Subsection("shims").Option(shim)
 }
 
-// RefreshShims syncs the shims from .git/config with .git/bin
-func (project *Project) RefreshShims() error {
-	shims := project.ListShims()
+// ShimRefresh syncs the shims from .git/config with .git/bin
+func (project *Project) ShimRefresh() error {
+	shims := project.ShimList()
 
 	if len(shims) == 0 {
 		return nil
@@ -57,8 +57,8 @@ func (project *Project) RefreshShims() error {
 	return nil
 }
 
-// AddShim adds a shim to this project
-func (project *Project) AddShim(shim string, command string) error {
+// ShimAdd adds a shim to this project
+func (project *Project) ShimAdd(shim string, command string) error {
 	validShimRegexp := regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9._-]*$")
 
 	if !validShimRegexp.MatchString(shim) {
@@ -88,8 +88,8 @@ func (project *Project) AddShim(shim string, command string) error {
 	return project.repository.Storer.SetConfig(project.config)
 }
 
-// RemoveShim removes a shim from this project
-func (project *Project) RemoveShim(shim string) error {
+// ShimRemove removes a shim from this project
+func (project *Project) ShimRemove(shim string) error {
 	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Lstat(dest); err == nil {

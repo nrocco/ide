@@ -15,7 +15,7 @@ var removeShimCmd = &cobra.Command{
 		shims := []string{}
 		if len(args) == 0 {
 			if err := loadProject(cmd, args); err == nil {
-				for shim := range project.ListShims() {
+				for shim := range project.ShimList() {
 					shims = append(shims, shim)
 				}
 			}
@@ -25,7 +25,7 @@ var removeShimCmd = &cobra.Command{
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, shim := range args {
-			err := project.RemoveShim(shim)
+			err := project.ShimRemove(shim)
 			if err != nil {
 				log.Println(err)
 			} else {

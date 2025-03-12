@@ -69,14 +69,14 @@ func (project *Project) Location() string {
 
 // Destroy removes any trace of ide configuration from .git/config file
 func (project *Project) Destroy() error {
-	for _, hook := range project.ListHooks() {
+	for _, hook := range project.HookList() {
 		if err := project.RemoveHook(hook); err != nil {
 			return err
 		}
 	}
 
-	for shim := range project.ListShims() {
-		if err := project.RemoveShim(shim); err != nil {
+	for shim := range project.ShimList() {
+		if err := project.ShimRemove(shim); err != nil {
 			return err
 		}
 	}

@@ -11,8 +11,8 @@ func (project *Project) CtagsFile() string {
 	return filepath.Join(project.location, ".git", "tags")
 }
 
-// HasCtagsFile returns true if a ctags file exists
-func (project *Project) HasCtagsFile() bool {
+// CtagsFileExists returns true if a ctags file exists
+func (project *Project) CtagsFileExists() bool {
 	if _, err := os.Stat(project.CtagsFile()); err == nil {
 		return true
 	}

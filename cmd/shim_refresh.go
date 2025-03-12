@@ -16,7 +16,7 @@ var refreshShimCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := project.RefreshShims(); err != nil {
+		if err := project.ShimRefresh(); err != nil {
 			return err
 		}
 

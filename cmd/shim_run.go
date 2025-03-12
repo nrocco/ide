@@ -148,7 +148,7 @@ var runShimCmd = &cobra.Command{
 		shims := []string{}
 		if len(args) == 0 {
 			if err := loadProject(cmd, args); err == nil {
-				for shim := range project.ListShims() {
+				for shim := range project.ShimList() {
 					shims = append(shims, shim)
 				}
 			}
@@ -157,7 +157,7 @@ var runShimCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		command := project.GetShim(args[0])
+		command := project.ShimGet(args[0])
 		if command == "" {
 			return errors.New("shim does not exist")
 		} else if strings.HasPrefix(command, "compose[") {
