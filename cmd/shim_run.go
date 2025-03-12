@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"os"
 	"os/exec"
@@ -12,7 +11,6 @@ import (
 	"text/template"
 
 	"github.com/anmitsu/go-shlex"
-	"github.com/docker/compose/v2/pkg/api"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
@@ -41,6 +39,10 @@ func (b shimContext) RelDir() string {
 
 // IsTTY detects if the current file descriptors are attached to a TTY
 func (b shimContext) IsTTY() bool {
+	return isTTY()
+}
+
+func isTTY() bool {
 	if !isatty.IsTerminal(os.Stdin.Fd()) {
 		return false
 	}
@@ -98,60 +100,43 @@ func runComposeShim(command string, args []string) error {
 	re := regexp.MustCompile(`\[(.+)\]:(.+)`)
 	matches := re.FindStringSubmatch(command)
 	if len(matches) != 3 {
-		return errors.New("no bueno")
+		return errors.New("invalid compose[service]:command string")
 	}
 
 	service := matches[1]
-	command = os.ExpandEnv(matches[2])
-	parts, err := shlex.Split(command, true)
+
+	parts, err := shlex.Split(os.ExpandEnv(matches[2]), true)
 	if err != nil {
 		return err
 	}
 
-	parts = append(parts, args[1:]...)
+	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
 
-	composeClient, err := project.DockerComposeClient()
-	if err != nil {
+	kaka := []string{"docker", "compose"}
+	if len(runningContainers) == 0 {
+		kaka = append(kaka, "run", "--rm")
+	} else {
+		kaka = append(kaka, "exec")
+	}
+	if !isTTY() {
+		kaka = append(kaka, "-T")
+	}
+	kaka = append(kaka, service)
+	kaka = append(kaka, parts...)
+	kaka = append(kaka, args[1:]...)
+
+	runner := exec.Command(kaka[0], kaka[1:]...)
+	runner.Stdin = os.Stdin
+	runner.Stdout = os.Stdout
+	runner.Stderr = os.Stderr
+	if err := runner.Run(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			os.Exit(exiterr.ExitCode())
+		}
 		return err
 	}
 
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	rel, err := filepath.Rel(project.Location(), dir)
-	if err != nil {
-		return err
-	}
-
-	containers, err := composeClient.Ps(context.Background(), project.Name(), api.PsOptions{
-		Services: []string{service},
-	})
-	if err != nil {
-		return err
-	}
-	if len(containers) != 1 {
-		return errors.New("blaaaat") // TODO
-	}
-
-	dockerClient, err := project.DockerClient()
-	if err != nil {
-		return err
-	}
-
-	containerSpec, err := dockerClient.ContainerInspect(context.Background(), containers[0].Name)
-	if err != nil {
-		return err
-	}
-
-	// TODO: add support for project name other then the directory name
-	_, err = composeClient.Exec(context.Background(), project.Name(), api.RunOptions{
-		Service:    service,
-		Command:    parts,
-		WorkingDir: filepath.Join(containerSpec.Config.WorkingDir, rel),
-	})
-
-	return err
+	return nil
 }
 
 var runShimCmd = &cobra.Command{

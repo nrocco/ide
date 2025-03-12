@@ -1,8 +1,6 @@
 # syntax = docker/dockerfile:1
 FROM --platform=${BUILDPLATFORM} tonistiigi/xx:latest AS xx
 
-FROM crazymax/osxcross:latest-alpine AS osxcross
-
 FROM --platform=${BUILDPLATFORM} golang:alpine AS godev
 COPY --from=xx / /
 RUN apk add --no-cache \

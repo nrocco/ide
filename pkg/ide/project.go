@@ -3,8 +3,6 @@ package ide
 import (
 	"path/filepath"
 
-	"github.com/docker/compose/v2/pkg/api"
-	"github.com/docker/docker/client"
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 )
@@ -13,8 +11,6 @@ import (
 type Project struct {
 	repository    *git.Repository
 	config        *config.Config
-	dockerClient  *client.Client
-	composeClient api.Service
 	location      string
 }
 

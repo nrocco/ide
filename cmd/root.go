@@ -5,9 +5,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/spf13/cobra"
-
 	"github.com/nrocco/ide/pkg/ide"
+	"github.com/spf13/cobra"
 )
 
 var project *ide.Project
