@@ -27,7 +27,7 @@ func NewProject(location string) (*Project, error) {
 	}
 
 	workTree, workTreeErr := repository.Worktree()
-	if configErr != nil {
+	if workTreeErr != nil {
 		return &Project{}, workTreeErr
 	}
 
