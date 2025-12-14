@@ -9,10 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var fixCmd = &cobra.Command{
+var fixLintCmd = &cobra.Command{
 	Use:   "fix",
 	Short: "Fix source code",
 	Long:  "Fix source code",
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, path := range args {
 			fileInfo, err := os.Stat(path)
@@ -66,5 +67,5 @@ var fixCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(fixCmd)
+	lintCmd.AddCommand(fixLintCmd)
 }
