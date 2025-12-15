@@ -27,7 +27,6 @@ var runLintCmd = &cobra.Command{
 			case ".go":
 				tools.LintWhitespace(path, true, true, false)
 				tools.GovetLinter.Exec(path).ForEachViolation(tools.PrintViolation)
-				tools.GovetLinter.Exec(path).ForEachViolation(tools.PrintViolation)
 				tools.GolintLinter.Exec(path).ForEachViolation(tools.PrintViolation)
 				tools.GobuildLinter.Exec(path).ForEachViolation(tools.PrintViolation)
 			case ".html":

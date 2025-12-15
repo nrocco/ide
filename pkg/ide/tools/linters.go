@@ -9,7 +9,7 @@ var (
 	CookstyleLinter = Linter{
 		Name:    "cookstyle",
 		Command: "cookstyle",
-		Args:    []string{"--display-cop-names", "--no-color", "--format", "emacs"},
+		Args:    []string{"--display-cop-names", "--no-color", "--format", "emacs", "<file>"},
 		Matcher: regexp.MustCompile(`^(.*):(?P<Line>[\d]+):[\d]+:\s+(?<Message>.+)$`),
 	}
 
@@ -17,7 +17,7 @@ var (
 	EsLintLinter = Linter{
 		Name:    "eslint",
 		Command: "eslint",
-		Args:    []string{"--format=compact"},
+		Args:    []string{"--format=compact", "<file>"},
 		Matcher: regexp.MustCompile(`^[^:]+: line (\d+), col \d+, (.*)$`),
 	}
 
@@ -25,7 +25,7 @@ var (
 	Flake8Linter = Linter{
 		Name:    "flake8",
 		Command: "flake8",
-		Args:    []string{"--extend-ignore=E501"},
+		Args:    []string{"--extend-ignore=E501", "<file>"},
 		Matcher: regexp.MustCompile(`^(?P<File>.*):(?P<Line>\d+):(?P<Col>\d+):(?<Message>.*)$`),
 	}
 
@@ -57,7 +57,7 @@ var (
 	JqLinter = Linter{
 		Name:    "jq",
 		Command: "jq",
-		Args:    []string{"."},
+		Args:    []string{".", "<file>"},
 		Matcher: regexp.MustCompile(`^parse (?<Severity>error): (?<Message>.*) at line (?<Line>\d+), .*$`),
 	}
 
@@ -65,7 +65,7 @@ var (
 	PhpLinter = Linter{
 		Name:    "php",
 		Command: "php",
-		Args:    []string{"-l"},
+		Args:    []string{"-l", "<file>"},
 		Matcher: regexp.MustCompile(`^PHP Parse (?<Severity>error): (?<Message>.*) in (?<File>.*) on line (?<Line>\d+)$`),
 	}
 
@@ -73,7 +73,7 @@ var (
 	ShellcheckLinter = Linter{
 		Name:    "shellcheck",
 		Command: "shellcheck",
-		Args:    []string{"--format", "gcc"},
+		Args:    []string{"--format", "gcc", "<file>"},
 		Matcher: regexp.MustCompile(`^(?<File>.*):(?<Line>\d+):(?<Col>\d+): (?<Message>.*)$`),
 	}
 
