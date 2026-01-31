@@ -45,5 +45,5 @@ func init() {
 	genpassCmd.Flags().BoolVar(&genpassOpts.Punctuation, "punctuation", false, "include punctuation")
 	genpassCmd.Flags().BoolVar(&genpassOpts.Hexdigits, "hexdigits", false, "use only hex digits")
 
-	rootCmd.AddCommand(genpassCmd)
+	toolsCmd.AddCommand(genpassCmd)
 }

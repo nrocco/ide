@@ -31,5 +31,5 @@ var compareCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(compareCmd)
+	toolsCmd.AddCommand(compareCmd)
 }

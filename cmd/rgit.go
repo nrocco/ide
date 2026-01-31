@@ -67,5 +67,5 @@ var rgitCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(rgitCmd)
+	toolsCmd.AddCommand(rgitCmd)
 }
