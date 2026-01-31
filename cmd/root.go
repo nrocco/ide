@@ -43,6 +43,9 @@ func Execute() {
 	} else if os.Args[0] == "compare" {
 		args := []string{"ide", "compare", "--"}
 		os.Args = append(args, os.Args[1:]...)
+	} else if os.Args[0] == "consume" {
+		args := []string{"ide", "consume", "--"}
+		os.Args = append(args, os.Args[1:]...)
 	} else if os.Args[0] == "rgit" {
 		args := []string{"ide", "rgit", "--"}
 		os.Args = append(args, os.Args[1:]...)
