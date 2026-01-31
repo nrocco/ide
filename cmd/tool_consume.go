@@ -201,5 +201,5 @@ func consumeBaseDir() string {
 }
 
 func init() {
-	toolsCmd.AddCommand(consumeCmd)
+	toolCmd.AddCommand(consumeCmd)
 }

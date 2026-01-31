@@ -56,5 +56,5 @@ var testDockerIgnoreCmd = &cobra.Command{
 }
 
 func init() {
-	toolsCmd.AddCommand(testDockerIgnoreCmd)
+	toolCmd.AddCommand(testDockerIgnoreCmd)
 }

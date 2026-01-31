@@ -45,5 +45,5 @@ var escapeCmd = &cobra.Command{
 }
 
 func init() {
-	toolsCmd.AddCommand(escapeCmd)
+	toolCmd.AddCommand(escapeCmd)
 }
