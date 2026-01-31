@@ -8,6 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var dockerFile string = `
+FROM busybox:1.36-uclibc
+WORKDIR /build-context
+COPY . /build-context
+CMD ["sh", "-c", "find . -mindepth 1 | cut -c3- | sort"]
+`
+
 var testDockerIgnoreCmd = &cobra.Command{
 	Use:   "test-dockerignore",
 	Short: "Test a .dockerignore in the current directory",
@@ -21,17 +28,10 @@ var testDockerIgnoreCmd = &cobra.Command{
 			return err
 		}
 
-		dockerFile := strings.Join([]string{
-			"FROM busybox",
-			"COPY . /build-context",
-			"WORKDIR /build-context",
-			"CMD find .",
-		}, "\n")
-
 		command := exec.Command("docker", "image", "build", "-t", "build-context", "-f", "-", ".")
 		command.Stdin = strings.NewReader(dockerFile)
-		command.Stdout = os.Stdout
-		command.Stderr = os.Stderr
+		// command.Stdout = os.Stdout
+		// command.Stderr = os.Stderr
 
 		if err := command.Run(); err != nil {
 			return err
@@ -45,8 +45,8 @@ var testDockerIgnoreCmd = &cobra.Command{
 		}
 
 		command = exec.Command("docker", "image", "rm", "build-context")
-		command.Stdout = os.Stdout
-		command.Stderr = os.Stderr
+		// command.Stdout = os.Stdout
+		// command.Stderr = os.Stderr
 		if err := command.Run(); err != nil {
 			return err
 		}
