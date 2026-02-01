@@ -18,6 +18,26 @@ type consumeConfig struct {
 	Path           string   `json:"path"`
 }
 
+type sessionConfig struct {
+	Consume consumeConfig              `json:"consume"`
+	Session map[string]json.RawMessage `json:"-"`
+}
+
+func (c *sessionConfig) UnmarshalJSON(data []byte) error {
+	raw := make(map[string]json.RawMessage)
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if consumeRaw, ok := raw["consume"]; ok {
+		if err := json.Unmarshal(consumeRaw, &c.Consume); err != nil {
+			return err
+		}
+		delete(raw, "consume")
+	}
+	c.Session = raw
+	return nil
+}
+
 var consumeCmd = &cobra.Command{
 	Use:   "consume [host] as [session] [httpie args...]",
 	Short: "HTTP client wrapper using httpie sessions",
@@ -49,12 +69,8 @@ var consumeCmd = &cobra.Command{
 			}
 			var sessions []string
 			for _, entry := range entries {
-				name := entry.Name()
-				if strings.HasSuffix(name, ".json.gpg") {
-					sessions = append(sessions, strings.TrimSuffix(name, ".json.gpg"))
-				} else if strings.HasSuffix(name, ".json") {
-					sessions = append(sessions, strings.TrimSuffix(name, ".json"))
-				}
+				name := strings.TrimSuffix(strings.TrimSuffix(entry.Name(), ".gpg"), ".json")
+				sessions = append(sessions, name)
 			}
 			return sessions, cobra.ShellCompDirectiveNoFileComp
 		default:
@@ -62,61 +78,26 @@ var consumeCmd = &cobra.Command{
 		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		host := args[0]
 		if args[1] != "as" {
 			return fmt.Errorf("expected 'as' keyword, got '%s'", args[1])
 		}
+
+		host := args[0]
 		sessionName := args[2]
 		httpieArgs := args[3:]
 
-		baseDir := consumeBaseDir()
-		sessionFile := filepath.Join(baseDir, host, sessionName+".json")
-		gpgSessionFile := sessionFile + ".gpg"
-
-		var sessionData map[string]any
-		var err error
-
-		if _, err = os.Stat(gpgSessionFile); err == nil {
-			sessionData, err = loadGPGSession(gpgSessionFile)
-		} else if _, err = os.Stat(sessionFile); err == nil {
-			sessionData, err = loadJSONSession(sessionFile)
-		} else {
-			return fmt.Errorf("%s does not exist", sessionFile)
-		}
+		config, err := loadSessionFromFile(filepath.Join(consumeBaseDir(), host, sessionName+".json"))
 		if err != nil {
 			return err
 		}
-
-		var config consumeConfig
-		if consumeSection, ok := sessionData["consume"].(map[string]any); ok {
-			if opts, ok := consumeSection["default_options"].([]any); ok {
-				for _, opt := range opts {
-					if s, ok := opt.(string); ok {
-						config.DefaultOptions = append(config.DefaultOptions, s)
-					}
-				}
-			}
-			if scheme, ok := consumeSection["scheme"].(string); ok {
-				config.Scheme = scheme
-			}
-			if h, ok := consumeSection["host"].(string); ok {
-				config.Host = h
-			}
-			if path, ok := consumeSection["path"].(string); ok {
-				config.Path = path
-			}
+		if config.Consume.Scheme == "" {
+			config.Consume.Scheme = "http"
 		}
-
-		if config.Scheme == "" {
-			config.Scheme = "http"
+		if config.Consume.Host == "" {
+			config.Consume.Host = host
 		}
-		if config.Host == "" {
-			config.Host = host
-		}
-		config.Host = strings.TrimRight(config.Host, "/")
-		config.Path = strings.Trim(config.Path, "/")
-
-		delete(sessionData, "consume")
+		config.Consume.Host = strings.TrimRight(config.Consume.Host, "/")
+		config.Consume.Path = strings.Trim(config.Consume.Path, "/")
 
 		tmpFile, err := os.CreateTemp("", "consume-session-*.json")
 		if err != nil {
@@ -124,7 +105,7 @@ var consumeCmd = &cobra.Command{
 		}
 		defer os.Remove(tmpFile.Name())
 
-		if err := json.NewEncoder(tmpFile).Encode(sessionData); err != nil {
+		if err := json.NewEncoder(tmpFile).Encode(config.Session); err != nil {
 			tmpFile.Close()
 			return err
 		}
@@ -136,13 +117,13 @@ var consumeCmd = &cobra.Command{
 		}
 
 		execArgs := []string{"--session-read-only", tmpFile.Name()}
-		execArgs = append(execArgs, config.DefaultOptions...)
+		execArgs = append(execArgs, config.Consume.DefaultOptions...)
 
 		for _, arg := range httpieArgs {
 			if strings.HasPrefix(arg, "/") {
-				url := fmt.Sprintf("%s://%s/", config.Scheme, config.Host)
-				if config.Path != "" {
-					url += config.Path + "/"
+				url := fmt.Sprintf("%s://%s/", config.Consume.Scheme, config.Consume.Host)
+				if config.Consume.Path != "" {
+					url += config.Consume.Path + "/"
 				}
 				url += strings.TrimLeft(arg, "/")
 				execArgs = append(execArgs, url)
@@ -160,33 +141,40 @@ var consumeCmd = &cobra.Command{
 	},
 }
 
-func loadGPGSession(path string) (map[string]any, error) {
+func loadSessionFromFile(path string) (*sessionConfig, error) {
+	if _, err := os.Stat(path + ".gpg"); err == nil {
+		return loadSessionFromFileGPG(path + ".gpg")
+	} else if _, err := os.Stat(path); err == nil {
+		return loadSessionFromFileJSON(path)
+	}
+	return nil, fmt.Errorf("%s does not exist", path)
+}
+
+func loadSessionFromFileGPG(path string) (*sessionConfig, error) {
 	command := exec.Command("gpg", "-q", "--no-tty", "--decrypt", path)
 	command.Stdin = os.Stdin
 	output, err := command.Output()
 	if err != nil {
-		return nil, fmt.Errorf("failed to decrypt %s: %w", path, err)
+		return nil, err
 	}
-
-	var data map[string]any
+	var data sessionConfig
 	if err := json.Unmarshal(output, &data); err != nil {
-		return nil, fmt.Errorf("failed to parse decrypted session: %w", err)
+		return nil, err
 	}
-	return data, nil
+	return &data, nil
 }
 
-func loadJSONSession(path string) (map[string]any, error) {
+func loadSessionFromFileJSON(path string) (*sessionConfig, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
-
-	var data map[string]any
+	var data sessionConfig
 	if err := json.NewDecoder(file).Decode(&data); err != nil {
-		return nil, fmt.Errorf("failed to parse session file: %w", err)
+		return nil, err
 	}
-	return data, nil
+	return &data, nil
 }
 
 func consumeBaseDir() string {
