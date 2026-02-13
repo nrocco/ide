@@ -6,6 +6,7 @@ COPY --from=xx / /
 RUN apk add --no-cache \
         ca-certificates \
         clang \
+        ctags \
         file \
         findutils \
         gcc \
