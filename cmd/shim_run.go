@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"os"
 	"os/exec"
@@ -94,6 +95,62 @@ func runPlainShim(command string, args []string) error {
 	}
 
 	return nil
+}
+
+func containerWorkDir(service string) string {
+	out, err := exec.Command("docker", "compose", "config", "--format", "json").Output()
+	if err != nil {
+		return ""
+	}
+
+	var config struct {
+		Services map[string]struct {
+			Volumes []struct {
+				Type   string `json:"type"`
+				Source string `json:"source"`
+				Target string `json:"target"`
+			} `json:"volumes"`
+		} `json:"services"`
+	}
+
+	if err := json.Unmarshal(out, &config); err != nil {
+		return ""
+	}
+
+	svc, ok := config.Services[service]
+	if !ok {
+		return ""
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+
+	repoPath, _ := filepath.EvalSymlinks(project.Location())
+	cwd, _ = filepath.EvalSymlinks(cwd)
+
+	for _, v := range svc.Volumes {
+		if v.Type != "bind" {
+			continue
+		}
+		source, _ := filepath.EvalSymlinks(v.Source)
+
+		// Check that the repo path falls within this mount source
+		if _, err := filepath.Rel(source, repoPath); err != nil || !strings.HasPrefix(repoPath, source) {
+			continue
+		}
+
+		// Map the host cwd to the corresponding container path
+		cwdRel, err := filepath.Rel(source, cwd)
+		if err != nil || strings.HasPrefix(cwdRel, "..") {
+			continue
+		}
+
+		return filepath.Join(v.Target, cwdRel)
+	}
+
+	return ""
 }
 
 func runComposeShim(command string, args []string) error {
