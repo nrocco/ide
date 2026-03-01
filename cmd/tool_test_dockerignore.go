@@ -22,7 +22,6 @@ var testDockerIgnoreCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	},
-	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := os.Stat(".dockerignore"); err != nil {
 			return err
