@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -19,9 +19,9 @@ var addHookCmd = &cobra.Command{
 		for _, hook := range args {
 			err := project.HookAdd(hook)
 			if err != nil {
-				log.Println(err)
+				fmt.Println(err)
 			} else {
-				log.Printf("Hook %s add\n", hook)
+				fmt.Printf("Hook %s add\n", hook)
 			}
 		}
 

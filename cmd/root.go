@@ -40,14 +40,11 @@ func Execute() {
 	if strings.Contains(os.Args[0], ".git/hooks") {
 		args := []string{os.Args[0], "hook", "run", path.Base(os.Args[0]), "--"}
 		os.Args = append(args, os.Args[1:]...)
-	} else if os.Args[0] == "compare" {
-		args := []string{"ide", "tool", "compare", "--"}
-		os.Args = append(args, os.Args[1:]...)
-	} else if os.Args[0] == "consume" {
-		args := []string{"ide", "tool", "consume", "--"}
-		os.Args = append(args, os.Args[1:]...)
 	} else if os.Args[0] == "rgit" {
-		args := []string{"ide", "tool", "rgit", "--"}
+		args := []string{"ide", "tool", "rgit"}
+		os.Args = append(args, os.Args[1:]...)
+	} else if os.Args[0] == "rrgit" {
+		args := []string{"ide", "tool", "rgit", "--rgit-recursive"}
 		os.Args = append(args, os.Args[1:]...)
 	} else if strings.Contains(os.Args[0], "/go-build") {
 		// TODO this exists for development only

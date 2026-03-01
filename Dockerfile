@@ -10,6 +10,7 @@ RUN apk add --no-cache \
         file \
         findutils \
         gcc \
+        git \
         musl-dev \
     && true
 RUN go install golang.org/x/lint/golint@latest

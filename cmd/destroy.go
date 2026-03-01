@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var destroyCmd = &cobra.Command{
 			return err
 		}
 
-		log.Println("Repository is no longer an ide project")
+		fmt.Println("Repository is no longer an ide project")
 
 		return nil
 	},

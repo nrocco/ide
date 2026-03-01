@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +20,7 @@ var refreshShimCmd = &cobra.Command{
 			return err
 		}
 
-		log.Printf("Shims refreshed\n")
+		fmt.Printf("Shims refreshed\n")
 
 		return nil
 	},

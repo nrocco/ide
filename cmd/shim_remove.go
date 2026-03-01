@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -27,9 +27,9 @@ var removeShimCmd = &cobra.Command{
 		for _, shim := range args {
 			err := project.ShimRemove(shim)
 			if err != nil {
-				log.Println(err)
+				fmt.Println(err)
 			} else {
-				log.Printf("Shim %s removed\n", shim)
+				fmt.Printf("Shim %s removed\n", shim)
 			}
 		}
 

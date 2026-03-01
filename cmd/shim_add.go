@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -22,7 +22,7 @@ var addShimCmd = &cobra.Command{
 			return err
 		}
 
-		log.Printf("Shim %s add\n", args[0])
+		fmt.Printf("Shim %s add\n", args[0])
 
 		return project.DirEnvAddLayoutIde()
 	},
