@@ -1,7 +1,7 @@
 package ide
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -33,13 +33,13 @@ func (project *Project) hookIsValid(hook string) bool {
 // HookAdd adds a git repository hook
 func (project *Project) HookAdd(hook string) error {
 	if !project.hookIsValid(hook) {
-		return errors.New(hook + " is not a valid hook")
+		return fmt.Errorf("%s is not a valid hook", hook)
 	}
 
 	dest := filepath.Join(project.location, ".git", "hooks", hook)
 
 	if _, err := os.Stat(dest); err == nil {
-		return errors.New("hook " + hook + " already exists for this project")
+		return fmt.Errorf("hook %s already exists for this project", hook)
 	}
 
 	source, _ := os.Executable()
@@ -50,7 +50,7 @@ func (project *Project) HookAdd(hook string) error {
 // RemoveHook removes a git repository hook
 func (project *Project) RemoveHook(hook string) error {
 	if !project.hookIsValid(hook) {
-		return errors.New(hook + " is not a valid hook")
+		return fmt.Errorf("%s is not a valid hook", hook)
 	}
 
 	dest := filepath.Join(project.location, ".git", "hooks", hook)

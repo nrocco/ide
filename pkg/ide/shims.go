@@ -3,7 +3,7 @@ package ide
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -69,13 +69,13 @@ func (project *Project) ShimAdd(shim string, command string) error {
 	validShimRegexp := regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9._-]*$")
 
 	if !validShimRegexp.MatchString(shim) {
-		return errors.New("not a valid shim name: " + shim)
+		return fmt.Errorf("not a valid shim name: %s", shim)
 	}
 
 	dest := filepath.Join(project.location, ".git", "bin", shim)
 
 	if _, err := os.Stat(dest); err == nil {
-		return errors.New("shim " + shim + " already exists for this project")
+		return fmt.Errorf("shim %s already exists for this project", shim)
 	}
 
 	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {
@@ -177,7 +177,7 @@ func (project *Project) runComposeShim(command string, args []string) error {
 	re := regexp.MustCompile(`\[(.+)\]:(.+)`)
 	matches := re.FindStringSubmatch(command)
 	if len(matches) != 3 {
-		return errors.New("invalid compose[service]:command string")
+		return fmt.Errorf("invalid compose[service]:command string: %s", command)
 	}
 
 	service := matches[1]
