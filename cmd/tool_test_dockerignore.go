@@ -30,9 +30,6 @@ var testDockerIgnoreCmd = &cobra.Command{
 
 		command := exec.Command("docker", "image", "build", "-t", "build-context", "-f", "-", ".")
 		command.Stdin = strings.NewReader(dockerFile)
-		// command.Stdout = os.Stdout
-		// command.Stderr = os.Stderr
-
 		if err := command.Run(); err != nil {
 			return err
 		}
@@ -45,8 +42,6 @@ var testDockerIgnoreCmd = &cobra.Command{
 		}
 
 		command = exec.Command("docker", "image", "rm", "build-context")
-		// command.Stdout = os.Stdout
-		// command.Stderr = os.Stderr
 		if err := command.Run(); err != nil {
 			return err
 		}

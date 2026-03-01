@@ -64,8 +64,8 @@ var parseCmd = &cobra.Command{
 
 func init() {
 	parseCmd.Flags().Bool("debug", false, "Output raw JSON instead of formatted output")
-	parseCmd.Flags().Bool("no-public", false, "Exclude public functions")   // TODO use this
-	parseCmd.Flags().Bool("no-private", false, "Exclude private functions") // TODO use this
+	parseCmd.Flags().Bool("no-public", false, "Exclude public functions")
+	parseCmd.Flags().Bool("no-private", false, "Exclude private functions")
 
 	toolCmd.AddCommand(parseCmd)
 }
