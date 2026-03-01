@@ -1,4 +1,4 @@
-package ide
+package tools
 
 import (
 	"crypto/rand"

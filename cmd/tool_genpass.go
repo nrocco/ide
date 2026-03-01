@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/nrocco/ide/pkg/ide"
+	"github.com/nrocco/ide/pkg/ide/tools"
 	"github.com/spf13/cobra"
 )
 
-var genpassOpts ide.PasswordOptions
+var genpassOpts tools.PasswordOptions
 
 var genpassCmd = &cobra.Command{
 	Use:   "genpass [length]",
@@ -28,7 +28,7 @@ var genpassCmd = &cobra.Command{
 			}
 		}
 
-		password, err := ide.GeneratePassword(length, genpassOpts)
+		password, err := tools.GeneratePassword(length, genpassOpts)
 		if err != nil {
 			return err
 		}
