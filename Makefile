@@ -1,6 +1,6 @@
 NAME = ide
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
-BUILD_COMMIT ?= $(shell git describe --always --dirty)
+BUILD_COMMIT ?= $(shell git rev-parse --short HEAD)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 .PHONY: help
