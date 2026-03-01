@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nrocco/ide/pkg/ide/tools"
+	"github.com/nrocco/ide/pkg/ide/linters"
 	"github.com/spf13/cobra"
 )
 
@@ -25,36 +25,36 @@ var runLintCmd = &cobra.Command{
 
 			switch filepath.Ext(path) {
 			case ".go":
-				tools.LintWhitespace(path, true, true, false)
-				tools.GovetLinter.Exec(path).ForEachViolation(tools.PrintViolation)
-				tools.GolintLinter.Exec(path).ForEachViolation(tools.PrintViolation)
-				tools.GobuildLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, false)
+				linters.GovetLinter.Exec(path).ForEachViolation(linters.PrintViolation)
+				linters.GolintLinter.Exec(path).ForEachViolation(linters.PrintViolation)
+				linters.GobuildLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".html":
-				tools.LintWhitespace(path, true, true, true)
+				linters.LintWhitespace(path, true, true, true)
 			case ".json":
-				tools.LintWhitespace(path, true, true, true)
-				tools.JqLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.JqLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".php":
-				tools.LintWhitespace(path, true, true, true)
-				tools.PhpLinter.Exec(path).ForEachViolation(tools.PrintViolation)
-				// TODO tools.LintPhpstan(path)
+				linters.LintWhitespace(path, true, true, true)
+				linters.PhpLinter.Exec(path).ForEachViolation(linters.PrintViolation)
+				// TODO linters.LintPhpstan(path)
 			case ".py":
-				tools.LintWhitespace(path, true, true, true)
-				tools.Flake8Linter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.Flake8Linter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".rb":
-				tools.LintWhitespace(path, true, true, true)
-				tools.CookstyleLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.CookstyleLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".sh":
-				tools.LintWhitespace(path, true, true, true)
-				tools.ShellcheckLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.ShellcheckLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".ts", ".vue", ".js":
-				tools.LintWhitespace(path, true, true, true)
-				tools.EsLintLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.EsLintLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			case ".yaml", ".yml":
-				tools.LintWhitespace(path, true, true, true)
-				tools.YamlLinter.Exec(path).ForEachViolation(tools.PrintViolation)
+				linters.LintWhitespace(path, true, true, true)
+				linters.YamlLinter.Exec(path).ForEachViolation(linters.PrintViolation)
 			default:
-				tools.LintWhitespace(path, true, true, true)
+				linters.LintWhitespace(path, true, true, true)
 			}
 		}
 

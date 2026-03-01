@@ -5,7 +5,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/nrocco/ide/pkg/ide/tools"
+	"github.com/nrocco/ide/pkg/ide/linters"
 	"github.com/spf13/cobra"
 )
 
@@ -20,14 +20,14 @@ var testLintCmd = &cobra.Command{
 			return err
 		}
 
-		linterResult := tools.LinterResult{
+		linterResult := linters.LinterResult{
 			Scanner: bufio.NewScanner(os.Stdin),
 			Name: "<noname>",
 			File: "<nofile>",
 			Matcher: matcher,
 		}
 
-		return linterResult.ForEachViolation(tools.PrintViolation)
+		return linterResult.ForEachViolation(linters.PrintViolation)
 	},
 }
 
