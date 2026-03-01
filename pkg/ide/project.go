@@ -9,9 +9,9 @@ import (
 
 // Project represents an ide project
 type Project struct {
-	repository    *git.Repository
-	config        *config.Config
-	location      string
+	repository *git.Repository
+	config     *config.Config
+	location   string
 }
 
 // NewProject instantiates a new instance of Project for a given directory

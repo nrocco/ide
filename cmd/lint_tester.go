@@ -22,8 +22,8 @@ var testLintCmd = &cobra.Command{
 
 		linterResult := linters.LinterResult{
 			Scanner: bufio.NewScanner(os.Stdin),
-			Name: "<noname>",
-			File: "<nofile>",
+			Name:    "<noname>",
+			File:    "<nofile>",
 			Matcher: matcher,
 		}
 

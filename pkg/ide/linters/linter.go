@@ -19,8 +19,8 @@ type Linter struct {
 // LinterResult wraps stdout/stderr of a linter to extract violations
 type LinterResult struct {
 	*bufio.Scanner
-	Name string
-	File string
+	Name    string
+	File    string
 	Matcher *regexp.Regexp
 }
 

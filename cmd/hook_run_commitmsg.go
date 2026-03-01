@@ -49,7 +49,7 @@ var runCommitMsgHookCmd = &cobra.Command{
 		defer commitMsgFile.Close()
 
 		w := bufio.NewWriter(commitMsgFile)
-		w.WriteString(key+" ")
+		w.WriteString(key + " ")
 		w.Write(commitMsgBytes)
 
 		return w.Flush()
