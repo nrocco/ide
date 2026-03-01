@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nrocco/ide/pkg/ide/tools"
+	"github.com/nrocco/ide/pkg/ide/fixers"
 	"github.com/spf13/cobra"
 )
 
@@ -25,40 +25,40 @@ var fixLintCmd = &cobra.Command{
 
 			switch filepath.Ext(path) {
 			case ".go":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
-				tools.FixGofmt(path)
-				tools.FixGoimports(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
+				fixers.FixGofmt(path)
+				fixers.FixGoimports(path)
 			case ".html":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			case ".json":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
-				tools.FixJq(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
+				fixers.FixJq(path)
 			case ".php":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
-				tools.FixPhpcsfixer(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
+				fixers.FixPhpcsfixer(path)
 			case ".py":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			case ".rb":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			case ".sh":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			case ".ts", ".vue", ".js":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
-				tools.FixEslint(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
+				fixers.FixEslint(path)
 			case ".yaml", ".yml":
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			default:
-				tools.FixWhitespace(path)
-				tools.FixClrf(path)
+				fixers.FixWhitespace(path)
+				fixers.FixClrf(path)
 			}
 		}
 
