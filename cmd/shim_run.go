@@ -112,20 +112,23 @@ func runComposeShim(command string, args []string) error {
 
 	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
 
-	kaka := []string{"docker", "compose"}
+	runArgs := []string{"docker", "compose"}
 	if len(runningContainers) == 0 {
-		kaka = append(kaka, "run", "--rm")
+		runArgs = append(runArgs, "run", "--rm")
 	} else {
-		kaka = append(kaka, "exec")
+		runArgs = append(runArgs, "exec")
 	}
 	if !isTTY() {
-		kaka = append(kaka, "-T")
+		runArgs = append(runArgs, "-T")
 	}
-	kaka = append(kaka, service)
-	kaka = append(kaka, parts...)
-	kaka = append(kaka, args[1:]...)
+	if workDir := containerWorkDir(service); workDir != "" {
+		runArgs = append(runArgs, "-w", workDir)
+	}
+	runArgs = append(runArgs, service)
+	runArgs = append(runArgs, parts...)
+	runArgs = append(runArgs, args[1:]...)
 
-	runner := exec.Command(kaka[0], kaka[1:]...)
+	runner := exec.Command(runArgs[0], runArgs[1:]...)
 	runner.Stdin = os.Stdin
 	runner.Stdout = os.Stdout
 	runner.Stderr = os.Stderr

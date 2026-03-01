@@ -67,7 +67,7 @@ var parseCmd = &cobra.Command{
 			entry.Language = strings.ToLower(entry.Language)
 			entry.Typeref = strings.TrimPrefix(entry.Typeref, "typename:")
 
-			if cmd.Flags().GetBool("debug") {
+			if debug, _ := cmd.Flags().GetBool("debug"); debug {
 				fmt.Printf("%+v\n", entry)
 				continue
 			}
