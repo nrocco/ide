@@ -2,13 +2,11 @@ package ide
 
 import (
 	"bufio"
-	"path/filepath"
 	"os"
-	"strings"
 )
 
-// AddGitBinToPath updates your local .envrc and adds .git/bin to the $PATH
-func (project *Project) AddGitBinToPath() error {
+// DirEnvAddLayoutIde updates your local .envrc and adds .git/bin to the $PATH
+func (project *Project) DirEnvAddLayoutIde() error {
 	file, err := os.OpenFile(".envrc", os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
@@ -17,10 +15,11 @@ func (project *Project) AddGitBinToPath() error {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "layout_ide") {
+		if scanner.Text() == "layout_ide" {
 			return nil
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
 		return err
 	}
@@ -32,13 +31,26 @@ func (project *Project) AddGitBinToPath() error {
 	return nil
 }
 
-// HasGitBinInPath checks if $PATH contains the current .git/bin directory
-func (project *Project) HasGitBinInPath() bool {
-	return strings.Contains(os.Getenv("PATH"), filepath.Join(project.location, ".git", "bin"))
+// DirEnvHasLayoutIde checks if .envrc contains layout_ide
+func (project *Project) DirEnvHasLayoutIde() bool {
+	file, err := os.Open(".envrc")
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if scanner.Text() == "layout_ide" {
+			return true
+		}
+	}
+
+	return false
 }
 
-// HasDirEnv checks if the current project has a .envrc file
-func (project *Project) HasDirEnv() bool {
+// DirEnvExists checks if the current project has a .envrc file
+func (project *Project) DirEnvExists() bool {
 	_, err := os.Stat(".envrc")
 	return !os.IsNotExist(err)
 }

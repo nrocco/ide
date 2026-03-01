@@ -24,7 +24,7 @@ var addShimCmd = &cobra.Command{
 
 		log.Printf("Shim %s add\n", args[0])
 
-		return project.AddGitBinToPath()
+		return project.DirEnvAddLayoutIde()
 	},
 }
 

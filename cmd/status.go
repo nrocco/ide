@@ -31,16 +31,10 @@ var statusCmd = &cobra.Command{
 			fmt.Printf("  Ctags: ~\n")
 		}
 
-		if project.HasDirEnv() {
-			fmt.Printf("  HasDirEnv: yes\n")
+		if project.DirEnvExists() {
+			fmt.Printf("  DirEnvExists: yes\n")
 		} else {
-			fmt.Printf("  HasDirEnv: no\n")
-		}
-
-		if project.HasGitBinInPath() {
-			fmt.Printf("  GitBinInPath: yes\n")
-		} else {
-			fmt.Printf("  GitBinInPath: no\n")
+			fmt.Printf("  DirEnvExists: no\n")
 		}
 
 		if hooks := project.HookList(); len(hooks) > 0 {
