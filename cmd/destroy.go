@@ -15,6 +15,7 @@ var destroyCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// TODO: add --force option here
 		err := project.Destroy()
 		if err != nil {
 			return err
