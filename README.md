@@ -6,7 +6,7 @@ ide provides a tool set that gets out of your way
 [![Go Reference](https://pkg.go.dev/badge/github.com/nrocco/ide.svg)](https://pkg.go.dev/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 
-> a tool that glues vim, git, direnv, docker compose and ctags together
+> a tool that glues nvim, git, direnv, docker compose and ctags together
 > to provide a powerful integrated development environment
 
 ## Usage

@@ -21,12 +21,12 @@ var compareCmd = &cobra.Command{
 			options = append(options, filepath.Join(project, file))
 		}
 
-		vim := exec.Command("vim", options...)
-		vim.Stdin = os.Stdin
-		vim.Stdout = os.Stdout
-		vim.Stderr = os.Stderr
+		command := exec.Command("nvim", options...)
+		command.Stdin = os.Stdin
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
 
-		return vim.Run()
+		return command.Run()
 	},
 }
 
