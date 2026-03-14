@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>nl.ide.ssh-agent-proxy</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/n.dirocco/.local/bin/ssh-agent-proxy</string>
+        <string>--dir</string>
+        <string>/Users/n.dirocco/.ssh/agents</string>
+        <string>--upstream</string>
+        <string>/Users/n.dirocco/.ssh/agents/1password.sock</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/ssh-agent-proxy.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/ssh-agent-proxy.log</string>
+</dict>
+</plist>

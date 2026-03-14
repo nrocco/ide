@@ -91,6 +91,39 @@ In `.git/compose.yaml`:
       ruby_cache:
 
 
+## ssh-agent-proxy
+
+Load it
+
+```
+launchctl load ~/Library/LaunchAgents/nl.ide.ssh-agent-proxy.plist
+```
+
+Start/stop without unloading
+
+```
+launchctl start nl.ide.ssh-agent-proxy
+launchctl stop nl.ide.ssh-agent-proxy
+```
+
+Unload (disable autostart)
+
+```
+launchctl unload ~/Library/LaunchAgents/nl.ide.ssh-agent-proxy.plist
+```
+
+Check if it's running
+
+```
+launchctl list | grep ssh-agent-split
+```
+
+View logs
+
+```
+tail -f /tmp/ssh-agent-split.log
+```
+
 ## Contributing
 
 1. Fork it
