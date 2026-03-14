@@ -7,11 +7,13 @@ RUN apk add --no-cache \
         ca-certificates \
         clang \
         ctags \
+        fd \
         file \
         findutils \
         gcc \
         git \
         musl-dev \
+        ripgrep \
     && true
 RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/deadcode@latest

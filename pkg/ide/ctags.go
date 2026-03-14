@@ -3,6 +3,7 @@ package ide
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -92,6 +93,19 @@ func (project *Project) CtagsFileSize() uint64 {
 	}
 
 	return uint64(stat.Size())
+}
+
+// CtagsGenerate generates a ctags file at .git/tags using a temp file for atomicity
+func (project *Project) CtagsGenerate() error {
+	tmpPath := fmt.Sprintf("%s.%d", project.CtagsFile(), os.Getpid())
+
+	cmd := exec.Command("ctags", "-R", "-f", tmpPath, project.location)
+	if err := cmd.Run(); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+
+	return os.Rename(tmpPath, project.CtagsFile())
 }
 
 // CtagsParseCode parses ctags from the given files
