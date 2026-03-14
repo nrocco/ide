@@ -39,15 +39,15 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod go vet -v ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod staticcheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod govulncheck ./...
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod deadcode .
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod deadcode ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod go test -v -cover -short ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod \
     mkdir -p /out && \
     xx-go build -trimpath -o /out -ldflags "\
-        -X github.com/nrocco/ide/cmd.version=${BUILD_VERSION} \
-        -X github.com/nrocco/ide/cmd.commit=${BUILD_COMMIT} \
-        -X github.com/nrocco/ide/cmd.date=${BUILD_DATE} \
-        -s -w" && \
+        -X main.version=${BUILD_VERSION} \
+        -X main.commit=${BUILD_COMMIT} \
+        -X main.date=${BUILD_DATE} \
+        -s -w" ./cmd/ide && \
     xx-verify --static /out/*
 
 FROM scratch AS bin
