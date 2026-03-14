@@ -58,7 +58,7 @@ var (
 		Name:    "jq",
 		Command: "jq",
 		Args:    []string{".", "<file>"},
-		Matcher: regexp.MustCompile(`^parse (?<Severity>error): (?<Message>.*) at line (?<Line>\d+), .*$`),
+		Matcher: regexp.MustCompile(`^jq: parse (?<Severity>error): (?<Message>.*) at line (?<Line>\d+), column (?<Col>\d+)$`),
 	}
 
 	// PhpLinter uses `php` to lint php files

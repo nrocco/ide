@@ -69,7 +69,7 @@ func PrintViolation(violation LinterViolation) {
 }
 
 // Exec runs the linter on the specified file path
-func (l *Linter) Exec(path string) *LinterResult {
+func (l *Linter) Exec(path string, debug bool) *LinterResult {
 	var args []string
 
 	for _, arg := range l.Args {
@@ -80,7 +80,11 @@ func (l *Linter) Exec(path string) *LinterResult {
 		}
 	}
 
-	output, _ := exec.Command(l.Command, args...).CombinedOutput()
+	output, err := exec.Command(l.Command, args...).CombinedOutput() // TODO handle err here
+
+	if debug {
+		fmt.Printf("command: %s\nargs: %v\nerror: %s\noutput:\n%s\n", l.Command, args, err, output)
+	}
 
 	return &LinterResult{
 		Scanner: bufio.NewScanner(bytes.NewReader(output)),
