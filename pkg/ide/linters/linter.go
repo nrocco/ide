@@ -4,24 +4,101 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
 	"regexp"
 )
+
+// Matcher parses raw linter output into violations
+type Matcher interface {
+	Parse(output []byte, name, file string) []LinterViolation
+}
+
+// RegexMatcher parses linter output line-by-line using a regular expression
+type RegexMatcher struct {
+	re *regexp.Regexp
+}
+
+// NewRegexMatcher creates a RegexMatcher from a regexp pattern string
+func NewRegexMatcher(pattern string) *RegexMatcher {
+	return &RegexMatcher{re: regexp.MustCompile(pattern)}
+}
+
+// Parse scans output line by line and extracts violations using the regexp
+func (m *RegexMatcher) Parse(output []byte, name, file string) []LinterViolation {
+	var violations []LinterViolation
+	scanner := bufio.NewScanner(bytes.NewReader(output))
+	for scanner.Scan() {
+		match := m.re.FindStringSubmatch(scanner.Text())
+		if match == nil {
+			continue
+		}
+		v := LinterViolation{
+			Linter: name,
+			File:   file,
+		}
+		for i, subname := range m.re.SubexpNames() {
+			switch subname {
+			case "File":
+				v.File = match[i]
+			case "Line":
+				v.Line = match[i]
+			case "Col":
+				v.Col = match[i]
+			case "Severity":
+				v.Severity = match[i]
+			case "Message":
+				v.Message = match[i]
+			}
+		}
+		violations = append(violations, v)
+	}
+	return violations
+}
+
+// JSONMatcher parses linter output as JSON using a provided parse function
+type JSONMatcher struct {
+	parse func(output []byte, name, file string) []LinterViolation
+}
+
+// NewJSONMatcher creates a JSONMatcher with the given parse function
+func NewJSONMatcher(parse func(output []byte, name, file string) []LinterViolation) *JSONMatcher {
+	return &JSONMatcher{parse: parse}
+}
+
+// Parse delegates to the provided parse function
+func (m *JSONMatcher) Parse(output []byte, name, file string) []LinterViolation {
+	return m.parse(output, name, file)
+}
+
+// NewLinterResult creates a LinterResult by reading all bytes from r
+func NewLinterResult(r io.Reader, name, file string, matcher Matcher) (*LinterResult, error) {
+	output, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	return &LinterResult{
+		output:  output,
+		Name:    name,
+		File:    file,
+		Matcher: matcher,
+	}, nil
+}
 
 // Linter TODO
 type Linter struct {
 	Name    string
 	Command string
 	Args    []string
-	Matcher *regexp.Regexp
+	Matcher Matcher
 }
 
 // LinterResult wraps stdout/stderr of a linter to extract violations
 type LinterResult struct {
-	*bufio.Scanner
-	Name    string
-	File    string
-	Matcher *regexp.Regexp
+	output []byte
+	Name   string
+	File   string
+	Matcher Matcher
 }
 
 // LinterViolation is a structure with all information related to a single violation a linter detected
@@ -36,29 +113,8 @@ type LinterViolation struct {
 
 // ForEachViolation parses the linters stdout/stderr and loops through every violation found
 func (r *LinterResult) ForEachViolation(walker func(LinterViolation)) error {
-	for r.Scan() {
-		match := r.Matcher.FindStringSubmatch(r.Text())
-		if nil == match {
-			continue
-		}
-		violation := LinterViolation{
-			Linter: r.Name,
-			File:   r.File,
-		}
-		for i, name := range r.Matcher.SubexpNames() {
-			if name == "File" {
-				violation.File = match[i]
-			} else if name == "Line" {
-				violation.Line = match[i]
-			} else if name == "Col" {
-				violation.Col = match[i]
-			} else if name == "Severity" {
-				violation.Severity = match[i]
-			} else if name == "Message" {
-				violation.Message = match[i]
-			}
-		}
-		walker(violation)
+	for _, v := range r.Matcher.Parse(r.output, r.Name, r.File) {
+		walker(v)
 	}
 	return nil
 }
@@ -87,7 +143,7 @@ func (l *Linter) Exec(path string, debug bool) *LinterResult {
 	}
 
 	return &LinterResult{
-		Scanner: bufio.NewScanner(bytes.NewReader(output)),
+		output:  output,
 		Name:    l.Name,
 		File:    path,
 		Matcher: l.Matcher,

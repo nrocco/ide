@@ -1,7 +1,8 @@
 package linters
 
 import (
-	"regexp"
+	"encoding/json"
+	"strconv"
 )
 
 var (
@@ -10,15 +11,46 @@ var (
 		Name:    "cookstyle",
 		Command: "cookstyle",
 		Args:    []string{"--display-cop-names", "--no-color", "--format", "emacs", "<file>"},
-		Matcher: regexp.MustCompile(`^(.*):(?P<Line>[\d]+):[\d]+:\s+(?<Message>.+)$`),
+		Matcher: NewRegexMatcher(`^(.*):(?P<Line>[\d]+):[\d]+:\s+(?<Message>.+)$`),
 	}
 
 	// EsLintLinter uses `eslint` to lint javascript, typescript and vue files
 	EsLintLinter = Linter{
 		Name:    "eslint",
 		Command: "eslint",
-		Args:    []string{"--format=compact", "<file>"},
-		Matcher: regexp.MustCompile(`^[^:]+: line (\d+), col \d+, (.*)$`),
+		Args:    []string{"--format=json", "<file>"},
+		Matcher: NewJSONMatcher(func(output []byte, name, file string) []LinterViolation {
+			var results []struct {
+				FilePath string `json:"filePath"`
+				Messages []struct {
+					Line     int    `json:"line"`
+					Column   int    `json:"column"`
+					Severity int    `json:"severity"` // 1 = warn, 2 = error
+					Message  string `json:"message"`
+				} `json:"messages"`
+			}
+			if err := json.Unmarshal(output, &results); err != nil {
+				return nil
+			}
+			var violations []LinterViolation
+			for _, r := range results {
+				for _, m := range r.Messages {
+					severity := "warning"
+					if m.Severity == 2 {
+						severity = "error"
+					}
+					violations = append(violations, LinterViolation{
+						Linter:   name,
+						File:     r.FilePath,
+						Line:     strconv.Itoa(m.Line),
+						Col:      strconv.Itoa(m.Column),
+						Severity: severity,
+						Message:  m.Message,
+					})
+				}
+			}
+			return violations
+		}),
 	}
 
 	// Flake8Linter uses `flake8` to lint python files
@@ -26,7 +58,7 @@ var (
 		Name:    "flake8",
 		Command: "flake8",
 		Args:    []string{"--extend-ignore=E501", "<file>"},
-		Matcher: regexp.MustCompile(`^(?P<File>.*):(?P<Line>\d+):(?P<Col>\d+):(?<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?P<File>.*):(?P<Line>\d+):(?P<Col>\d+):(?<Message>.*)$`),
 	}
 
 	// GobuildLinter uses `go build` to lint go files
@@ -34,7 +66,7 @@ var (
 		Name:    "go",
 		Command: "go",
 		Args:    []string{"build", "./..."},
-		Matcher: regexp.MustCompile(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
 	}
 
 	// GolintLinter uses `golint` to lint go files
@@ -42,7 +74,7 @@ var (
 		Name:    "golint",
 		Command: "golint",
 		Args:    []string{"./..."},
-		Matcher: regexp.MustCompile(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
 	}
 
 	// GovetLinter uses the `go vet` tool to lint go files
@@ -50,7 +82,7 @@ var (
 		Name:    "go",
 		Command: "go",
 		Args:    []string{"vet", "./..."},
-		Matcher: regexp.MustCompile(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): (?P<Message>.*)$`),
 	}
 
 	// JqLinter uses the `jq` tool to lint json files
@@ -58,7 +90,7 @@ var (
 		Name:    "jq",
 		Command: "jq",
 		Args:    []string{".", "<file>"},
-		Matcher: regexp.MustCompile(`^jq: parse (?<Severity>error): (?<Message>.*) at line (?<Line>\d+), column (?<Col>\d+)$`),
+		Matcher: NewRegexMatcher(`^jq: parse (?<Severity>error): (?<Message>.*) at line (?<Line>\d+), column (?<Col>\d+)$`),
 	}
 
 	// PhpLinter uses `php` to lint php files
@@ -66,7 +98,7 @@ var (
 		Name:    "php",
 		Command: "php",
 		Args:    []string{"-l", "<file>"},
-		Matcher: regexp.MustCompile(`^PHP Parse (?<Severity>error): (?<Message>.*) in (?<File>.*) on line (?<Line>\d+)$`),
+		Matcher: NewRegexMatcher(`^PHP Parse (?<Severity>error): (?<Message>.*) in (?<File>.*) on line (?<Line>\d+)$`),
 	}
 
 	// ShellcheckLinter uses `shellcheck` to format bash/sh files
@@ -74,7 +106,7 @@ var (
 		Name:    "shellcheck",
 		Command: "shellcheck",
 		Args:    []string{"--format", "gcc", "<file>"},
-		Matcher: regexp.MustCompile(`^(?<File>.*):(?<Line>\d+):(?<Col>\d+): (?<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?<File>.*):(?<Line>\d+):(?<Col>\d+): (?<Message>.*)$`),
 	}
 
 	// YamlLinter uses the python tool yamllint to lint yaml files
@@ -82,6 +114,6 @@ var (
 		Name:    "yamllint",
 		Command: "yamllint",
 		Args:    []string{"--strict", "--format=parsable", "<file>"},
-		Matcher: regexp.MustCompile(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): \[(?P<Severity>[a-z]+)\] (?P<Message>.*)$`),
+		Matcher: NewRegexMatcher(`^(?P<File>[^:]+):(?P<Line>\d+):(?P<Col>\d+): \[(?P<Severity>[a-z]+)\] (?P<Message>.*)$`),
 	}
 )
