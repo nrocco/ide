@@ -15,6 +15,7 @@ type Config struct {
 	Scheme         string   `json:"scheme"`
 	Host           string   `json:"host"`
 	Path           string   `json:"path"`
+	AccountID      string   `json:"account_id"`
 }
 
 // SessionConfig holds a parsed session file with its consume config and raw session data
@@ -39,41 +40,48 @@ func (c *SessionConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LoadSessionFromFile loads a session config from a .json or .gpg file
+// LoadSessionFromFile loads a session config from a .json file, resolving any op:// URIs via the op CLI
 func LoadSessionFromFile(path string) (*SessionConfig, error) {
-	if _, err := os.Stat(path + ".gpg"); err == nil {
-		return loadSessionFromFileGPG(path + ".gpg")
-	} else if _, err := os.Stat(path); err == nil {
-		return loadSessionFromFileJSON(path)
+	if _, err := os.Stat(path); err != nil {
+		return nil, fmt.Errorf("%s does not exist", path)
 	}
-	return nil, fmt.Errorf("%s does not exist", path)
-}
-
-func loadSessionFromFileGPG(path string) (*SessionConfig, error) {
-	command := exec.Command("gpg", "-q", "--no-tty", "--decrypt", path)
-	command.Stdin = os.Stdin
-	output, err := command.Output()
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var first SessionConfig
+	if err := json.Unmarshal(raw, &first); err != nil {
+		return nil, err
+	}
+	if first.Consume.AccountID == "" {
+		return &first, nil
+	}
+	resolved, err := resolveOPSecrets(raw, first.Consume.AccountID)
 	if err != nil {
 		return nil, err
 	}
 	var data SessionConfig
-	if err := json.Unmarshal(output, &data); err != nil {
+	if err := json.Unmarshal(resolved, &data); err != nil {
 		return nil, err
 	}
 	return &data, nil
 }
 
-func loadSessionFromFileJSON(path string) (*SessionConfig, error) {
-	file, err := os.Open(path)
+// resolveOPSecrets pipes JSON through `op inject` to replace op:// URIs with their 1Password values.
+// If accountID is non-empty, passes --account to target a specific 1Password account.
+// If the JSON contains no op:// references, op inject returns it unchanged.
+func resolveOPSecrets(data []byte, accountID string) ([]byte, error) {
+	args := []string{"inject"}
+	if accountID != "" {
+		args = append(args, "--account", accountID)
+	}
+	cmd := exec.Command("op", args...)
+	cmd.Stdin = strings.NewReader(string(data))
+	out, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("op inject: %w", err)
 	}
-	defer file.Close()
-	var data SessionConfig
-	if err := json.NewDecoder(file).Decode(&data); err != nil {
-		return nil, err
-	}
-	return &data, nil
+	return out, nil
 }
 
 // ListHosts returns all host directories in the base directory
@@ -99,7 +107,7 @@ func ListSessionsForHost(host string) ([]string, error) {
 	}
 	var sessions []string
 	for _, entry := range entries {
-		name := strings.TrimSuffix(strings.TrimSuffix(entry.Name(), ".gpg"), ".json")
+		name := strings.TrimSuffix(entry.Name(), ".json")
 		sessions = append(sessions, name)
 	}
 	return sessions, nil

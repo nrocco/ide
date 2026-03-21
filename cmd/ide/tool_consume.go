@@ -10,7 +10,7 @@ import (
 var consumeCmd = &cobra.Command{
 	Use:   "consume [host] as [session] [httpie args...]",
 	Short: "HTTP client wrapper using httpie sessions",
-	Long:  "HTTP client wrapper that uses httpie session files with optional GPG encryption",
+	Long:  "HTTP client wrapper that uses httpie session files with optional op:// value resolving",
 	Args:  cobra.MinimumNArgs(4),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		switch len(args) {
