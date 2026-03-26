@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -44,9 +45,18 @@ var generateTagsCmd = &cobra.Command{
 			if dryRun {
 				return nil
 			}
+			fmt.Fprintln(os.Stderr, "Updating tags file...")
+		} else {
+			fmt.Fprintln(os.Stderr, "Creating tags file...")
 		}
 
-		return project.CtagsGenerate()
+		if err := project.CtagsGenerate(); err != nil {
+			return err
+		}
+
+		fmt.Fprintln(os.Stderr, "Generated tags file!")
+
+		return nil
 	},
 }
 
