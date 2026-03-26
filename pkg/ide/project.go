@@ -67,6 +67,21 @@ func (project *Project) Location() string {
 	return project.location
 }
 
+// NoTags returns true if tag generation is disabled for this project
+func (project *Project) NoTags() bool {
+	return project.config.Raw.Section("ide").Option("notags") == "true"
+}
+
+// SetNoTags sets whether tag generation is disabled for this project
+func (project *Project) SetNoTags(value bool) error {
+	if value {
+		project.config.Raw.SetOption("ide", "", "notags", "true")
+	} else {
+		project.config.Raw.Section("ide").RemoveOption("notags")
+	}
+	return project.repository.Storer.SetConfig(project.config)
+}
+
 // Destroy removes any trace of ide configuration from .git/config file
 func (project *Project) Destroy() error {
 	for _, hook := range project.HookList() {
