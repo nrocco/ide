@@ -34,8 +34,11 @@ func (m *RegexMatcher) Parse(output []byte, name, file string) []LinterViolation
 			continue
 		}
 		v := LinterViolation{
-			Linter: name,
-			File:   file,
+			Linter:   name,
+			File:     file,
+			Line:     "0",
+			Col:      "0",
+			Severity: "unknown",
 		}
 		for i, subname := range m.re.SubexpNames() {
 			switch subname {
@@ -95,9 +98,9 @@ type Linter struct {
 
 // LinterResult wraps stdout/stderr of a linter to extract violations
 type LinterResult struct {
-	output []byte
-	Name   string
-	File   string
+	output  []byte
+	Name    string
+	File    string
 	Matcher Matcher
 }
 
