@@ -7,11 +7,11 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/n.dirocco/.local/bin/ssh-agent-proxy</string>
+        <string>/Users/nicodirocco/.cache/bin/ssh-agent-proxy</string>
         <string>--dir</string>
-        <string>/Users/n.dirocco/.ssh/agents</string>
+        <string>/Users/nicodirocco/.ssh/agents</string>
         <string>--upstream</string>
-        <string>/Users/n.dirocco/.ssh/agents/1password.sock</string>
+        <string>/Users/nicodirocco/.ssh/agents/1password.sock</string>
     </array>
 
     <key>RunAtLoad</key>

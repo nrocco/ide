@@ -2,7 +2,7 @@
 
 ide provides a tool set that gets out of your way
 
-[![Actions Status](https://github.com/nrocco/ide/actions/workflows/master.yml/badge.svg)](https://github.com/nrocco/ide/actions/workflows/master.yml)
+[![Actions Status](https://github.com/nrocco/ide/actions/workflows/main.yml/badge.svg)](https://github.com/nrocco/ide/actions/workflows/main.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nrocco/ide.svg)](https://pkg.go.dev/github.com/nrocco/ide)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nrocco/ide)](https://goreportcard.com/report/github.com/nrocco/ide)
 
@@ -47,7 +47,7 @@ You can also view the current status of your ide project:
     $ ide status
     Ide
       Name: my-project
-      Branch: master
+      Branch: main
       Location: /Users/nrocco/dev/my-project
       Ctags:
         File: /Users/nrocco/dev/my-project/.git/tags
