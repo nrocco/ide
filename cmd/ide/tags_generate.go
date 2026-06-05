@@ -22,7 +22,6 @@ var generateTagsCmd = &cobra.Command{
 			fdArgs := []string{
 				"--changed-after=" + age.UTC().Format("2006-01-02T15:04:05Z07:00"),
 				"--type=file",
-				"--no-ignore-vcs",
 			}
 			if !dryRun {
 				fdArgs = append(fdArgs, "--quiet")
