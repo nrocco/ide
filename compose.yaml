@@ -12,5 +12,5 @@ services:
       - "go_cache:/root/.cache"
       - "go_pkg:/go/pkg"
 volumes:
-  go_cache:
-  go_pkg:
+  go_cache: {}
+  go_pkg: {}
