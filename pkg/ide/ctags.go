@@ -124,7 +124,12 @@ func (project *Project) CtagsParseCode(walker func(CtagsEntry), files ...string)
 		"--fields=aCeEfFikKlmnNpPrRsStxzZ",
 		"--output-format=json",
 	}
-	args = append(args, files...)
+	for _, f := range files {
+		if strings.HasPrefix(f, "-") {
+			f = "./" + f
+		}
+		args = append(args, f)
+	}
 
 	ctags := exec.Command("ctags", args...)
 

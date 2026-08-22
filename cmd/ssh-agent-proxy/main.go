@@ -130,7 +130,9 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 		return nil, fmt.Errorf("remove stale socket: %w", err)
 	}
 
+	oldUmask := syscall.Umask(0077)
 	l, err := net.Listen("unix", sockPath)
+	syscall.Umask(oldUmask)
 	if err != nil {
 		return nil, fmt.Errorf("listen: %w", err)
 	}
@@ -300,6 +302,9 @@ func main() {
 
 	if err := os.MkdirAll(*dir, 0700); err != nil {
 		log.Fatalf("failed to create socket dir: %v", err)
+	}
+	if err := os.Chmod(*dir, 0700); err != nil {
+		log.Fatalf("failed to set socket dir permissions: %v", err)
 	}
 
 	m := newManager(*upstream, *dir)

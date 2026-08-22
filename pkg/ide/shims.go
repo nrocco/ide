@@ -259,7 +259,8 @@ func (project *Project) containerWorkDir(service string) string {
 		source, _ := filepath.EvalSymlinks(v.Source)
 
 		// Check that the repo path falls within this mount source
-		if _, err := filepath.Rel(source, repoPath); err != nil || !strings.HasPrefix(repoPath, source) {
+		repoRel, err := filepath.Rel(source, repoPath)
+		if err != nil || repoRel == ".." || strings.HasPrefix(repoRel, ".."+string(os.PathSeparator)) {
 			continue
 		}
 
