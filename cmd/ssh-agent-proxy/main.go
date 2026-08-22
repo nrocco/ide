@@ -16,6 +16,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -190,7 +191,7 @@ func (kl *keyListener) handleConn(conn net.Conn, upstreamPath string) {
 		keyBlob:  kl.blob,
 	}
 
-	if err := agent.ServeAgent(fa, conn); err != nil && err != io.EOF {
+	if err := agent.ServeAgent(fa, conn); !errors.Is(err, io.EOF) {
 		log.Printf("serve error: %v", err)
 	}
 }

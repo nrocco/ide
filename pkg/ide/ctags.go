@@ -99,7 +99,7 @@ func (project *Project) CtagsFileSize() uint64 {
 func (project *Project) CtagsGenerate() error {
 	tmpPath := fmt.Sprintf("%s.%d", project.CtagsFile(), os.Getpid())
 
-	cmd := exec.Command("ctags", "-R", "-f", tmpPath, project.location)
+	cmd := exec.Command("ctags", "--tag-relative=always", "--recurse=yes", "-f", tmpPath, project.location)
 	if err := cmd.Run(); err != nil {
 		os.Remove(tmpPath)
 		return err
