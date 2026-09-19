@@ -53,6 +53,11 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
         -X main.commit=${BUILD_COMMIT} \
         -X main.date=${BUILD_DATE} \
         -s -w" ./cmd/ssh-agent-proxy && \
+    xx-go build -trimpath -o /out -ldflags "\
+        -X main.version=${BUILD_VERSION} \
+        -X main.commit=${BUILD_COMMIT} \
+        -X main.date=${BUILD_DATE} \
+        -s -w" ./cmd/vimenc && \
     xx-verify --static /out/*
 
 FROM scratch AS bin

@@ -18,6 +18,9 @@ build-arm64-darwin: dist/$(NAME)-arm64-darwin
 .PHONY: build-amd64-linux
 build-amd64-linux: dist/$(NAME)-amd64-linux
 
+.PHONY: build-amd64-linux
+build-arm64-linux: dist/$(NAME)-arm64-linux
+
 .PHONY: dist/$(NAME)-arm64-darwin
 dist/$(NAME)-arm64-darwin:
 	mkdir -p dist/$(NAME)-arm64-darwin
@@ -40,6 +43,18 @@ dist/$(NAME)-amd64-linux:
 		--target bin \
 		--platform linux/amd64 \
 		--output dist/$(NAME)-amd64-linux \
+		.
+
+.PHONY: dist/$(NAME)-arm64-linux
+dist/$(NAME)-arm64-linux:
+	mkdir -p dist/$(NAME)-arm64-linux
+	docker image build \
+		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
+		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
+		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
+		--target bin \
+		--platform linux/arm64 \
+		--output dist/$(NAME)-arm64-linux \
 		.
 
 .PHONY: coverage
