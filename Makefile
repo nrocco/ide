@@ -10,7 +10,8 @@ help:
 .PHONY: build-all
 build-all: \
 	build-arm64-darwin \
-	build-amd64-linux
+	build-amd64-linux \
+	build-arm64-linux
 
 .PHONY: build-arm64-darwin
 build-arm64-darwin: dist/$(NAME)-arm64-darwin

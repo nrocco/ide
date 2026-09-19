@@ -1,5 +1,3 @@
-// vim-ssl: edit a symmetrically-encrypted file in vim.
-//
 // Encryption: AES-256-GCM (stdlib crypto/aes + crypto/cipher — the same AES
 // implementation OpenSSL uses, no CLI shell-out, no cgo/openssl bindings).
 // GCM is authenticated (AEAD): unlike openssl's plain `enc -aes-256-cbc`,
@@ -14,11 +12,15 @@
 // Memory hardening (see prior discussion of the same concerns in Python):
 //   - passphrase held in a mlock'd byte slice (syscall.Mlock), zeroed after use
 //   - core dumps disabled (RLIMIT_CORE = 0)
-//   - process marked non-dumpable (PR_SET_DUMPABLE=0) — blocks ptrace from
-//     other same-user processes
+//   - process marked non-dumpable — blocks ptrace from other same-user
+//     processes. Linux: PR_SET_DUMPABLE=0. Darwin: PT_DENY_ATTACH. See
+//     hardening_linux.go / hardening_darwin.go.
 //   - passphrase re-prompted after vim exits rather than cached across the
 //     edit session (shrinks in-memory exposure window)
-//   - plaintext tempfile on tmpfs (/dev/shm), shredded on exit incl. signals
+//   - plaintext tempfile shredded on exit incl. signals. Linux: tmpfs
+//     (/dev/shm), so it never touches disk. Darwin has no tmpfs mounted by
+//     default, so we fall back to os.TempDir() (backed by disk/APFS) — a
+//     weaker guarantee than Linux; see tmpdir_darwin.go.
 //
 // Same hard limit as before: none of this stops a root/CAP_SYS_PTRACE
 // attacker. Go's garbage collector is also a real caveat here — see the
@@ -39,7 +41,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
-	"unsafe"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/sys/unix"
@@ -90,10 +91,10 @@ func hardenProcess() error {
 	if err := syscall.Setrlimit(syscall.RLIMIT_CORE, &syscall.Rlimit{Cur: 0, Max: 0}); err != nil {
 		return fmt.Errorf("setrlimit RLIMIT_CORE: %w", err)
 	}
-	// PR_SET_DUMPABLE, arg 0 = not dumpable. Blocks ptrace from other
-	// same-user processes.
-	if err := unix.Prctl(unix.PR_SET_DUMPABLE, 0, 0, 0, 0); err != nil {
-		return fmt.Errorf("prctl PR_SET_DUMPABLE: %w", err)
+	// Platform-specific anti-ptrace hardening (PR_SET_DUMPABLE on Linux,
+	// PT_DENY_ATTACH on Darwin) — see hardening_linux.go / hardening_darwin.go.
+	if err := setNonDumpable(); err != nil {
+		return fmt.Errorf("anti-debug hardening: %w", err)
 	}
 	return nil
 }
@@ -143,44 +144,29 @@ func readPassphraseLocked(prompt string, maxLen int) (*lockedBytes, int, error) 
 }
 
 // ---------- termios raw mode (echo off) via direct ioctl ----------
+//
+// The ioctl request numbers (tcgetsReq/tcsetsReq) differ between Linux and
+// Darwin — see termiosreq_linux.go / termiosreq_darwin.go. The struct layout
+// also differs (Linux's termios has an extra line-discipline byte; Darwin's
+// Cc array is a different length), so we use golang.org/x/sys/unix's
+// platform-correct unix.Termios/IoctlGetTermios/IoctlSetTermios instead of a
+// hand-rolled struct, rather than duplicating the layout ourselves.
 
-type termiosT struct {
-	Iflag, Oflag, Cflag, Lflag uint32
-	Line                       byte
-	Cc                         [32]byte
-	Ispeed, Ospeed             uint32
-}
-
-const (
-	tcgets = 0x5401
-	tcsets = 0x5402
-	echo   = 0x00000008
-	icanon = 0x00000002
-)
-
-func termMakeRaw(fd int) (*termiosT, error) {
-	var t termiosT
-	if err := ioctl(fd, tcgets, unsafe.Pointer(&t)); err != nil {
+func termMakeRaw(fd int) (*unix.Termios, error) {
+	orig, err := unix.IoctlGetTermios(fd, tcgetsReq)
+	if err != nil {
 		return nil, err
 	}
-	orig := t
-	t.Lflag &^= echo | icanon // no echo, read byte-by-byte
-	if err := ioctl(fd, tcsets, unsafe.Pointer(&t)); err != nil {
+	raw := *orig
+	raw.Lflag &^= unix.ECHO | unix.ICANON // no echo, read byte-by-byte
+	if err := unix.IoctlSetTermios(fd, tcsetsReq, &raw); err != nil {
 		return nil, err
 	}
-	return &orig, nil
+	return orig, nil
 }
 
-func termRestore(fd int, state *termiosT) {
-	_ = ioctl(fd, tcsets, unsafe.Pointer(state))
-}
-
-func ioctl(fd int, req uintptr, arg unsafe.Pointer) error {
-	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), req, uintptr(arg))
-	if errno != 0 {
-		return errno
-	}
-	return nil
+func termRestore(fd int, state *unix.Termios) {
+	_ = unix.IoctlSetTermios(fd, tcsetsReq, state)
 }
 
 // ---------- PBKDF2-HMAC-SHA256 (RFC 8018), stdlib-only ----------
@@ -324,7 +310,7 @@ var rootCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, "warning:", err)
 		}
 
-		tmp, err := os.CreateTemp("/dev/shm", "vimssl-")
+		tmp, err := os.CreateTemp(secureTmpDir(), "vimenc-")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "error creating tmpfile:", err)
 			return err
