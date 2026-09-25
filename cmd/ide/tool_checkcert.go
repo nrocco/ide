@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -34,30 +35,51 @@ var checkcertCmd = &cobra.Command{
 			opensslArgs = args[1:]
 		}
 
-		sClient := exec.Command("openssl", "s_client", "-no-interactive", "-servername", host, "-showcerts", host+":"+port)
-		sClient.Stderr = nil
-
-		x509Args := append([]string{"x509", "-in", "/dev/stdin", "-noout"}, opensslArgs...)
-		x509 := exec.Command("openssl", x509Args...)
-		x509.Stdout = os.Stdout
-		x509.Stderr = os.Stderr
-
-		pipe, err := sClient.StdoutPipe()
+		// Tee s_client's stdout and stderr to the terminal and into x509's stdin
+		pr, pw, err := os.Pipe()
 		if err != nil {
 			return err
 		}
-		x509.Stdin = pipe
 
-		if err := sClient.Start(); err != nil {
+		sClient := exec.Command("openssl", "s_client", "-no-interactive", "-servername", host, "-showcerts", host+":"+port)
+		sClient.Stdout = &teeWriter{w: os.Stdout, pipe: pw}
+		sClient.Stderr = &teeWriter{w: os.Stderr, pipe: pw}
+
+		x509Args := append([]string{"x509", "-in", "/dev/stdin"}, opensslArgs...)
+		x509 := exec.Command("openssl", x509Args...)
+		x509.Stdin = pr
+		x509.Stdout = os.Stdout
+		x509.Stderr = os.Stderr
+
+		if err := x509.Start(); err != nil {
+			pr.Close()
+			pw.Close()
 			return err
 		}
-		if err := x509.Start(); err != nil {
+		pr.Close()
+
+		if err := sClient.Start(); err != nil {
+			pw.Close()
+			x509.Wait()
 			return err
 		}
 
 		sClient.Wait()
+		pw.Close()
 		return x509.Wait()
 	},
+}
+
+// teeWriter writes to w and, best effort, to pipe. Errors writing to pipe are
+// ignored so output keeps flowing to w after the reading process has exited.
+type teeWriter struct {
+	w    io.Writer
+	pipe io.Writer
+}
+
+func (t *teeWriter) Write(p []byte) (int, error) {
+	t.pipe.Write(p)
+	return t.w.Write(p)
 }
 
 func init() {
