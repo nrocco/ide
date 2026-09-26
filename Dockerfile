@@ -19,6 +19,7 @@ RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/deadcode@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
 RUN go install golang.org/x/vuln/cmd/govulncheck@latest
+RUN go install golang.org/x/tools/gopls@latest
 RUN go install honnef.co/go/tools/cmd/staticcheck@latest
 WORKDIR /src
 ENV CGO_ENABLED=0
