@@ -4,6 +4,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var tagsToggleCmdOpts struct {
+	On  bool
+	Off bool
+}
+
 var tagsToggleCmd = &cobra.Command{
 	Use:   "toggle",
 	Short: "Toggle the notags option",
@@ -17,14 +22,13 @@ var tagsToggleCmd = &cobra.Command{
 			return project.SetNoTags(!project.NoTags())
 		}
 
-		off, _ := cmd.Flags().GetBool("off")
-		return project.SetNoTags(off)
+		return project.SetNoTags(tagsToggleCmdOpts.On)
 	},
 }
 
 func init() {
-	tagsToggleCmd.Flags().Bool("on", false, "Enable notags")
-	tagsToggleCmd.Flags().Bool("off", false, "Disable notags")
+	tagsToggleCmd.Flags().BoolVar(&tagsToggleCmdOpts.On, "on", false, "Enable notags")
+	tagsToggleCmd.Flags().BoolVar(&tagsToggleCmdOpts.Off, "off", false, "Disable notags")
 	tagsToggleCmd.MarkFlagsMutuallyExclusive("on", "off")
 
 	tagsCmd.AddCommand(tagsToggleCmd)

@@ -8,6 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var parseCmdOpts struct {
+	Debug     bool
+	NoPublic  bool
+	NoPrivate bool
+}
+
 var parseCmd = &cobra.Command{
 	Use:   "parse <path>...",
 	Short: "Parse ctags output for a path",
@@ -16,19 +22,16 @@ var parseCmd = &cobra.Command{
 		return nil, cobra.ShellCompDirectiveDefault
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		debug, _ := cmd.Flags().GetBool("debug")
-		noPublic, _ := cmd.Flags().GetBool("no-public")
-		noPrivate, _ := cmd.Flags().GetBool("no-private")
 		currentFile := ""
 
 		return project.CtagsParseCode(func(entry ide.CtagsEntry) {
-			if noPublic && entry.IsPublic() {
+			if parseCmdOpts.NoPublic && entry.IsPublic() {
 				return
 			}
-			if noPrivate && entry.IsPrivate() {
+			if parseCmdOpts.NoPrivate && entry.IsPrivate() {
 				return
 			}
-			if debug {
+			if parseCmdOpts.Debug {
 				fmt.Printf("%+v\n", entry)
 				return
 			}
@@ -63,9 +66,9 @@ var parseCmd = &cobra.Command{
 }
 
 func init() {
-	parseCmd.Flags().Bool("debug", false, "Output raw JSON instead of formatted output")
-	parseCmd.Flags().Bool("no-public", false, "Exclude public functions")
-	parseCmd.Flags().Bool("no-private", false, "Exclude private functions")
+	parseCmd.Flags().BoolVar(&parseCmdOpts.Debug, "debug", false, "Output raw JSON instead of formatted output")
+	parseCmd.Flags().BoolVar(&parseCmdOpts.NoPublic, "no-public", false, "Exclude public functions")
+	parseCmd.Flags().BoolVar(&parseCmdOpts.NoPrivate, "no-private", false, "Exclude private functions")
 
 	toolCmd.AddCommand(parseCmd)
 }

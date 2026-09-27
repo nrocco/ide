@@ -13,7 +13,7 @@ import (
 // ipcalcMaxSubnets is the maximum number of subnets listed with --split
 const ipcalcMaxSubnets = 64
 
-var ipcalcOpts struct {
+var ipcalcCmdOpts struct {
 	Split    int
 	Contains string
 }
@@ -94,16 +94,16 @@ var ipcalcCmd = &cobra.Command{
 		fmt.Fprintf(out, "Next Network               : %s\n", blue(formatOptional(network.Next())))
 		fmt.Fprintf(out, "Supernet                   : %s\n", blue(formatOptional(network.Supernet())))
 
-		if ipcalcOpts.Contains != "" {
-			other, err := tools.NewIPNetwork(ipcalcOpts.Contains)
+		if ipcalcCmdOpts.Contains != "" {
+			other, err := tools.NewIPNetwork(ipcalcCmdOpts.Contains)
 			if err != nil {
 				return fmt.Errorf("--contains: %w", err)
 			}
-			fmt.Fprintf(out, "Contains                   : %s\n", blue(fmt.Sprintf("%s contained=%t overlaps=%t", ipcalcOpts.Contains, network.Contains(other), network.Overlaps(other))))
+			fmt.Fprintf(out, "Contains                   : %s\n", blue(fmt.Sprintf("%s contained=%t overlaps=%t", ipcalcCmdOpts.Contains, network.Contains(other), network.Overlaps(other))))
 		}
 
 		if cmd.Flags().Changed("split") {
-			subnets, err := network.Subnets(ipcalcOpts.Split)
+			subnets, err := network.Subnets(ipcalcCmdOpts.Split)
 			if err != nil {
 				return fmt.Errorf("--split: %w", err)
 			}
@@ -120,7 +120,7 @@ var ipcalcCmd = &cobra.Command{
 			}
 			count := new(big.Int).Div(network.NumAddresses(), size)
 
-			fmt.Fprintf(out, "Split                      : %s\n", blue(fmt.Sprintf("/%d -> %s subnets, %s addresses each", ipcalcOpts.Split, count, size)))
+			fmt.Fprintf(out, "Split                      : %s\n", blue(fmt.Sprintf("/%d -> %s subnets, %s addresses each", ipcalcCmdOpts.Split, count, size)))
 			for _, line := range lines {
 				fmt.Fprintf(out, "                             %s\n", blue(line))
 			}
@@ -162,8 +162,8 @@ func formatThousands(n *big.Int) string {
 }
 
 func init() {
-	ipcalcCmd.Flags().IntVar(&ipcalcOpts.Split, "split", 0, "split range into subnets of this prefix length")
-	ipcalcCmd.Flags().StringVar(&ipcalcOpts.Contains, "contains", "", "check if address/range is inside and overlaps")
+	ipcalcCmd.Flags().IntVar(&ipcalcCmdOpts.Split, "split", 0, "split range into subnets of this prefix length")
+	ipcalcCmd.Flags().StringVar(&ipcalcCmdOpts.Contains, "contains", "", "check if address/range is inside and overlaps")
 
 	toolCmd.AddCommand(ipcalcCmd)
 }

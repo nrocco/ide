@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var destroyCmdOpts struct {
+	Force bool
+}
+
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "Remove all ide configuration for a repository",
@@ -18,9 +22,7 @@ var destroyCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		destroyForce, _ := cmd.Flags().GetBool("no-private")
-
-		if !destroyForce {
+		if !destroyCmdOpts.Force {
 			fmt.Print("This will remove all ide configuration from the repository. Continue? [y/N] ")
 			reader := bufio.NewReader(os.Stdin)
 			response, err := reader.ReadString('\n')
@@ -44,7 +46,7 @@ var destroyCmd = &cobra.Command{
 }
 
 func init() {
-	destroyCmd.Flags().Bool("force", false, "Actually destroy ide configuration")
+	destroyCmd.Flags().BoolVar(&destroyCmdOpts.Force, "force", false, "Actually destroy ide configuration")
 
 	rootCmd.AddCommand(destroyCmd)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var genpassOpts tools.PasswordOptions
+var genpassCmdOpts tools.PasswordOptions
 
 var genpassCmd = &cobra.Command{
 	Use:   "genpass [length]",
@@ -28,7 +28,7 @@ var genpassCmd = &cobra.Command{
 			}
 		}
 
-		password, err := tools.GeneratePassword(length, genpassOpts)
+		password, err := tools.GeneratePassword(length, genpassCmdOpts)
 		if err != nil {
 			return err
 		}
@@ -39,11 +39,11 @@ var genpassCmd = &cobra.Command{
 }
 
 func init() {
-	genpassCmd.Flags().BoolVar(&genpassOpts.Upper, "upper", true, "include uppercase letters")
-	genpassCmd.Flags().BoolVar(&genpassOpts.Lower, "lower", true, "include lowercase letters")
-	genpassCmd.Flags().BoolVar(&genpassOpts.Numbers, "numbers", true, "include digits")
-	genpassCmd.Flags().BoolVar(&genpassOpts.Punctuation, "punctuation", false, "include punctuation")
-	genpassCmd.Flags().BoolVar(&genpassOpts.Hexdigits, "hexdigits", false, "use only hex digits")
+	genpassCmd.Flags().BoolVar(&genpassCmdOpts.Upper, "upper", true, "include uppercase letters")
+	genpassCmd.Flags().BoolVar(&genpassCmdOpts.Lower, "lower", true, "include lowercase letters")
+	genpassCmd.Flags().BoolVar(&genpassCmdOpts.Numbers, "numbers", true, "include digits")
+	genpassCmd.Flags().BoolVar(&genpassCmdOpts.Punctuation, "punctuation", false, "include punctuation")
+	genpassCmd.Flags().BoolVar(&genpassCmdOpts.Hexdigits, "hexdigits", false, "use only hex digits")
 
 	toolCmd.AddCommand(genpassCmd)
 }

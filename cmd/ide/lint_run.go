@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var runLintCmdOpts struct {
+	Debug bool
+}
+
 var runLintCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Lint source code and report errors",
@@ -23,38 +27,36 @@ var runLintCmd = &cobra.Command{
 				return fmt.Errorf("%s is a directory", path)
 			}
 
-			debug, _ := cmd.Flags().GetBool("debug")
-
 			switch filepath.Ext(path) {
 			case ".go":
 				linters.LintWhitespace(path, true, true, false)
-				linters.GovetLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
-				linters.GolintLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
-				linters.GobuildLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.GovetLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
+				linters.GolintLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
+				linters.GobuildLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".html":
 				linters.LintWhitespace(path, true, true, true)
 			case ".json":
 				linters.LintWhitespace(path, true, true, true)
-				linters.JqLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.JqLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".php":
 				linters.LintWhitespace(path, true, true, true)
-				linters.PhpLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.PhpLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 				// TODO linters.LintPhpstan(path)
 			case ".py":
 				linters.LintWhitespace(path, true, true, true)
-				linters.Flake8Linter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.Flake8Linter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".rb":
 				linters.LintWhitespace(path, true, true, true)
-				linters.CookstyleLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.CookstyleLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".sh":
 				linters.LintWhitespace(path, true, true, true)
-				linters.ShellcheckLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.ShellcheckLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".ts", ".vue", ".js":
 				linters.LintWhitespace(path, true, true, true)
-				linters.EsLintLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.EsLintLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			case ".yaml", ".yml":
 				linters.LintWhitespace(path, true, true, true)
-				linters.YamlLinter.Exec(path, debug).ForEachViolation(linters.PrintViolation)
+				linters.YamlLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			default:
 				linters.LintWhitespace(path, true, true, true)
 			}
@@ -65,7 +67,7 @@ var runLintCmd = &cobra.Command{
 }
 
 func init() {
-	runLintCmd.Flags().Bool("debug", false, "Debug linter output")
+	runLintCmd.Flags().BoolVar(&runLintCmdOpts.Debug, "debug", false, "Debug linter output")
 
 	lintCmd.AddCommand(runLintCmd)
 }

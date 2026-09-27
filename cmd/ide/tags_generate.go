@@ -9,26 +9,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var generateTagsCmdOpts struct {
+	DryRun bool
+}
+
 var generateTagsCmd = &cobra.Command{
 	Use:     "generate",
 	Short:   "Generate tags",
 	Long:    "Generate tags",
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-
 		age := project.CtagsFileAge()
 		if !age.IsZero() {
 			fdArgs := []string{
 				"--changed-after=" + age.UTC().Format("2006-01-02T15:04:05Z07:00"),
 				"--type=file",
 			}
-			if !dryRun {
+			if !generateTagsCmdOpts.DryRun {
 				fdArgs = append(fdArgs, "--quiet")
 			}
 
 			fd := exec.Command("fd", fdArgs...)
-			if dryRun {
+			if generateTagsCmdOpts.DryRun {
 				fd.Stdout = os.Stdout
 			}
 
@@ -41,7 +43,7 @@ var generateTagsCmd = &cobra.Command{
 				return err
 			}
 
-			if dryRun {
+			if generateTagsCmdOpts.DryRun {
 				return nil
 			}
 			fmt.Fprintln(os.Stderr, "Updating tags file...")
@@ -60,7 +62,7 @@ var generateTagsCmd = &cobra.Command{
 }
 
 func init() {
-	generateTagsCmd.Flags().Bool("dry-run", false, "Show files that would trigger regeneration without regenerating")
+	generateTagsCmd.Flags().BoolVar(&generateTagsCmdOpts.DryRun, "dry-run", false, "Show files that would trigger regeneration without regenerating")
 
 	tagsCmd.AddCommand(generateTagsCmd)
 }
