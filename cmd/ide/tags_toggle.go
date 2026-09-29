@@ -18,11 +18,12 @@ var tagsToggleCmd = &cobra.Command{
 	},
 	PreRunE: loadProject,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if !cmd.Flags().Changed("on") && !cmd.Flags().Changed("off") {
-			return project.SetNoTags(!project.NoTags())
+		if cmd.Flags().Changed("on") {
+			return project.SetNoTags(tagsToggleCmdOpts.On)
+		} else if cmd.Flags().Changed("off") {
+			return project.SetNoTags(tagsToggleCmdOpts.Off)
 		}
-
-		return project.SetNoTags(tagsToggleCmdOpts.On)
+		return project.SetNoTags(!project.NoTags())
 	},
 }
 
