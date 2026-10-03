@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/nrocco/ide/pkg/ide/linters"
 	"github.com/spf13/cobra"
@@ -12,6 +13,19 @@ import (
 var runLintCmdOpts struct {
 	Debug bool
 }
+
+var (
+	goFileRe     = regexp.MustCompile(`\.go$`)
+	htmlFileRe   = regexp.MustCompile(`\.html$`)
+	jsonFileRe   = regexp.MustCompile(`\.json$`)
+	makefileRe   = regexp.MustCompile(`^(GNUmakefile|[Mm]akefile|.*\.mk)$`)
+	phpFileRe    = regexp.MustCompile(`\.php$`)
+	pythonFileRe = regexp.MustCompile(`\.py$`)
+	rubyFileRe   = regexp.MustCompile(`\.rb$`)
+	shellFileRe  = regexp.MustCompile(`\.sh$`)
+	scriptFileRe = regexp.MustCompile(`\.(ts|vue|js)$`)
+	yamlFileRe   = regexp.MustCompile(`\.ya?ml$`)
+)
 
 var runLintCmd = &cobra.Command{
 	Use:   "run",
@@ -27,34 +41,38 @@ var runLintCmd = &cobra.Command{
 				return fmt.Errorf("%s is a directory", path)
 			}
 
-			switch filepath.Ext(path) {
-			case ".go":
+			name := filepath.Base(path)
+
+			switch {
+			case goFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, false)
 				linters.GovetLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 				linters.GolintLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 				linters.GobuildLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".html":
+			case htmlFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
-			case ".json":
+			case jsonFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.JqLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".php":
+			case makefileRe.MatchString(name):
+				linters.LintWhitespace(path, true, true, false)
+			case phpFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.PhpLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 				// TODO linters.LintPhpstan(path)
-			case ".py":
+			case pythonFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.Flake8Linter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".rb":
+			case rubyFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.CookstyleLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".sh":
+			case shellFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.ShellcheckLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".ts", ".vue", ".js":
+			case scriptFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.EsLintLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
-			case ".yaml", ".yml":
+			case yamlFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, true)
 				linters.YamlLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			default:
