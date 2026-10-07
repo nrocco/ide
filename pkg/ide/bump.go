@@ -95,6 +95,7 @@ const VersionStrategyAuto = "auto"
 // detection picks the first strategy that applies.
 func (project *Project) VersionStrategies() []VersionStrategy {
 	return []VersionStrategy{
+		project.ChefVersionStrategy(),
 		project.GitVersionStrategy(),
 	}
 }

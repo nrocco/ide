@@ -2,6 +2,8 @@ package ide
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -142,5 +144,66 @@ func TestProjectVersionStrategy(t *testing.T) {
 
 	if _, err := project.VersionStrategy("foo"); err == nil {
 		t.Error("VersionStrategy(\"foo\") expected an error")
+	}
+	if _, err := project.VersionStrategy("chef"); err == nil {
+		t.Error("VersionStrategy(\"chef\") expected an error without metadata.rb")
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, "metadata.rb"), []byte("version '1.0.0'\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	strategy, err := project.VersionStrategy(VersionStrategyAuto)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strategy.Name() != "chef" {
+		t.Errorf("VersionStrategy(auto) = %s, expected chef", strategy.Name())
+	}
+}
+
+func TestChefVersionStrategy(t *testing.T) {
+	dir := t.TempDir()
+	strategy := (&Project{location: dir}).ChefVersionStrategy()
+	file := filepath.Join(dir, "metadata.rb")
+
+	if strategy.Applies() {
+		t.Error("expected chef strategy not to apply without metadata.rb")
+	}
+
+	os.WriteFile(file, []byte("name 'example'\nchef_version '>= 17.0'\n"), 0644)
+	if strategy.Applies() {
+		t.Error("expected chef strategy not to apply when only chef_version is present")
+	}
+
+	metadata := "name 'example'\nchef_version '>= 17.0'\nversion '2.1.11'\nsupports 'ubuntu'\n"
+	os.WriteFile(file, []byte(metadata), 0644)
+	if !strategy.Applies() {
+		t.Fatal("expected chef strategy to apply")
+	}
+
+	current, err := strategy.Current()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if current.String() != "2.1.11" {
+		t.Errorf("expected 2.1.11, got %s", current)
+	}
+
+	if err := strategy.Write(SemVer{Major: 2, Minor: 2}); err != nil {
+		t.Fatal(err)
+	}
+	content, _ := os.ReadFile(file)
+	expected := "name 'example'\nchef_version '>= 17.0'\nversion '2.2.0'\nsupports 'ubuntu'\n"
+	if string(content) != expected {
+		t.Errorf("unexpected metadata.rb content:\n%s", content)
+	}
+
+	os.WriteFile(file, []byte("version \"1.2.3\"\n"), 0644)
+	current, err = strategy.Current()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if current.String() != "1.2.3" {
+		t.Errorf("expected 1.2.3, got %s", current)
 	}
 }
