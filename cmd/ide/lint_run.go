@@ -15,6 +15,7 @@ var runLintCmdOpts struct {
 }
 
 var (
+	alloyFileRe  = regexp.MustCompile(`\.alloy$`)
 	goFileRe     = regexp.MustCompile(`\.go$`)
 	htmlFileRe   = regexp.MustCompile(`\.html$`)
 	jsonFileRe   = regexp.MustCompile(`\.json$`)
@@ -44,6 +45,8 @@ var runLintCmd = &cobra.Command{
 			name := filepath.Base(path)
 
 			switch {
+			case alloyFileRe.MatchString(name):
+				linters.LintWhitespace(path, true, true, false)
 			case goFileRe.MatchString(name):
 				linters.LintWhitespace(path, true, true, false)
 				linters.GovetLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
