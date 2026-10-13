@@ -21,6 +21,7 @@ RUN go install golang.org/x/tools/cmd/goimports@latest
 RUN go install golang.org/x/vuln/cmd/govulncheck@latest
 RUN go install golang.org/x/tools/gopls@latest
 RUN go install honnef.co/go/tools/cmd/staticcheck@latest
+RUN go install github.com/securego/gosec/v2/cmd/gosec@master
 WORKDIR /src
 ENV CGO_ENABLED=0
 
@@ -29,7 +30,7 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod go mod download
 
 FROM govendorer AS gobuilder
-ARG BUILD_VERSION=master
+ARG BUILD_VERSION=main
 ARG BUILD_COMMIT=unknown
 ARG BUILD_DATE=now
 ARG TARGETOS
@@ -41,6 +42,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod staticcheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod govulncheck ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod deadcode ./...
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod gosec ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod go test -v -cover -short ./...
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod \
     mkdir -p /out && \

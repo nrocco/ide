@@ -11,9 +11,11 @@ var (
 	trailingSpace      = regexp.MustCompile(`\s+$`)
 	windowsLineEndings = regexp.MustCompile(`\r\n$`)
 	literalTabs        = regexp.MustCompile(`^\t+`)
+	leadingSpaces      = regexp.MustCompile(`^ +`)
 )
 
-// LintWhitespace checks if a file has trailing whitespace, literal tabs or windows line endings
+// LintWhitespace checks if a file has trailing whitespace, windows line endings or the wrong indentation.
+// If tabs is true lines indented with spaces are reported, otherwise lines indented with tabs are reported.
 func LintWhitespace(path string, spaces bool, clrf bool, tabs bool) error {
 	file, err := os.Open(path)
 	if err != nil {
@@ -33,7 +35,10 @@ func LintWhitespace(path string, spaces bool, clrf bool, tabs bool) error {
 		if clrf && windowsLineEndings.Match(line) {
 			PrintViolation(LinterViolation{Linter: "whitespace", File: path, Line: strconv.Itoa(lineNumber), Col: "0", Severity: "error", Message: "windows line endings detected"})
 		}
-		if tabs && literalTabs.Match(line) {
+		if tabs && leadingSpaces.Match(line) {
+			PrintViolation(LinterViolation{Linter: "whitespace", File: path, Line: strconv.Itoa(lineNumber), Col: "0", Severity: "error", Message: "indentation with spaces detected"})
+		}
+		if !tabs && literalTabs.Match(line) {
 			PrintViolation(LinterViolation{Linter: "whitespace", File: path, Line: strconv.Itoa(lineNumber), Col: "0", Severity: "error", Message: "literal tab characters detected"})
 		}
 		lineNumber++
