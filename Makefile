@@ -1,4 +1,8 @@
 NAME = ide
+DOCKER_IMAGE = registry.gitlab.com/nrocco/$(NAME)
+DOCKER_IMAGE_VERSION = latest
+DOCKER_IMAGE_PLATFORM = darwin/arm64,linux/amd64,linux/arm64
+DOCKER_IMAGE_BUILD_ARGS =
 BUILD_VERSION ?= $(shell git describe --tags --always --dirty)
 BUILD_COMMIT ?= $(shell git rev-parse --short HEAD)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -19,8 +23,8 @@ lint:
 
 .PHONY: build-all
 build-all: \
-	build-arm64-darwin \
 	build-amd64-linux \
+	build-arm64-darwin \
 	build-arm64-linux
 
 .PHONY: build-arm64-darwin
@@ -35,38 +39,17 @@ build-arm64-linux: dist/$(NAME)-arm64-linux
 .PHONY: dist/$(NAME)-arm64-darwin
 dist/$(NAME)-arm64-darwin:
 	mkdir -p dist/$(NAME)-arm64-darwin
-	docker image build \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--target bin \
-		--platform darwin/arm64 \
-		--output dist/$(NAME)-arm64-darwin \
-		.
-
-.PHONY: dist/$(NAME)-amd64-linux
-dist/$(NAME)-amd64-linux:
-	mkdir -p dist/$(NAME)-amd64-linux
-	docker image build \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--target bin \
-		--platform linux/amd64 \
-		--output dist/$(NAME)-amd64-linux \
-		.
+	$(MAKE) image DOCKER_IMAGE_PLATFORM=darwin/arm64 DOCKER_IMAGE_BUILD_ARGS="--target bin --output dist/$(NAME)-arm64-darwin"
 
 .PHONY: dist/$(NAME)-arm64-linux
 dist/$(NAME)-arm64-linux:
 	mkdir -p dist/$(NAME)-arm64-linux
-	docker image build \
-		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
-		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
-		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
-		--target bin \
-		--platform linux/arm64 \
-		--output dist/$(NAME)-arm64-linux \
-		.
+	$(MAKE) image DOCKER_IMAGE_PLATFORM=linux/arm64 DOCKER_IMAGE_BUILD_ARGS="--target bin --output dist/$(NAME)-arm64-linux"
+
+.PHONY: dist/$(NAME)-amd64-linux
+dist/$(NAME)-amd64-linux:
+	mkdir -p dist/$(NAME)-amd64-linux
+	$(MAKE) image DOCKER_IMAGE_PLATFORM=linux/amd64 DOCKER_IMAGE_BUILD_ARGS="--target bin --output dist/$(NAME)-amd64-linux"
 
 .PHONY: coverage
 coverage:
@@ -78,9 +61,19 @@ coverage:
 clear:
 	rm -rf dist coverage
 
-.PHONY: release
-release:
-	tar czf "dist/$(NAME)-arm64-darwin.tar.gz" -C dist/ "$(NAME)-arm64-darwin"
-	tar czf "dist/$(NAME)-amd64-linux.tar.gz" -C dist/ "$(NAME)-amd64-linux"
-	sha256sum dist/*.tar.gz > dist/checksums.txt
-	tools/release-to-github.py nrocco/$(NAME) $(BUILD_VERSION) dist/checksums.txt dist/*.tar.gz
+.PHONY: image
+image:
+	docker buildx build $(DOCKER_IMAGE_BUILD_ARGS) \
+		--platform $(DOCKER_IMAGE_PLATFORM) \
+		--build-arg "BUILD_VERSION=$(BUILD_VERSION)" \
+		--build-arg "BUILD_COMMIT=$(BUILD_COMMIT)" \
+		--build-arg "BUILD_DATE=$(BUILD_DATE)" \
+		--tag "$(DOCKER_IMAGE):$(DOCKER_IMAGE_VERSION)" \
+		.
+
+.PHONY: clear push
+push:
+	$(MAKE) image DOCKER_IMAGE_BUILD_ARGS='--push'
+
+.PHONY: ci
+ci: clear lint coverage
