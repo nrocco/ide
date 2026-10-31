@@ -21,6 +21,12 @@ lint:
 	gosec ./...
 	go test -v -cover -short ./...
 
+.PHONY: coverage
+coverage:
+	mkdir -p coverage
+	go test -v -coverpkg=./... -coverprofile=coverage/coverage.out ./...
+	go tool cover -html=coverage/coverage.out -o coverage/coverage.html
+
 .PHONY: build-all
 build-all: \
 	build-amd64-linux \
@@ -50,12 +56,6 @@ dist/$(NAME)-arm64-linux:
 dist/$(NAME)-amd64-linux:
 	mkdir -p dist/$(NAME)-amd64-linux
 	$(MAKE) image DOCKER_IMAGE_PLATFORM=linux/amd64 DOCKER_IMAGE_BUILD_ARGS="--target bin --output dist/$(NAME)-amd64-linux"
-
-.PHONY: coverage
-coverage:
-	mkdir -p coverage
-	go test -v -coverpkg=./... -coverprofile=coverage/coverage.out ./...
-	go tool cover -html=coverage/coverage.out -o coverage/coverage.html
 
 .PHONY: clear
 clear:

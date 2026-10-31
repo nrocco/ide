@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     command: ["sleep", "infinity"]
     volumes:
-      - ".:/src"
+      - "./:/src/"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "go_cache:/root/.cache"
       - "go_pkg:/go/pkg"
