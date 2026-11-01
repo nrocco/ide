@@ -25,11 +25,11 @@ RUN go install github.com/securego/gosec/v2/cmd/gosec@master
 WORKDIR /src
 ENV CGO_ENABLED=0
 
-FROM godev AS govendorer
+FROM --platform=${BUILDPLATFORM} godev AS govendorer
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod go mod download
 
-FROM govendorer AS gobuilder
+FROM --platform=${BUILDPLATFORM} govendorer AS gobuilder
 ARG BUILD_VERSION=main
 ARG BUILD_COMMIT=unknown
 ARG BUILD_DATE=now
