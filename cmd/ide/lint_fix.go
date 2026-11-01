@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,6 +16,8 @@ var fixLintCmd = &cobra.Command{
 	Long:  "Fix source code",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		var failed []error
+
 		for _, path := range args {
 			fileInfo, err := os.Stat(path)
 			if err != nil {
@@ -23,46 +26,25 @@ var fixLintCmd = &cobra.Command{
 				return fmt.Errorf("%s is a directory", path)
 			}
 
+			errs := []error{fixers.FixWhitespace(path), fixers.FixClrf(path)}
+
 			switch filepath.Ext(path) {
 			case ".go":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-				fixers.FixGofmt(path)
-				fixers.FixGoimports(path)
-			case ".html":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
+				errs = append(errs, fixers.FixGofmt(path), fixers.FixGoimports(path))
 			case ".json":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-				fixers.FixJq(path)
+				errs = append(errs, fixers.FixJq(path))
 			case ".php":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-				fixers.FixPhpcsfixer(path)
-			case ".py":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-			case ".rb":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-			case ".sh":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
+				errs = append(errs, fixers.FixPhpcsfixer(path))
 			case ".ts", ".vue", ".js":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-				fixers.FixEslint(path)
-			case ".yaml", ".yml":
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
-			default:
-				fixers.FixWhitespace(path)
-				fixers.FixClrf(path)
+				errs = append(errs, fixers.FixEslint(path))
+			}
+
+			if err := errors.Join(errs...); err != nil {
+				failed = append(failed, fmt.Errorf("%s: %w", path, err))
 			}
 		}
 
-		return nil
+		return errors.Join(failed...)
 	},
 }
 

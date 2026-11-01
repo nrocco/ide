@@ -10,7 +10,11 @@ import (
 func (project *Project) HookList() []string {
 	hooks := []string{}
 
-	filepath.Walk(filepath.Join(project.location, ".git", "hooks"), func(path string, f os.FileInfo, err error) error {
+	// Errors are ignored on purpose: a missing or unreadable hooks dir means no hooks
+	_ = filepath.Walk(filepath.Join(project.location, ".git", "hooks"), func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
 		if f.Mode()&os.ModeSymlink != 0 {
 			hooks = append(hooks, f.Name())
 		}

@@ -3,8 +3,10 @@ package linters
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 )
@@ -139,7 +141,13 @@ func (l *Linter) Exec(path string, debug bool) *LinterResult {
 		}
 	}
 
-	output, err := exec.Command(l.Command, args...).CombinedOutput() // TODO handle err here
+	output, err := exec.Command(l.Command, args...).CombinedOutput()
+
+	// A non-zero exit means the linter found violations; anything else (e.g. binary not found) is a real failure
+	var exitErr *exec.ExitError
+	if err != nil && !errors.As(err, &exitErr) {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", l.Name, err)
+	}
 
 	if debug {
 		fmt.Printf("command: %s\nargs: %v\nerror: %s\noutput:\n%s\n", l.Command, args, err, output)

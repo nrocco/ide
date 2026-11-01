@@ -30,6 +30,7 @@ func FixJq(path string) error {
 	cmd := exec.Command("jq", "--sort-keys", "--monochrome-output", ".", path)
 	cmd.Stdout = file
 	if err := cmd.Run(); err != nil {
+		_ = os.Remove(path + ".tmp")
 		return err
 	}
 	return os.Rename(path+".tmp", path)
