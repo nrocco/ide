@@ -18,7 +18,9 @@ var testLintCmd = &cobra.Command{
 			return err
 		}
 
-		return linterResult.ForEachViolation(linters.PrintViolation)
+		linterResult.ForEachViolation(linters.PrintViolation)
+
+		return nil
 	},
 }
 

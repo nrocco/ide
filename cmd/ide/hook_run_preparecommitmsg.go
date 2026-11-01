@@ -44,7 +44,7 @@ var runPrepareCommitMsgHookCmd = &cobra.Command{
 			fmt.Fprintln(w, strings.ToUpper(key)+" ")
 		}
 
-		w.Write(commitMsgBytes)
+		_, _ = w.Write(commitMsgBytes)
 
 		return w.Flush()
 	},

@@ -126,7 +126,7 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 	sockPath := filepath.Join(dir, socketName(key))
 
 	// Remove stale socket
-	if err := os.Remove(sockPath); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(sockPath); err != nil && !os.IsNotExist(err) { // #nosec G703 -- path is inside the --dir socket directory, file names are sanitized
 		return nil, fmt.Errorf("remove stale socket: %w", err)
 	}
 
@@ -136,17 +136,17 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 	if err != nil {
 		return nil, fmt.Errorf("listen: %w", err)
 	}
-	if err := os.Chmod(sockPath, 0600); err != nil {
-		l.Close()
+	if err := os.Chmod(sockPath, 0600); err != nil { // #nosec G703 -- path is inside the --dir socket directory, file names are sanitized
+		_ = l.Close()
 		return nil, fmt.Errorf("chmod: %w", err)
 	}
 
 	// Symlink by comment for convenience, e.g. my-github-key.sock
 	if key.Comment != "" {
 		linkPath := filepath.Join(dir, sanitizeComment(key.Comment)+".sock")
-		_ = os.Remove(linkPath)
+		_ = os.Remove(linkPath) // #nosec G703 -- path is inside the --dir socket directory, file names are sanitized
 		if err := os.Symlink(sockPath, linkPath); err != nil {
-			log.Printf("warning: could not create symlink %q: %v", linkPath, err)
+			log.Printf("warning: could not create symlink %q: %v", linkPath, err) // #nosec G706 -- agent-supplied values are quoted with %q
 		}
 	}
 
@@ -159,7 +159,7 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 
 	go kl.serve(upstreamPath)
 
-	log.Printf("listening: %s  (%s  %q)", sockPath, keyFingerprint(key), key.Comment)
+	log.Printf("listening: %s  (%s  %q)", sockPath, keyFingerprint(key), key.Comment) // #nosec G706 -- agent-supplied values are quoted with %q
 
 	return kl, nil
 }
@@ -181,7 +181,7 @@ func (kl *keyListener) serve(upstreamPath string) {
 func (kl *keyListener) handleConn(conn net.Conn, upstreamPath string) {
 	defer conn.Close()
 
-	upstreamConn, err := net.Dial("unix", upstreamPath)
+	upstreamConn, err := net.Dial("unix", upstreamPath) // #nosec G704 -- upstream is a local unix socket from --upstream/$SSH_AUTH_SOCK
 	if err != nil {
 		log.Printf("failed to connect to upstream: %v", err)
 		return
@@ -199,10 +199,10 @@ func (kl *keyListener) handleConn(conn net.Conn, upstreamPath string) {
 }
 
 func (kl *keyListener) close(dir string) {
-	kl.listener.Close()
-	os.Remove(kl.sockPath)
+	_ = kl.listener.Close()
+	_ = os.Remove(kl.sockPath)
 	if kl.key.Comment != "" {
-		os.Remove(filepath.Join(dir, sanitizeComment(kl.key.Comment)+".sock"))
+		_ = os.Remove(filepath.Join(dir, sanitizeComment(kl.key.Comment)+".sock")) // #nosec G703 -- path is inside the --dir socket directory, file names are sanitized
 	}
 }
 
@@ -224,7 +224,7 @@ func newManager(upstreamPath, dir string) *manager {
 }
 
 func (m *manager) sync() error {
-	conn, err := net.Dial("unix", m.upstreamPath)
+	conn, err := net.Dial("unix", m.upstreamPath) // #nosec G704 -- upstream is a local unix socket from --upstream/$SSH_AUTH_SOCK
 	if err != nil {
 		return fmt.Errorf("dial upstream: %w", err)
 	}
@@ -303,7 +303,7 @@ func main() {
 	if err := os.MkdirAll(*dir, 0700); err != nil {
 		log.Fatalf("failed to create socket dir: %v", err)
 	}
-	if err := os.Chmod(*dir, 0700); err != nil {
+	if err := os.Chmod(*dir, 0700); err != nil { // #nosec G302 -- directory needs the execute bit, 0700 is owner-only
 		log.Fatalf("failed to set socket dir permissions: %v", err)
 	}
 

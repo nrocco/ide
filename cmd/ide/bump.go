@@ -58,7 +58,7 @@ func init() {
 	bumpCmd.Flags().StringVar(&bumpCmdOpts.Strategy, "strategy", ide.VersionStrategyAuto, "strategy used to read and write the version, auto detects the strategy")
 	bumpCmd.Flags().BoolVar(&bumpCmdOpts.Force, "force", false, "actually write the new version instead of only showing it")
 
-	bumpCmd.RegisterFlagCompletionFunc("strategy", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = bumpCmd.RegisterFlagCompletionFunc("strategy", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		names := []string{ide.VersionStrategyAuto}
 		if err := loadProject(cmd, args); err == nil {
 			for _, strategy := range project.VersionStrategies() {

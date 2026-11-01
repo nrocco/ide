@@ -89,7 +89,7 @@ var compareCmd = &cobra.Command{
 
 		options := append([]string{"-d"}, files...)
 
-		command := exec.Command("nvim", options...)
+		command := exec.Command("nvim", options...) // #nosec G204 -- fixed binary, arguments are passed without a shell
 		command.Stdin = os.Stdin
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr

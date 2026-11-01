@@ -7,7 +7,7 @@ import (
 
 // DirEnvAddLayoutIde updates your local .envrc and adds .git/bin to the $PATH
 func (project *Project) DirEnvAddLayoutIde() error {
-	file, err := os.OpenFile(".envrc", os.O_RDWR|os.O_CREATE, 0o644)
+	file, err := os.OpenFile(".envrc", os.O_RDWR|os.O_CREATE, 0o644) // #nosec G302 -- .envrc is a regular project file, 0644 is the norm
 	if err != nil {
 		return err
 	}

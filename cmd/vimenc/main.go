@@ -181,14 +181,14 @@ func pbkdf2SHA256(password, salt []byte, iterations, keyLen int) []byte {
 	for i := 1; i <= numBlocks; i++ {
 		binary.BigEndian.PutUint32(block, uint32(i))
 		h := prf()
-		h.Write(salt)
-		h.Write(block)
+		_, _ = h.Write(salt)
+		_, _ = h.Write(block)
 		u := h.Sum(nil)
 		t := make([]byte, len(u))
 		copy(t, u)
 		for j := 1; j < iterations; j++ {
 			h := prf()
-			h.Write(u)
+			_, _ = h.Write(u)
 			u = h.Sum(nil)
 			for k := range t {
 				t[k] ^= u[k]
@@ -208,7 +208,7 @@ type hmacIface interface {
 
 // File format: base64([salt(16)][nonce(12)][ciphertext+GCM tag])
 func encryptFile(inPath, outPath string, passphrase []byte) error {
-	plaintext, err := os.ReadFile(inPath)
+	plaintext, err := os.ReadFile(inPath) // #nosec G304 -- path is supplied by the user on the command line
 	if err != nil {
 		return err
 	}
@@ -242,11 +242,11 @@ func encryptFile(inPath, outPath string, passphrase []byte) error {
 	base64.StdEncoding.Encode(encoded, blob)
 	encoded = append(encoded, '\n')
 
-	return os.WriteFile(outPath, encoded, 0600)
+	return os.WriteFile(outPath, encoded, 0600) // #nosec G703 -- output is the user-chosen target or our own tempfile
 }
 
 func decryptFile(inPath, outPath string, passphrase []byte) error {
-	encoded, err := os.ReadFile(inPath)
+	encoded, err := os.ReadFile(inPath) // #nosec G304 -- path is supplied by the user on the command line
 	if err != nil {
 		return err
 	}
@@ -293,7 +293,7 @@ func shred(path string) {
 	if _, err := os.Stat(path); err != nil {
 		return
 	}
-	if err := exec.Command("shred", "-u", path).Run(); err != nil {
+	if err := exec.Command("shred", "-u", path).Run(); err != nil { // #nosec G204 -- fixed binary, arguments are passed without a shell
 		_ = os.Remove(path)
 	}
 }
@@ -316,7 +316,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 		tmpPath := tmp.Name()
-		tmp.Close()
+		_ = tmp.Close()
 
 		sigCh := make(chan os.Signal, 1)
 		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
@@ -342,7 +342,7 @@ var rootCmd = &cobra.Command{
 			// passphrase wiped here — not held during the vim edit session
 		}
 
-		vimCmd := exec.Command("vim", tmpPath)
+		vimCmd := exec.Command("vim", tmpPath) // #nosec G204 -- fixed binary, arguments are passed without a shell
 		vimCmd.Stdin, vimCmd.Stdout, vimCmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 		if err := vimCmd.Run(); err != nil {
 			fmt.Fprintln(os.Stderr, "vim exited with error:", err)

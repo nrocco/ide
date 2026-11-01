@@ -12,7 +12,7 @@ import (
 func getIgnoredDirs(path string) []string {
 	items := []string{}
 
-	output, err := exec.Command("git", "-C", path, "ls-files", "--exclude-standard", "--ignored", "--others", "--directory").Output()
+	output, err := exec.Command("git", "-C", path, "ls-files", "--exclude-standard", "--ignored", "--others", "--directory").Output() // #nosec G204 -- fixed binary, arguments are passed without a shell
 	if err != nil {
 		return items
 	}

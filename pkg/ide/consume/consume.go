@@ -45,7 +45,7 @@ func LoadSessionFromFile(path string) (*SessionConfig, error) {
 	if _, err := os.Stat(path); err != nil {
 		return nil, fmt.Errorf("%s does not exist", path)
 	}
-	raw, err := os.ReadFile(path)
+	raw, err := os.ReadFile(path) // #nosec G304 -- path is supplied by the user on the command line
 	if err != nil {
 		return nil, err
 	}
@@ -135,10 +135,10 @@ func Run(host, sessionName string, httpieArgs []string) error {
 	defer os.Remove(tmpFile.Name())
 
 	if err := json.NewEncoder(tmpFile).Encode(config.Session); err != nil {
-		tmpFile.Close()
+		_ = tmpFile.Close()
 		return err
 	}
-	tmpFile.Close()
+	_ = tmpFile.Close()
 
 	httpie := os.Getenv("CONSUME_HTTPIE")
 	if httpie == "" {
@@ -161,7 +161,7 @@ func Run(host, sessionName string, httpieArgs []string) error {
 		}
 	}
 
-	command := exec.Command(httpie, execArgs...)
+	command := exec.Command(httpie, execArgs...) // #nosec G204 G702 -- binary and arguments come from the user (CONSUME_HTTPIE, CLI args, session file)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr

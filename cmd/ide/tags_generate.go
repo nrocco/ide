@@ -29,7 +29,7 @@ var generateTagsCmd = &cobra.Command{
 				fdArgs = append(fdArgs, "--quiet")
 			}
 
-			fd := exec.Command("fd", fdArgs...)
+			fd := exec.Command("fd", fdArgs...) // #nosec G204 -- fixed binary, arguments are passed without a shell
 			if generateTagsCmdOpts.DryRun {
 				fd.Stdout = os.Stdout
 			}

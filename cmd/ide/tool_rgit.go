@@ -74,7 +74,7 @@ var rgitCmd = &cobra.Command{
 				return nil
 			}
 			// fmt.Println(options)
-			cmd := exec.Command("git", options...)
+			cmd := exec.Command("git", options...) // #nosec G204 -- fixed binary, arguments are passed without a shell
 			cmd.Dir = repo
 			cmd.Stdin = os.Stdin
 			cmd.Stdout = os.Stdout

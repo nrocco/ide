@@ -43,7 +43,7 @@ var parseCmd = &cobra.Command{
 				color.Magenta(entry.Path)
 				fmt.Printf("\n")
 			}
-			color.New(color.FgHiBlack).Printf("%5d  ", entry.Line)
+			fmt.Print(color.HiBlackString("%5d  ", entry.Line))
 			if entry.Language == "python" && entry.Kind == "member" {
 				fmt.Printf("%s.", entry.Scope)
 			}
@@ -51,14 +51,14 @@ var parseCmd = &cobra.Command{
 				fmt.Printf("(%s) ", entry.Scope)
 			}
 			if entry.IsPublic() {
-				color.New(color.FgHiBlue).Printf("%s", entry.Name)
+				fmt.Print(color.HiBlueString("%s", entry.Name))
 			} else {
-				color.New(color.FgHiRed).Printf("%s", entry.Name)
+				fmt.Print(color.HiRedString("%s", entry.Name))
 			}
-			color.New(color.FgHiGreen).Printf("%s", entry.Signature)
+			fmt.Print(color.HiGreenString("%s", entry.Signature))
 			if entry.Typeref != "" {
-				color.New(color.FgHiBlack).Printf(": ")
-				color.New(color.FgHiBlue).Printf("%s", entry.Typeref)
+				fmt.Print(color.HiBlackString(": "))
+				fmt.Print(color.HiBlueString("%s", entry.Typeref))
 			}
 			fmt.Printf("\n")
 		}, args...)

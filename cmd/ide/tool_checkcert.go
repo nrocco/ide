@@ -41,31 +41,31 @@ var checkcertCmd = &cobra.Command{
 			return err
 		}
 
-		sClient := exec.Command("openssl", "s_client", "-no-interactive", "-servername", host, "-showcerts", host+":"+port)
+		sClient := exec.Command("openssl", "s_client", "-no-interactive", "-servername", host, "-showcerts", host+":"+port) // #nosec G204 -- fixed binary, arguments are passed without a shell
 		sClient.Stdout = &teeWriter{w: os.Stdout, pipe: pw}
 		sClient.Stderr = &teeWriter{w: os.Stderr, pipe: pw}
 
 		x509Args := append([]string{"x509", "-in", "/dev/stdin"}, opensslArgs...)
-		x509 := exec.Command("openssl", x509Args...)
+		x509 := exec.Command("openssl", x509Args...) // #nosec G204 -- fixed binary, arguments are passed without a shell
 		x509.Stdin = pr
 		x509.Stdout = os.Stdout
 		x509.Stderr = os.Stderr
 
 		if err := x509.Start(); err != nil {
-			pr.Close()
-			pw.Close()
+			_ = pr.Close()
+			_ = pw.Close()
 			return err
 		}
-		pr.Close()
+		_ = pr.Close()
 
 		if err := sClient.Start(); err != nil {
-			pw.Close()
-			x509.Wait()
+			_ = pw.Close()
+			_ = x509.Wait()
 			return err
 		}
 
-		sClient.Wait()
-		pw.Close()
+		_ = sClient.Wait()
+		_ = pw.Close()
 		return x509.Wait()
 	},
 }
@@ -78,7 +78,7 @@ type teeWriter struct {
 }
 
 func (t *teeWriter) Write(p []byte) (int, error) {
-	t.pipe.Write(p)
+	_, _ = t.pipe.Write(p)
 	return t.w.Write(p)
 }
 

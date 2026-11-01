@@ -159,7 +159,7 @@ func (project *Project) runPlainShim(command string, args []string) error {
 
 	parts = append(parts, args[1:]...)
 
-	runner := exec.Command(parts[0], parts[1:]...)
+	runner := exec.Command(parts[0], parts[1:]...) // #nosec G204 -- running the shim command from the user's local git config is the purpose of shims
 	runner.Stdin = os.Stdin
 	runner.Stdout = os.Stdout
 	runner.Stderr = os.Stderr
@@ -187,7 +187,7 @@ func (project *Project) runComposeShim(command string, args []string) error {
 		return err
 	}
 
-	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output()
+	runningContainers, _ := exec.Command("docker", "compose", "ps", "--quiet", "--filter", "status=running", service).Output() // #nosec G204 -- fixed binary, arguments are passed without a shell
 
 	runArgs := []string{"docker", "compose"}
 	if len(runningContainers) == 0 {

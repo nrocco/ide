@@ -67,7 +67,9 @@ var runLintCmd = &cobra.Command{
 				linters.YamlLinter.Exec(path, runLintCmdOpts.Debug).ForEachViolation(linters.PrintViolation)
 			}
 
-			linters.LintWhitespace(path, true, true, tabs)
+			if err := linters.LintWhitespace(path, true, true, tabs); err != nil {
+				return err
+			}
 		}
 
 		return nil

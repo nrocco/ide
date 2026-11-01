@@ -17,7 +17,7 @@ var (
 // LintWhitespace checks if a file has trailing whitespace, windows line endings or the wrong indentation.
 // If tabs is true lines indented with spaces are reported, otherwise lines indented with tabs are reported.
 func LintWhitespace(path string, spaces bool, clrf bool, tabs bool) error {
-	file, err := os.Open(path)
+	file, err := os.Open(path) // #nosec G304 -- path is supplied by the user on the command line
 	if err != nil {
 		return err
 	}

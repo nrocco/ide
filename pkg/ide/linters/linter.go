@@ -117,11 +117,10 @@ type LinterViolation struct {
 }
 
 // ForEachViolation parses the linters stdout/stderr and loops through every violation found
-func (r *LinterResult) ForEachViolation(walker func(LinterViolation)) error {
+func (r *LinterResult) ForEachViolation(walker func(LinterViolation)) {
 	for _, v := range r.Matcher.Parse(r.output, r.Name, r.File) {
 		walker(v)
 	}
-	return nil
 }
 
 // PrintViolation is a walker function to print the violation to stdout
@@ -141,7 +140,7 @@ func (l *Linter) Exec(path string, debug bool) *LinterResult {
 		}
 	}
 
-	output, err := exec.Command(l.Command, args...).CombinedOutput()
+	output, err := exec.Command(l.Command, args...).CombinedOutput() // #nosec G204 -- command comes from the built-in linter definitions
 
 	// A non-zero exit means the linter found violations; anything else (e.g. binary not found) is a real failure
 	var exitErr *exec.ExitError
