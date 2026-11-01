@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nrocco/ide/pkg/ide/fixers"
 	"github.com/spf13/cobra"
@@ -24,6 +25,11 @@ var fixLintCmd = &cobra.Command{
 				return err
 			} else if fileInfo.IsDir() {
 				return fmt.Errorf("%s is a directory", path)
+			}
+
+			// Prevent a file name starting with "-" from being parsed as a flag by the fixer tools
+			if strings.HasPrefix(path, "-") {
+				path = "./" + path
 			}
 
 			errs := []error{fixers.FixWhitespace(path), fixers.FixClrf(path)}

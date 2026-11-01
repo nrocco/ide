@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/binary"
 	"fmt"
 	"iter"
 	"math/big"
@@ -393,7 +394,8 @@ func parsePrefixLen(text string, addr netip.Addr) (int, error) {
 
 	if addr.Is4() {
 		if mask, err := netip.ParseAddr(text); err == nil && mask.Is4() {
-			m := uint32(addrToInt(mask).Uint64())
+			a := mask.As4()
+			m := binary.BigEndian.Uint32(a[:])
 			if ones := bits.LeadingZeros32(^m); m == ^uint32(0)<<(32-ones) {
 				return ones, nil
 			}

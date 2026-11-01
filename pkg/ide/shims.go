@@ -42,7 +42,7 @@ func (project *Project) ShimRefresh() error {
 	}
 
 	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {
-		if err := os.Mkdir(".git/bin", 0o755); err != nil {
+		if err := os.Mkdir(".git/bin", 0o750); err != nil {
 			return err
 		}
 	}
@@ -79,7 +79,7 @@ func (project *Project) ShimAdd(shim string, command string) error {
 	}
 
 	if _, err := os.Stat(".git/bin"); os.IsNotExist(err) {
-		if err := os.Mkdir(".git/bin", 0o755); err != nil {
+		if err := os.Mkdir(".git/bin", 0o750); err != nil {
 			return err
 		}
 	}

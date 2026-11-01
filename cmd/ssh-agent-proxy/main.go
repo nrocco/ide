@@ -146,7 +146,7 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 		linkPath := filepath.Join(dir, sanitizeComment(key.Comment)+".sock")
 		_ = os.Remove(linkPath)
 		if err := os.Symlink(sockPath, linkPath); err != nil {
-			log.Printf("warning: could not create symlink %s: %v", linkPath, err)
+			log.Printf("warning: could not create symlink %q: %v", linkPath, err)
 		}
 	}
 
@@ -159,7 +159,7 @@ func startListener(key agent.Key, dir string, upstreamPath string) (*keyListener
 
 	go kl.serve(upstreamPath)
 
-	log.Printf("listening: %s  (%s  %s)", sockPath, keyFingerprint(key), key.Comment)
+	log.Printf("listening: %s  (%s  %q)", sockPath, keyFingerprint(key), key.Comment)
 
 	return kl, nil
 }

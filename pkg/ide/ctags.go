@@ -92,7 +92,12 @@ func (project *Project) CtagsFileSize() uint64 {
 		return 0
 	}
 
-	return uint64(stat.Size())
+	size := stat.Size()
+	if size < 0 {
+		return 0
+	}
+
+	return uint64(size)
 }
 
 // CtagsGenerate generates a ctags file at .git/tags using a temp file for atomicity
